@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37012.4 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessAccountantService", "BusinessAccountantService\BusinessAccountantService.csproj", "{835D3F8C-9A92-4934-A6AE-49F9AAB57D3B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{835D3F8C-9A92-4934-A6AE-49F9AAB57D3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{835D3F8C-9A92-4934-A6AE-49F9AAB57D3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{835D3F8C-9A92-4934-A6AE-49F9AAB57D3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{835D3F8C-9A92-4934-A6AE-49F9AAB57D3B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D1A84F6-E3E1-44C9-906B-47888DE9316E}
+	EndGlobalSection
+EndGlobal
