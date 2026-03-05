@@ -31,5 +31,18 @@ namespace BusinessAccountantService
             // Привязываем список к таблице в XAML (которую мы назвали RepairsGrid)
             RepairsGrid.ItemsSource = repairs;
         }
+
+        private void AddClient_Click(object sender, RoutedEventArgs e)
+        {
+            AddClientWindow addWindow = new AddClientWindow();
+            addWindow.Owner = this; // Чтобы окно открывалось поверх главного
+
+            if (addWindow.ShowDialog() == true)
+            {
+                // Сюда мы вернемся после нажатия "Сохранить"
+                MessageBox.Show("Клиент будет сохранен в базу!");
+            }
+        }
+
     }
 }
