@@ -22,7 +22,7 @@
             <Button Content="Велосипеды" Height="40" Margin="10,5" Background="#34495E" Foreground="White" BorderThickness="0"/>
             <Button Content="Заказы в работе" Height="40" Margin="10,5" Background="#34495E" Foreground="White" BorderThickness="0"/>
             <Separator Margin="10" Background="#7F8C8D"/>
-            <Button Content="Создать PDF отчет" Height="40" Margin="10,5" Background="#27AE60" Foreground="White" BorderThickness="0"/>
+            <Button Content="Создать PDF отчет" Height="40" Margin="10,5" Background="#27AE60" Foreground="White" BorderThickness="0" Click="GenerateReport_Click"/>
         </StackPanel>
 
         <!-- Основная область -->
