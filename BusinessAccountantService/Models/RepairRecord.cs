@@ -9,9 +9,12 @@ namespace BusinessAccountantService.Models
     public class RepairRecord
     {
         public int Id { get; set; }
-        public string ClientName { get; set; }
-        public string BikeModel { get; set; }
-        public string Status { get; set; }
-        public double Cost { get; set; }
+        public int ClientId { get; set; }
+        public string BikeInfo { get; set; }
+        public string ProblemDescription { get; set; }
+        public string WorksPerformed { get; set; }
+        public double TotalCost { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

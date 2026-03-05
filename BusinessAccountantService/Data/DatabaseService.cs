@@ -24,6 +24,18 @@ namespace BusinessAccountantService.Data
                         FullName TEXT NOT NULL,
                         Phone TEXT
                     );";
+                command.CommandText = @"
+                    CREATE TABLE IF NOT EXISTS Repairs (
+                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ClientId INTEGER,
+                        BikeInfo TEXT,
+                        ProblemDescription TEXT,
+                        WorksPerformed TEXT,
+                        TotalCost REAL,
+                        IsCompleted INTEGER DEFAULT 0,
+                        DateCreated DATETIME,
+                        FOREIGN KEY (ClientId) REFERENCES Clients(Id)
+                    );";
                 command.ExecuteNonQuery();
             }
         }

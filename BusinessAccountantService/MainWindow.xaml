@@ -42,7 +42,8 @@
             </StackPanel>
 
             <!-- Таблица данных -->
-            <DataGrid x:Name="ClientsGrid" Grid.Row="1" 
+            <DataGrid x:Name="ClientsGrid" Grid.Row="1"
+                      SelectionChanged="ClientsGrid_SelectionChanged"
                       AutoGenerateColumns="False" CanUserAddRows="False"
                       Background="White" BorderBrush="#DDDDDD" RowHeight="30">
                 <DataGrid.Columns>

@@ -80,7 +80,6 @@ namespace BusinessAccountantService
 
         private void ExportToPdf(Client client)
         {
-            // 1. Спрашиваем пользователя, куда сохранить файл
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "PDF files (*.pdf)|*.pdf",
@@ -89,7 +88,6 @@ namespace BusinessAccountantService
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                // 2. Генерируем документ
                 Document.Create(container =>
                 {
                     container.Page(page =>
@@ -104,7 +102,6 @@ namespace BusinessAccountantService
                             col.Item().PaddingTop(10).LineHorizontal(1);
                             col.Item().PaddingTop(10).Text("Список выполненных работ:").FontSize(12).Italic();
 
-                            // Тут можно добавить таблицу с работами из БД
                         });
 
                         page.Footer().AlignCenter().Text(x =>
@@ -114,10 +111,51 @@ namespace BusinessAccountantService
                         });
                     });
                 })
-                .GeneratePdf(saveFileDialog.FileName); // Сохраняем
+                .GeneratePdf(saveFileDialog.FileName);
 
                 MessageBox.Show("PDF отчет успешно создан!");
             }
         }
+
+        private List<RepairRecord> GetRepairsByClient(int clientId)
+        {
+            var list = new List<RepairRecord>();
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT * FROM Repairs WHERE ClientId = $id ORDER BY DateCreated DESC";
+                command.Parameters.AddWithValue("$id", clientId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new RepairRecord
+                        {
+                            Id = reader.GetInt32(0),
+                            BikeInfo = reader.GetString(2),
+                            ProblemDescription = reader.GetString(3),
+                            WorksPerformed = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                            TotalCost = reader.GetDouble(5),
+                            IsCompleted = reader.GetInt32(6) == 1
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ClientsGrid.SelectedItem is Client selectedClient)
+            {
+                var repairs = GetRepairsByClient(selectedClient.Id);
+
+               // RepairsGrid.ItemsSource = repairs;
+            }
+        }
+
+
     }
 }
