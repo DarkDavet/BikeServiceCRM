@@ -3,6 +3,7 @@ using BusinessAccountantService.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 using QuestPDF.Fluent;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,15 +40,51 @@ namespace BusinessAccountantService
             }
         }
 
-        private void GenerateReport_Click(object sender, RoutedEventArgs e)
+        private void EntryAct_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Проверяем, выбран ли клиент
+            var selectedClient = ClientsGrid.SelectedItem as Client;
+            // 2. Проверяем, выбран ли конкретный ремонт в нижней таблице
+            var selectedRepair = RepairsHistoryGrid.SelectedItem as RepairRecord;
+
+            if (selectedClient != null && selectedRepair != null)
+            {
+                ExportEntryAct(selectedClient, selectedRepair);
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите клиента И конкретную запись в истории ремонтов!");
+            }
+        }
+
+        private void FinalAct_Click(object sender, RoutedEventArgs e)
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
             {
-                ExportToPdf(selectedClient);
+                //ExportToPdf(selectedClient);
             }
             else
             {
                 MessageBox.Show("Сначала выберите клиента в списке!");
+            }
+        }
+
+        private void AddRepair_Click(object sender, RoutedEventArgs e)
+        {
+            if (ClientsGrid.SelectedItem is Client selectedClient)
+            {
+                AddRepairWindow repairWin = new AddRepairWindow(selectedClient.Id);
+                repairWin.Owner = this;
+
+                if (repairWin.ShowDialog() == true)
+                {
+                    RepairsHistoryGrid.ItemsSource = GetRepairsByClient(selectedClient.Id);
+                    MessageBox.Show("Заказ успешно добавлен в базу!");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Сначала выберите клиента из списка выше!");
             }
         }
 
@@ -78,12 +115,12 @@ namespace BusinessAccountantService
 
         }
 
-        private void ExportToPdf(Client client)
+        private void ExportEntryAct(Client client, RepairRecord repair)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 Filter = "PDF files (*.pdf)|*.pdf",
-                FileName = $"Report_{client.Name}.pdf"
+                FileName = $"Priemka_{client.Name}_{DateTime.Now:ddMMyy}.pdf"
             };
 
             if (saveFileDialog.ShowDialog() == true)
@@ -93,27 +130,45 @@ namespace BusinessAccountantService
                     container.Page(page =>
                     {
                         page.Margin(50);
-                        page.Header().Text("ОТЧЕТ ВЕЛОМАСТЕРСКОЙ").FontSize(20).SemiBold().FontColor(Colors.Blue.A);
+
+                        page.Header().Row(row => {
+                            row.RelativeItem().Column(col => {
+                                col.Item().Text("АКТ ПРИЕМКИ ВЕЛОСИПЕДА").FontSize(20).SemiBold().FontColor(Colors.Blue.A);
+                                col.Item().Text($"Номер заказа: #00{repair.Id}").FontSize(10);
+                            });
+                            row.RelativeItem().AlignRight().Text(DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
+                        });
 
                         page.Content().PaddingVertical(20).Column(col =>
                         {
-                            col.Item().Text($"Клиент: {client.Name}").FontSize(14);
-                            col.Item().Text($"Телефон: {client.Phone}").FontSize(14);
-                            col.Item().PaddingTop(10).LineHorizontal(1);
-                            col.Item().PaddingTop(10).Text("Список выполненных работ:").FontSize(12).Italic();
+                            col.Item().PaddingBottom(5).Text("ДАННЫЕ КЛИЕНТА").Bold();
+                            col.Item().Text($"ФИО: {client.Name}");
+                            col.Item().Text($"Телефон: {client.Phone}");
 
+                            col.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Gray.R);
+
+                            col.Item().PaddingBottom(5).Text("ОБЪЕКТ ПРИЕМКИ").Bold();
+                            col.Item().Text($"Велосипед: {repair.BikeInfo}");
+
+                            col.Item().PaddingTop(15).Text("ОПИСАНИЕ НЕИСПРАВНОСТИ:").Bold();
+                            col.Item().Border(0.5f).Padding(10).Background(Colors.Gray.R)
+                                .Text(repair.ProblemDescription).Italic();
+
+                            col.Item().PaddingTop(40).Row(row => {
+                                row.RelativeItem().Text("Принял: __________");
+                                row.RelativeItem().AlignRight().Text("Сдал: __________");
+                            });
                         });
 
-                        page.Footer().AlignCenter().Text(x =>
-                        {
-                            x.Span("Дата формирования: ");
+                        page.Footer().AlignCenter().Text(x => {
+                            x.Span("Стр. ");
                             x.CurrentPageNumber();
                         });
                     });
                 })
                 .GeneratePdf(saveFileDialog.FileName);
 
-                MessageBox.Show("PDF отчет успешно создан!");
+                Process.Start(new ProcessStartInfo(saveFileDialog.FileName) { UseShellExecute = true });
             }
         }
 
@@ -152,7 +207,7 @@ namespace BusinessAccountantService
             {
                 var repairs = GetRepairsByClient(selectedClient.Id);
 
-               // RepairsGrid.ItemsSource = repairs;
+                RepairsHistoryGrid.ItemsSource = repairs;
             }
         }
 
