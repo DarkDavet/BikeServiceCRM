@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BusinessAccountantService.Data;
+using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,15 +28,27 @@ namespace BusinessAccountantService
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // Пока просто закрываем окно, позже здесь будет запись в SQLite
-            if (!string.IsNullOrWhiteSpace(FullNameBox.Text))
+            string name = FullNameBox.Text;
+            string phone = PhoneBox.Text;
+
+            if (string.IsNullOrWhiteSpace(name))
             {
-                this.DialogResult = true; // Сигнал, что нажали "ОК"
+                MessageBox.Show("Имя обязательно!");
+                return;
             }
-            else
+
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
-                MessageBox.Show("Введите имя клиента!");
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "INSERT INTO Clients (FullName, Phone) VALUES ($name, $phone)";
+                command.Parameters.AddWithValue("$name", name);
+                command.Parameters.AddWithValue("$phone", phone);
+
+                command.ExecuteNonQuery();
             }
+
+            this.DialogResult = true; 
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

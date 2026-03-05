@@ -42,15 +42,13 @@
             </StackPanel>
 
             <!-- Таблица данных -->
-            <DataGrid x:Name="RepairsGrid" Grid.Row="1" 
+            <DataGrid x:Name="ClientsGrid" Grid.Row="1" 
                       AutoGenerateColumns="False" CanUserAddRows="False"
                       Background="White" BorderBrush="#DDDDDD" RowHeight="30">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                    <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="*"/>
-                    <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeModel}" Width="*"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="100"/>
-                    <DataGridTextColumn Header="Цена" Binding="{Binding Cost}" Width="80"/>
+                    <DataGridTextColumn Header="Клиент" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Номер телефона" Binding="{Binding Phone}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
 

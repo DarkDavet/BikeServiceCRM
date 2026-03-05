@@ -1,4 +1,6 @@
-﻿using BusinessAccountantService.Models;
+﻿using BusinessAccountantService.Data;
+using BusinessAccountantService.Models;
+using Microsoft.Data.Sqlite;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,29 +22,46 @@ namespace BusinessAccountantService
         public MainWindow()
         {
             InitializeComponent();
-
-            // Создаем тестовый список
-            List<RepairRecord> repairs = new List<RepairRecord>
-            {
-                new RepairRecord { Id = 1, ClientName = "Иван Иванов", BikeModel = "Giant Talon 2", Status = "В работе", Cost = 1500 },
-                new RepairRecord { Id = 2, ClientName = "Анна Петрова", BikeModel = "Specialized Sirrus", Status = "Готов", Cost = 3200 }
-            };
-
-            // Привязываем список к таблице в XAML (которую мы назвали RepairsGrid)
-            RepairsGrid.ItemsSource = repairs;
+            DatabaseService.Initialize();
+            LoadClients();
         }
 
         private void AddClient_Click(object sender, RoutedEventArgs e)
         {
             AddClientWindow addWindow = new AddClientWindow();
-            addWindow.Owner = this; // Чтобы окно открывалось поверх главного
+            addWindow.Owner = this;
 
             if (addWindow.ShowDialog() == true)
             {
-                // Сюда мы вернемся после нажатия "Сохранить"
-                MessageBox.Show("Клиент будет сохранен в базу!");
+                LoadClients();
             }
         }
 
+        private void LoadClients()
+        {
+            List<Client> clients = new List<Client>();
+
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, FullName, Phone FROM Clients";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        clients.Add(new Client
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Phone = reader.GetInt32(2)
+                        });
+                    }
+                }
+            }
+            ClientsGrid.ItemsSource = clients;
+
+        }
     }
 }
