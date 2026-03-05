@@ -3,6 +3,7 @@ using BusinessAccountantService.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 using QuestPDF.Fluent;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Windows;
@@ -29,6 +30,8 @@ namespace BusinessAccountantService
             LoadClients();
         }
 
+        private ICollectionView _clientsView;
+
         private void AddClient_Click(object sender, RoutedEventArgs e)
         {
             AddClientWindow addWindow = new AddClientWindow();
@@ -42,31 +45,25 @@ namespace BusinessAccountantService
 
         private void EntryAct_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Проверяем, выбран ли клиент
-            var selectedClient = ClientsGrid.SelectedItem as Client;
-            // 2. Проверяем, выбран ли конкретный ремонт в нижней таблице
-            var selectedRepair = RepairsHistoryGrid.SelectedItem as RepairRecord;
-
-            if (selectedClient != null && selectedRepair != null)
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
+                ClientsGrid.SelectedItem is Client selectedClient) 
             {
+                UpdateRepairStatus(selectedRepair.Id, "Выдан");
+                selectedRepair.Status = "Выдан";
+
                 ExportEntryAct(selectedClient, selectedRepair);
+
+                RepairsHistoryGrid.Items.Refresh();
             }
             else
             {
-                MessageBox.Show("Пожалуйста, выберите клиента И конкретную запись в истории ремонтов!");
+                MessageBox.Show("Выберите и клиента, и заказ!");
             }
         }
 
         private void FinalAct_Click(object sender, RoutedEventArgs e)
         {
-            if (ClientsGrid.SelectedItem is Client selectedClient)
-            {
-                //ExportToPdf(selectedClient);
-            }
-            else
-            {
-                MessageBox.Show("Сначала выберите клиента в списке!");
-            }
+            
         }
 
         private void AddRepair_Click(object sender, RoutedEventArgs e)
@@ -105,13 +102,31 @@ namespace BusinessAccountantService
                         clients.Add(new Client
                         {
                             Id = reader.GetInt32(0),
-                            Name = reader.GetString(1),
-                            Phone = reader.GetInt32(2)
+                            Name = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                            Phone = reader.IsDBNull(2) ? "" : reader.GetString(2)
                         });
                     }
                 }
             }
-            ClientsGrid.ItemsSource = clients;
+
+            _clientsView = CollectionViewSource.GetDefaultView(clients);
+
+            _clientsView.Filter = (obj) =>
+            {
+                if (string.IsNullOrWhiteSpace(SearchBox.Text)) return true;
+
+                var client = obj as Client;
+                if (client == null) return false;
+
+                string query = SearchBox.Text.ToLower();
+
+                bool nameMatch = client.Name?.ToLower().Contains(query) ?? false;
+                bool phoneMatch = client.Phone?.Contains(query) ?? false;
+
+                return nameMatch || phoneMatch;
+            };
+
+            ClientsGrid.ItemsSource = _clientsView;
 
         }
 
@@ -133,8 +148,12 @@ namespace BusinessAccountantService
 
                         page.Header().Row(row => {
                             row.RelativeItem().Column(col => {
-                                col.Item().Text("АКТ ПРИЕМКИ ВЕЛОСИПЕДА").FontSize(20).SemiBold().FontColor(Colors.Blue.A);
+                                col.Item().Text("АКТ ПРИЕМКИ ВЕЛОСИПЕДА").FontSize(20).SemiBold().FontColor(Colors.Blue.B);
                                 col.Item().Text($"Номер заказа: #00{repair.Id}").FontSize(10);
+                            });
+                            row.RelativeItem().AlignRight().Column(c => {
+                                c.Item().Text(repair.Status.ToUpper()).FontSize(24).Bold().FontColor(Colors.Green.B);
+                                c.Item().Text("ОПЛАЧЕНО").FontSize(10).AlignCenter();
                             });
                             row.RelativeItem().AlignRight().Text(DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
                         });
@@ -193,12 +212,25 @@ namespace BusinessAccountantService
                             ProblemDescription = reader.GetString(3),
                             WorksPerformed = reader.IsDBNull(4) ? "" : reader.GetString(4),
                             TotalCost = reader.GetDouble(5),
-                            IsCompleted = reader.GetInt32(6) == 1
+                            Status = reader.GetString(6)
                         });
                     }
                 }
             }
             return list;
+        }
+
+        private void UpdateRepairStatus(int repairId, string newStatus)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Repairs SET Status = $status WHERE Id = $id";
+                command.Parameters.AddWithValue("$status", newStatus);
+                command.Parameters.AddWithValue("$id", repairId);
+                command.ExecuteNonQuery();
+            }
         }
 
         private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -211,6 +243,36 @@ namespace BusinessAccountantService
             }
         }
 
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _clientsView?.Refresh();
+        }
+
+        private void RepairsHistoryGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.Column.Header.ToString() == "Статус" && e.EditAction == DataGridEditAction.Commit)
+            {
+                var repair = e.Row.Item as RepairRecord;
+                var cb = e.EditingElement as ComboBox;
+
+                if (repair != null && cb != null)
+                {
+                    string newStatus = cb.SelectedItem?.ToString() ?? cb.Text;
+
+                    if (!string.IsNullOrEmpty(newStatus))
+                    {
+                        UpdateRepairStatus(repair.Id, newStatus);
+
+                        repair.Status = newStatus;
+
+                        if (newStatus == "Выдан")
+                        {
+                            MessageBox.Show("Статус обновлен. Не забудьте распечатать чек!");
+                        }
+                    }
+                }
+            }
+        }
 
     }
 }

@@ -26,7 +26,7 @@ namespace BusinessAccountantService
         public AddRepairWindow(int clientId)
         {
             InitializeComponent();
-            _clientId = clientId; // Запоминаем, для кого ремонт
+            _clientId = clientId; 
         }
 
         private void SaveRepair_Click(object sender, RoutedEventArgs e)

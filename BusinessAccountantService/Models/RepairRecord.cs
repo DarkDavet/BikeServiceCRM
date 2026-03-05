@@ -14,7 +14,7 @@ namespace BusinessAccountantService.Models
         public string ProblemDescription { get; set; }
         public string WorksPerformed { get; set; }
         public double TotalCost { get; set; }
-        public bool IsCompleted { get; set; }
+        public string Status { get; set; }
         public DateTime DateCreated { get; set; }
     }
 }
