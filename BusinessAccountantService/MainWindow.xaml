@@ -123,6 +123,7 @@
                             </DataGridComboBoxColumn.EditingElementStyle>
                         </DataGridComboBoxColumn>
                         <DataGridTextColumn Header="Сумма" Binding="{Binding TotalCost}" Width="80" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Дата" Binding="{Binding DateFormatted}" Width="110" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>

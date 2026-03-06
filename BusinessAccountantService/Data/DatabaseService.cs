@@ -29,7 +29,7 @@ namespace BusinessAccountantService.Data
                 TotalCost REAL,
                 IsCompleted INTEGER DEFAULT 0,
                 Status TEXT DEFAULT 'Принят', -- Добавили сюда
-                DateCreated DATETIME,
+                DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (ClientId) REFERENCES Clients(Id)
             );";
                 command.ExecuteNonQuery();

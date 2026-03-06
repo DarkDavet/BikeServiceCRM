@@ -36,8 +36,8 @@ namespace BusinessAccountantService
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    INSERT INTO Repairs (ClientId, BikeInfo, ProblemDescription, TotalCost, DateCreated, IsCompleted) 
-                    VALUES ($cid, $bike, $prob, $cost, $date, 0)";
+                    INSERT INTO Repairs (ClientId, BikeInfo, ProblemDescription, TotalCost, Status, DateCreated) 
+                    VALUES ($cid, $bike, $prob, $cost, 'Принят', $date)";
 
                 command.Parameters.AddWithValue("$cid", _clientId);
                 command.Parameters.AddWithValue("$bike", BikeInfoBox.Text);

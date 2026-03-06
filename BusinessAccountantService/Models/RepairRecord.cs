@@ -31,6 +31,7 @@ namespace BusinessAccountantService.Models
             }
         }
         public DateTime DateCreated { get; set; }
+        public string DateFormatted => DateCreated.ToString("dd.MM.yyyy HH:mm");
 
 
         public event PropertyChangedEventHandler PropertyChanged;

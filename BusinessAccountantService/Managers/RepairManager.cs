@@ -18,7 +18,7 @@ namespace BusinessAccountantService.Managers
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status FROM Repairs WHERE ClientId = $id ORDER BY DateCreated DESC";
+                command.CommandText = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status, DateCreated FROM Repairs WHERE ClientId = $id ORDER BY DateCreated DESC";
                 command.Parameters.AddWithValue("$id", clientId);
 
                 using (var reader = command.ExecuteReader())
@@ -32,7 +32,8 @@ namespace BusinessAccountantService.Managers
                             ProblemDescription = reader.GetString(2),
                             WorksPerformed = reader.IsDBNull(3) ? "" : reader.GetString(3),
                             TotalCost = reader.GetDouble(4),
-                            Status = reader.GetString(5)
+                            Status = reader.IsDBNull(5) ? "Принят" : reader.GetString(5),
+                            DateCreated = reader.IsDBNull(6) ? DateTime.Now : reader.GetDateTime(6)
                         });
                     }
                 }
