@@ -130,9 +130,9 @@ namespace BusinessAccountantService
 
                     if (!string.IsNullOrEmpty(newStatus))
                     {
-                        UpdateRepairStatus(repair.Id, newStatus);
-
                         repair.Status = newStatus;
+
+                        UpdateRepairStatus(repair.Id, newStatus);
 
                         if (newStatus == "Выдан")
                         {
