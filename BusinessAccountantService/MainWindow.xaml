@@ -54,7 +54,7 @@
             </StackPanel>
             <!-- 1. Таблица КЛИЕНТОВ (называем её ClientsGrid) -->
             <DataGrid x:Name="ClientsGrid" Grid.Row="1" 
-              AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged">
+              AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" CanUserAddRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
                     <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*"/>
@@ -70,7 +70,7 @@
                 <TextBlock Text="История ремонтов выбранного клиента:" FontWeight="Bold" Margin="0,0,0,5"/>
                 <DataGrid x:Name="RepairsHistoryGrid" Height="200"
                           CellEditEnding="RepairsHistoryGrid_CellEditEnding"
-                  AutoGenerateColumns="False">
+                  AutoGenerateColumns="False" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="150" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Проблема" Binding="{Binding ProblemDescription}" Width="*" IsReadOnly="True"/>
