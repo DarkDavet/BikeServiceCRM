@@ -1,4 +1,5 @@
 ﻿using BusinessAccountantService.Data;
+using BusinessAccountantService.Managers;
 using BusinessAccountantService.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
@@ -23,6 +24,9 @@ namespace BusinessAccountantService
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly ClientManager _clientManager = new();
+        private readonly RepairManager _repairManager = new();
+        private readonly PdfExportManager _pdfmanager = new();
         public MainWindow()
         {
             InitializeComponent();
@@ -30,7 +34,6 @@ namespace BusinessAccountantService
             LoadClients();
         }
 
-        private ICollectionView _clientsView;
 
         private void AddClient_Click(object sender, RoutedEventArgs e)
         {
@@ -51,7 +54,7 @@ namespace BusinessAccountantService
                 UpdateRepairStatus(selectedRepair.Id, "Выдан");
                 selectedRepair.Status = "Выдан";
 
-                ExportEntryAct(selectedClient, selectedRepair);
+                _pdfmanager.ExportEntryAct(selectedClient, selectedRepair);
 
                 RepairsHistoryGrid.Items.Refresh();
             }
@@ -75,7 +78,7 @@ namespace BusinessAccountantService
 
                 if (repairWin.ShowDialog() == true)
                 {
-                    RepairsHistoryGrid.ItemsSource = GetRepairsByClient(selectedClient.Id);
+                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id);
                     MessageBox.Show("Заказ успешно добавлен в базу!");
                 }
             }
@@ -85,140 +88,6 @@ namespace BusinessAccountantService
             }
         }
 
-        private void LoadClients()
-        {
-            List<Client> clients = new List<Client>();
-
-            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
-            {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, FullName, Phone FROM Clients";
-
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        clients.Add(new Client
-                        {
-                            Id = reader.GetInt32(0),
-                            Name = reader.IsDBNull(1) ? "" : reader.GetString(1),
-                            Phone = reader.IsDBNull(2) ? "" : reader.GetString(2)
-                        });
-                    }
-                }
-            }
-
-            _clientsView = CollectionViewSource.GetDefaultView(clients);
-
-            _clientsView.Filter = (obj) =>
-            {
-                if (string.IsNullOrWhiteSpace(SearchBox.Text)) return true;
-
-                var client = obj as Client;
-                if (client == null) return false;
-
-                string query = SearchBox.Text.ToLower();
-
-                bool nameMatch = client.Name?.ToLower().Contains(query) ?? false;
-                bool phoneMatch = client.Phone?.Contains(query) ?? false;
-
-                return nameMatch || phoneMatch;
-            };
-
-            ClientsGrid.ItemsSource = _clientsView;
-
-        }
-
-        private void ExportEntryAct(Client client, RepairRecord repair)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "PDF files (*.pdf)|*.pdf",
-                FileName = $"Priemka_{client.Name}_{DateTime.Now:ddMMyy}.pdf"
-            };
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                Document.Create(container =>
-                {
-                    container.Page(page =>
-                    {
-                        page.Margin(50);
-
-                        page.Header().Row(row => {
-                            row.RelativeItem().Column(col => {
-                                col.Item().Text("АКТ ПРИЕМКИ ВЕЛОСИПЕДА").FontSize(20).SemiBold().FontColor(Colors.Blue.B);
-                                col.Item().Text($"Номер заказа: #00{repair.Id}").FontSize(10);
-                            });
-                            row.RelativeItem().AlignRight().Column(c => {
-                                c.Item().Text(repair.Status.ToUpper()).FontSize(24).Bold().FontColor(Colors.Green.B);
-                                c.Item().Text("ОПЛАЧЕНО").FontSize(10).AlignCenter();
-                            });
-                            row.RelativeItem().AlignRight().Text(DateTime.Now.ToString("dd.MM.yyyy HH:mm"));
-                        });
-
-                        page.Content().PaddingVertical(20).Column(col =>
-                        {
-                            col.Item().PaddingBottom(5).Text("ДАННЫЕ КЛИЕНТА").Bold();
-                            col.Item().Text($"ФИО: {client.Name}");
-                            col.Item().Text($"Телефон: {client.Phone}");
-
-                            col.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Gray.R);
-
-                            col.Item().PaddingBottom(5).Text("ОБЪЕКТ ПРИЕМКИ").Bold();
-                            col.Item().Text($"Велосипед: {repair.BikeInfo}");
-
-                            col.Item().PaddingTop(15).Text("ОПИСАНИЕ НЕИСПРАВНОСТИ:").Bold();
-                            col.Item().Border(0.5f).Padding(10).Background(Colors.Gray.R)
-                                .Text(repair.ProblemDescription).Italic();
-
-                            col.Item().PaddingTop(40).Row(row => {
-                                row.RelativeItem().Text("Принял: __________");
-                                row.RelativeItem().AlignRight().Text("Сдал: __________");
-                            });
-                        });
-
-                        page.Footer().AlignCenter().Text(x => {
-                            x.Span("Стр. ");
-                            x.CurrentPageNumber();
-                        });
-                    });
-                })
-                .GeneratePdf(saveFileDialog.FileName);
-
-                Process.Start(new ProcessStartInfo(saveFileDialog.FileName) { UseShellExecute = true });
-            }
-        }
-
-        private List<RepairRecord> GetRepairsByClient(int clientId)
-        {
-            var list = new List<RepairRecord>();
-            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
-            {
-                connection.Open();
-                var command = connection.CreateCommand();
-                command.CommandText = "SELECT * FROM Repairs WHERE ClientId = $id ORDER BY DateCreated DESC";
-                command.Parameters.AddWithValue("$id", clientId);
-
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        list.Add(new RepairRecord
-                        {
-                            Id = reader.GetInt32(0),
-                            BikeInfo = reader.GetString(2),
-                            ProblemDescription = reader.GetString(3),
-                            WorksPerformed = reader.IsDBNull(4) ? "" : reader.GetString(4),
-                            TotalCost = reader.GetDouble(5),
-                            Status = reader.GetString(6)
-                        });
-                    }
-                }
-            }
-            return list;
-        }
 
         private void UpdateRepairStatus(int repairId, string newStatus)
         {
@@ -237,7 +106,7 @@ namespace BusinessAccountantService
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
             {
-                var repairs = GetRepairsByClient(selectedClient.Id);
+                var repairs = _repairManager.GetRepairsByClient(selectedClient.Id);
 
                 RepairsHistoryGrid.ItemsSource = repairs;
             }
@@ -272,6 +141,29 @@ namespace BusinessAccountantService
                     }
                 }
             }
+        }
+
+        private ICollectionView _clientsView;
+
+        private void LoadClients()
+        {
+            var clients = _clientManager.GetAllClients();
+
+            _clientsView = CollectionViewSource.GetDefaultView(clients);
+
+            _clientsView.Filter = (obj) =>
+            {
+                string searchText = SearchBox.Text; 
+                if (string.IsNullOrWhiteSpace(searchText)) return true;
+
+                var client = obj as Client;
+                string query = searchText.ToLower();
+
+                return (client.Name?.ToLower().Contains(query) ?? false) ||
+                       (client.Phone?.Contains(query) ?? false);
+            };
+
+            ClientsGrid.ItemsSource = _clientsView;
         }
 
     }
