@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:BusinessAccountantService.Managers" 
         Title="ВелоСервис CRM" Height="600" Width="1000" 
         WindowStartupLocation="CenterScreen" Background="#F5F5F5">
+    <Window.Resources>
+        <local:StatusColorConverter x:Key="StatusColorConverter"/>
+    </Window.Resources>
 
     <Grid>
         <!-- Разметка: колонка для меню (200px) и колонка для контента -->
@@ -71,7 +75,20 @@
                         <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="150" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Проблема" Binding="{Binding ProblemDescription}" Width="*" IsReadOnly="True"/>
                         <DataGridComboBoxColumn Header="Статус" Width="120"
-    SelectedItemBinding="{Binding Status, UpdateSourceTrigger=PropertyChanged}">
+                        SelectedItemBinding="{Binding Status, UpdateSourceTrigger=PropertyChanged}">
+
+                            <DataGridComboBoxColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
+                                            <Setter Property="Foreground" Value="Black"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridComboBoxColumn.CellStyle>
+
                             <DataGridComboBoxColumn.ElementStyle>
                                 <Style TargetType="ComboBox">
                                     <Setter Property="ItemsSource">
@@ -84,8 +101,12 @@
                                             </x:Array>
                                         </Setter.Value>
                                     </Setter>
+                                    <!-- Делаем комбобокс прозрачным, чтобы видеть цвет ячейки под ним -->
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
                                 </Style>
                             </DataGridComboBoxColumn.ElementStyle>
+
                             <DataGridComboBoxColumn.EditingElementStyle>
                                 <Style TargetType="ComboBox">
                                     <Setter Property="ItemsSource">
