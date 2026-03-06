@@ -1,9 +1,11 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace BusinessAccountantService.Data
 {
@@ -19,7 +21,16 @@ namespace BusinessAccountantService.Data
                 connection.Open();
                 var command = connection.CreateCommand();
 
+                command.CommandText = "PRAGMA foreign_keys = ON;";
+                command.ExecuteNonQuery();
+
                 command.CommandText = @"
+            CREATE TABLE IF NOT EXISTS Clients (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                FullName TEXT NOT NULL,
+                Phone TEXT
+            );
+
             CREATE TABLE IF NOT EXISTS Repairs (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ClientId INTEGER,
@@ -27,22 +38,21 @@ namespace BusinessAccountantService.Data
                 ProblemDescription TEXT,
                 WorksPerformed TEXT,
                 TotalCost REAL,
-                IsCompleted INTEGER DEFAULT 0,
-                Status TEXT DEFAULT 'Принят', -- Добавили сюда
-                DateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (ClientId) REFERENCES Clients(Id)
+                Status TEXT DEFAULT 'Принят',
+                DateCreated DATETIME,
+                FOREIGN KEY (ClientId) REFERENCES Clients(Id) ON DELETE CASCADE
             );";
                 command.ExecuteNonQuery();
-
-                try
-                {
-                    command.CommandText = "ALTER TABLE Repairs ADD COLUMN Status TEXT DEFAULT 'Принят';";
-                    command.ExecuteNonQuery();
-                }
-                catch
-                {
-                    
-                }
+            }
+        }
+        public static void ResetDatabase()
+        {
+            if (File.Exists(DbName))
+            {
+                SqliteConnection.ClearAllPools();
+                File.Delete(DbName);
+                MessageBox.Show("База данных удалена. Перезапустите программу для создания новой структуры.");
+                Application.Current.Shutdown();
             }
         }
     }

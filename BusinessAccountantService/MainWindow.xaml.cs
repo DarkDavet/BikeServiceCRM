@@ -88,6 +88,72 @@ namespace BusinessAccountantService
             }
         }
 
+        private void DeleteClient_Click(object sender, RoutedEventArgs e)
+        {
+            if (ClientsGrid.SelectedItem is Client selectedClient)
+            {
+                if (MessageBox.Show($"Удалить {selectedClient.Name} и его историю?", "Удаление",
+                    MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+                    {
+                        connection.Open();
+
+                        // 1. ВКЛЮЧАЕМ КАСКАД (в этом конкретном соединении)
+                        using (var pragmaCmd = new SqliteCommand("PRAGMA foreign_keys = ON;", connection))
+                        {
+                            pragmaCmd.ExecuteNonQuery();
+                        }
+
+                        // 2. УДАЛЯЕМ ТОЛЬКО КЛИЕНТА (ремонты удалятся сами)
+                        using (var deleteCmd = new SqliteCommand("DELETE FROM Clients WHERE Id = $id", connection))
+                        {
+                            deleteCmd.Parameters.AddWithValue("$id", selectedClient.Id);
+                            deleteCmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    LoadClients(); // Обновляем список на экране
+                    RepairsHistoryGrid.ItemsSource = null; // Очищаем таблицу ремонтов
+                }
+            }
+        }
+
+        private void DeleteRepair_Click(object sender, RoutedEventArgs e)
+        {
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
+            {
+                if (MessageBox.Show("Удалить этот заказ?", "Удаление заказа", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    using (var conn = new SqliteConnection(DatabaseService.ConnectionString))
+                    {
+                        conn.Open();
+                        var cmd = new SqliteCommand("DELETE FROM Repairs WHERE Id = $id", conn);
+                        cmd.Parameters.AddWithValue("$id", selectedRepair.Id);
+                        cmd.ExecuteNonQuery();
+                    }
+                    // Обновляем только нижнюю таблицу
+                    if (ClientsGrid.SelectedItem is Client c)
+                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(c.Id);
+                }
+            }
+        }
+
+
+
+        private void ResetDb_Click(object sender, RoutedEventArgs e)
+        {
+            DatabaseService.ResetDatabase();
+        }
+
+        private void RepairsHistoryGrid_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                DeleteRepair_Click(sender, e);
+            }
+        }
+
 
         private void UpdateRepairStatus(int repairId, string newStatus)
         {
