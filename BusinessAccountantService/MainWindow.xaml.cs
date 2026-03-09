@@ -99,8 +99,8 @@ namespace BusinessAccountantService
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
                 ClientsGrid.SelectedItem is Client selectedClient) 
             {
-                UpdateRepairStatus(selectedRepair.Id, "Выдан");
-                selectedRepair.Status = "Выдан";
+                UpdateRepairStatus(selectedRepair.Id, "Принят");
+                selectedRepair.Status = "Принят";
 
                 _pdfmanager.ExportEntryAct(selectedClient, selectedRepair);
 
@@ -114,7 +114,20 @@ namespace BusinessAccountantService
 
         private void FinalAct_Click(object sender, RoutedEventArgs e)
         {
-            
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
+                ClientsGrid.SelectedItem is Client selectedClient) 
+            {
+                UpdateRepairStatus(selectedRepair.Id, "Выдан");
+                selectedRepair.Status = "Выдан";
+
+                _pdfmanager.ExportFinalAct(selectedClient, selectedRepair);
+
+                RepairsHistoryGrid.Items.Refresh();
+            }
+            else
+            {
+                MessageBox.Show("Выберите и клиента, и заказ!");
+            }
         }
 
         private void AddRepair_Click(object sender, RoutedEventArgs e)
