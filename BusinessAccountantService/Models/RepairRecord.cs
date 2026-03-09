@@ -9,30 +9,41 @@ using System.Threading.Tasks;
 
 namespace BusinessAccountantService.Models
 {
-    public class RepairRecord: INotifyPropertyChanged
+    public class RepairRecord : INotifyPropertyChanged
     {
         public int Id { get; set; }
         public int ClientId { get; set; }
         public string BikeInfo { get; set; }
         public string ProblemDescription { get; set; }
         public string WorksPerformed { get; set; }
-        public double TotalCost { get; set; }
+
+        private double _partsCost;
+        public double PartsCost
+        {
+            get => _partsCost;
+            set { _partsCost = value; OnPropertyChanged(); OnPropertyChanged(nameof(Profit)); }
+        }
+
+        private double _totalCost;
+        public double TotalCost
+        {
+            get => _totalCost;
+            set { _totalCost = value; OnPropertyChanged(); OnPropertyChanged(nameof(Profit)); }
+        }
+
+        // Это свойство теперь будет само уведомлять таблицу, 
+        // если изменились TotalCost или PartsCost
+        public double Profit => TotalCost - _partsCost;
+
         private string _status;
         public string Status
         {
             get => _status;
-            set
-            {
-                if (_status != value)
-                {
-                    _status = value;
-                    OnPropertyChanged(); 
-                }
-            }
+            set { if (_status != value) { _status = value; OnPropertyChanged(); } }
         }
+
         public DateTime DateCreated { get; set; }
         public string DateFormatted => DateCreated.ToString("dd.MM.yyyy HH:mm");
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
@@ -40,4 +51,5 @@ namespace BusinessAccountantService.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
+
 }

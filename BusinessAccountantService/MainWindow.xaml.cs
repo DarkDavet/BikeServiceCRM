@@ -33,6 +33,7 @@ namespace BusinessAccountantService
         public MainWindow()
         {
             InitializeComponent();
+            //DatabaseService.ResetDatabase();
             DatabaseService.Initialize();
             LoadClients();
             UpdateStatusInfo();

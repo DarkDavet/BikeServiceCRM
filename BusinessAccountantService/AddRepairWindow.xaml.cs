@@ -29,27 +29,87 @@ namespace BusinessAccountantService
             _clientId = clientId; 
         }
 
+        // Убираем текст-подсказку при клике
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb && tb.Text.StartsWith("Например:")) tb.Clear();
+        }
+
+        // Калькулятор (AddItem_Click) - точно такой же, как в EditRepairWindow
+        private void AddItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(ItemNameBox.Text) || !double.TryParse(ItemPriceBox.Text, out double price)) return;
+
+            WorksBox.Text += $"— {ItemNameBox.Text}: {price} руб.\n";
+
+            var result = MessageBox.Show("Это запчасть (Расход)?", "Тип записи", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                double.TryParse(PartsCostBox.Text, out double current);
+                PartsCostBox.Text = (current + price).ToString();
+            }
+            else
+            {
+                double.TryParse(CostBox.Text, out double current);
+                CostBox.Text = (current + price).ToString();
+            }
+            ItemNameBox.Clear(); ItemPriceBox.Clear(); ItemNameBox.Focus();
+        }
+
+        // Живой подсчет прибыли
+        private void CostFields_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ProfitText == null) return;
+            double.TryParse(PartsCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double p);
+            double.TryParse(CostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double t);
+            ProfitText.Text = $"Предварительная прибыль: {t - p} руб.";
+        }
+
+
         private void SaveRepair_Click(object sender, RoutedEventArgs e)
         {
+            // 1. Проверяем, введено ли хоть что-то по велосипеду
+            if (string.IsNullOrWhiteSpace(BikeInfoBox.Text) || BikeInfoBox.Text.StartsWith("Например:"))
+            {
+                MessageBox.Show("Пожалуйста, укажите марку и модель велосипеда.");
+                return;
+            }
+
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = @"
-                    INSERT INTO Repairs (ClientId, BikeInfo, ProblemDescription, TotalCost, Status, DateCreated) 
-                    VALUES ($cid, $bike, $prob, $cost, 'Принят', $date)";
 
-                command.Parameters.AddWithValue("$cid", _clientId);
+                // 2. SQL запрос со всеми новыми колонками (включая WorksPerformed и PartsCost)
+                command.CommandText = @"
+            INSERT INTO Repairs (ClientId, BikeInfo, ProblemDescription, WorksPerformed, PartsCost, TotalCost, Status, DateCreated) 
+            VALUES ($cid, $bike, $prob, $works, $parts, $cost, 'Принят', $date)";
+
+                // 3. Привязываем параметры
+                command.Parameters.AddWithValue("$cid", _clientId); // _clientId должен быть передан в конструктор окна
                 command.Parameters.AddWithValue("$bike", BikeInfoBox.Text);
                 command.Parameters.AddWithValue("$prob", ProblemBox.Text);
-                command.Parameters.AddWithValue("$cost", double.TryParse(CostBox.Text, out var c) ? c : 0);
+                command.Parameters.AddWithValue("$works", WorksBox.Text);
+
+                // Парсим деньги (с защитой от запятых)
+                double.TryParse(PartsCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parts);
+                double.TryParse(CostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double total);
+
+                command.Parameters.AddWithValue("$parts", parts);
+                command.Parameters.AddWithValue("$cost", total);
                 command.Parameters.AddWithValue("$date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 command.ExecuteNonQuery();
             }
+
+            // Закрываем окно с результатом "Успех"
             this.DialogResult = true;
         }
 
-        private void Cancel_Click(object sender, RoutedEventArgs e) => this.DialogResult = false;
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+        }
+
     }
 }

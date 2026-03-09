@@ -19,7 +19,8 @@ namespace BusinessAccountantService.Managers
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                string sql = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status, DateCreated FROM Repairs WHERE ClientId = $id";
+                string sql = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, PartsCost, TotalCost, Status, DateCreated " +
+                             "FROM Repairs WHERE ClientId = $id";
 
                 if (mode == ViewMode.Active) sql += " AND Status != 'Выдан'";
                 else if (mode == ViewMode.Archive) sql += " AND Status = 'Выдан'";
@@ -37,10 +38,11 @@ namespace BusinessAccountantService.Managers
                             BikeInfo = reader.GetString(1),
                             ProblemDescription = reader.GetString(2),
                             WorksPerformed = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                            TotalCost = reader.GetDouble(4),
-                            Status = reader.IsDBNull(5) ? "Принят" : reader.GetString(5),
-                            // Здесь может быть ошибка, если дата в базе в странном формате
-                            DateCreated = reader.IsDBNull(6) ? DateTime.Now : reader.GetDateTime(6)
+                            // Считываем новые данные
+                            PartsCost = reader.IsDBNull(4) ? 0 : reader.GetDouble(4),
+                            TotalCost = reader.GetDouble(5),
+                            Status = reader.IsDBNull(6) ? "Принят" : reader.GetString(6),
+                            DateCreated = reader.IsDBNull(7) ? DateTime.Now : reader.GetDateTime(7)
                         });
                     }
                 }
@@ -59,13 +61,15 @@ namespace BusinessAccountantService.Managers
                                 BikeInfo = $bike, 
                                 ProblemDescription = $prob, 
                                 WorksPerformed = $works, 
+                                PartsCost = $parts,
                                 TotalCost = $cost,
                                 Status = $status
                                 WHERE Id = $id";
 
                 command.Parameters.AddWithValue("$bike", r.BikeInfo);
                 command.Parameters.AddWithValue("$prob", r.ProblemDescription);
-                command.Parameters.AddWithValue("$works", r.WorksPerformed ?? ""); // Защита от null
+                command.Parameters.AddWithValue("$works", r.WorksPerformed ?? "");
+                command.Parameters.AddWithValue("$parts", r.PartsCost); // Сохраняем расходы
                 command.Parameters.AddWithValue("$cost", r.TotalCost);
                 command.Parameters.AddWithValue("$status", r.Status);
                 command.Parameters.AddWithValue("$id", r.Id);

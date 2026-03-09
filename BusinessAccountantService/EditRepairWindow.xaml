@@ -5,18 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="EditRepairWindow" Height="450" Width="800">
+        Title="EditRepairWindow" Height="550" Width="800">
 
     <Grid>
-        <StackPanel Margin="20">
-            <TextBlock Text="Редактирование заказа" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20">
+                <TextBlock Text="Редактирование заказа" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
 
             <Label Content="Информация о велосипеде:"/>
             <TextBox x:Name="BikeInfoBox" Margin="0,0,0,10"/>
 
             <Label Content="Описание проблемы:"/>
             <TextBox x:Name="ProblemBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
+            <GroupBox Header="Быстрое добавление запчастей/работ" Margin="0,0,0,10">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <!-- Название -->
+                        <ColumnDefinition Width="80"/>
+                        <!-- Цена -->
+                        <ColumnDefinition Width="Auto"/>
+                        <!-- Кнопка -->
+                    </Grid.ColumnDefinitions>
 
+                    <TextBox x:Name="ItemNameBox" Grid.Column="0" Margin="0,0,5,0" Tag="Название запчасти или работы..."/>
+                    <TextBox x:Name="ItemPriceBox" Grid.Column="1" Margin="0,0,5,0" Tag="Цена"/>
+                    <Button Content="+" Grid.Column="2" Width="30" Click="AddItem_Click" Background="#3498DB" Foreground="White" FontWeight="Bold"/>
+                </Grid>
+            </GroupBox>
             <Label Content="Выполненные работы:"/>
             <TextBox x:Name="WorksBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
 
@@ -50,5 +66,6 @@
                 <Button Content="Отмена" Width="100" Click="Cancel_Click"/>
             </StackPanel>
         </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

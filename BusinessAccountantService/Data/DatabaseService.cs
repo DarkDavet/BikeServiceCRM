@@ -37,6 +37,7 @@ namespace BusinessAccountantService.Data
                 BikeInfo TEXT,
                 ProblemDescription TEXT,
                 WorksPerformed TEXT,
+                PartsCost REAL DEFAULT 0,
                 TotalCost REAL,
                 Status TEXT DEFAULT 'Принят',
                 DateCreated DATETIME,
