@@ -53,6 +53,13 @@
                 <TextBox x:Name="SearchBox" Width="300" Height="28" 
                  VerticalContentAlignment="Center" 
                  TextChanged="SearchBox_TextChanged" />
+
+                <TextBlock x:Name="StatusInfoText" 
+               Text="Клиентов: 0 | Заказов: 0" 
+               Foreground="#27AE60" 
+               FontWeight="Bold" 
+               VerticalAlignment="Center" 
+               Margin="20,0,0,0"/>
             </StackPanel>
             <!-- 1. Таблица КЛИЕНТОВ (называем её ClientsGrid) -->
             <DataGrid x:Name="ClientsGrid" Grid.Row="1" 

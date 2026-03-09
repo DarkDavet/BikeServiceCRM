@@ -34,6 +34,7 @@ namespace BusinessAccountantService
             InitializeComponent();
             DatabaseService.Initialize();
             LoadClients();
+            UpdateStatusInfo();
         }
 
 
@@ -56,6 +57,7 @@ namespace BusinessAccountantService
             BtnAllClients.Background = _defaultButtonBrush;
 
             LoadClients();
+            UpdateStatusInfo();
 
             RepairsHistoryGrid.ItemsSource = null;
 
@@ -81,6 +83,7 @@ namespace BusinessAccountantService
             _clientsView = CollectionViewSource.GetDefaultView(activeClients);
             _clientsView.Filter = ClientFilterPredicate; // Используем то же правило поиска
             ClientsGrid.ItemsSource = _clientsView;
+            UpdateStatusInfo();
 
             RepairsHistoryGrid.ItemsSource = null;
         }
@@ -135,6 +138,7 @@ namespace BusinessAccountantService
                 if (repairWin.ShowDialog() == true)
                 {
                     RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _onlyActive);
+                    UpdateStatusInfo();
                     MessageBox.Show("Заказ успешно добавлен в базу!");
                 }
             }
@@ -168,7 +172,7 @@ namespace BusinessAccountantService
                             deleteCmd.ExecuteNonQuery();
                         }
                     }
-
+                    UpdateStatusInfo();
                     LoadClients(); // Обновляем список на экране
                     RepairsHistoryGrid.ItemsSource = null; // Очищаем таблицу ремонтов
                 }
@@ -191,6 +195,7 @@ namespace BusinessAccountantService
                     // Обновляем только нижнюю таблицу
                     if (ClientsGrid.SelectedItem is Client c)
                         RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(c.Id, _onlyActive);
+                    UpdateStatusInfo();
                 }
             }
         }
@@ -238,6 +243,7 @@ namespace BusinessAccountantService
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             _clientsView?.Refresh();
+            UpdateStatusInfo();
         }
 
         private void RepairsHistoryGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -281,6 +287,29 @@ namespace BusinessAccountantService
             _clientsView.Filter = ClientFilterPredicate;
 
             ClientsGrid.ItemsSource = _clientsView;
+        }
+
+        private void UpdateStatusInfo()
+        {
+            if (_clientsView == null) return;
+
+            int clientCount = 0;
+            int repairCount = 0;
+
+            // Проходим только по тем клиентам, которые сейчас видны в списке (после поиска)
+            foreach (var item in _clientsView)
+            {
+                if (item is Client client)
+                {
+                    clientCount++;
+                    // Считаем заказы только для этого конкретного (видимого) клиента
+                    // Передаем флаг _onlyActive, чтобы учитывать режим "Заказы в работе"
+                    var repairs = _repairManager.GetRepairsByClient(client.Id, _onlyActive);
+                    repairCount += repairs.Count;
+                }
+            }
+
+            StatusInfoText.Text = $"Клиентов: {clientCount} | Заказов: {repairCount}";
         }
 
     }

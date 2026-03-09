@@ -52,5 +52,29 @@ namespace BusinessAccountantService.Managers
             }
             return list;
         }
+
+        public int GetActiveRepairsCount()
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                // Считаем все заказы, которые не выданы
+                command.CommandText = "SELECT COUNT(*) FROM Repairs WHERE Status != 'Выдан'";
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+        }
+
+        public int GetAllRepairsCount()
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT COUNT(*) FROM Repairs";
+                return Convert.ToInt32(command.ExecuteScalar());
+            }
+        }
+
     }
 }
