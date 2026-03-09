@@ -25,6 +25,7 @@ namespace BusinessAccountantService
     public partial class MainWindow : Window
     {
         private readonly Brush _defaultButtonBrush = (Brush)new BrushConverter().ConvertFrom("#34495E");
+        private ViewMode _currentMode = ViewMode.All;
 
         private readonly ClientManager _clientManager = new();
         private readonly RepairManager _repairManager = new();
@@ -49,44 +50,31 @@ namespace BusinessAccountantService
             }
         }
 
-        private void ShowAllClients_Click(object sender, RoutedEventArgs e)
+        private void SwitchViewMode(ViewMode newMode, Button activeBtn)
         {
-            _onlyActive = false;
+            _currentMode = newMode;
 
-            BtnActiveOrders.Background = Brushes.LightGreen;
+            // Сбрасываем цвета всех кнопок
             BtnAllClients.Background = _defaultButtonBrush;
+            BtnActiveOrders.Background = _defaultButtonBrush;
+            BtnArchive.Background = _defaultButtonBrush;
 
-            LoadClients();
-            UpdateStatusInfo();
+            // Подсвечиваем нажатую
+            activeBtn.Background = Brushes.LightGreen;
 
-            RepairsHistoryGrid.ItemsSource = null;
-
-            SearchBox.Text = "";
-        }
-
-        private void ShowActiveOrders_Click(object sender, RoutedEventArgs e)
-        {
-            _onlyActive = true;
-
-            BtnActiveOrders.Background = Brushes.LightGreen;
-            BtnAllClients.Background = _defaultButtonBrush;
-
-            var activeClients = _clientManager.GetClientsWithActiveRepairs();
-
-            if (activeClients.Count == 0)
-            {
-                MessageBox.Show("На данный момент активных заказов нет.");
-                _onlyActive = false;
-            }
-
-            // Обновляем View, чтобы поиск по-прежнему работал, но уже по активным
-            _clientsView = CollectionViewSource.GetDefaultView(activeClients);
-            _clientsView.Filter = ClientFilterPredicate; // Используем то же правило поиска
+            // Загружаем данные
+            var clients = _clientManager.GetClientsByMode(_currentMode);
+            _clientsView = CollectionViewSource.GetDefaultView(clients);
+            _clientsView.Filter = ClientFilterPredicate;
             ClientsGrid.ItemsSource = _clientsView;
-            UpdateStatusInfo();
 
             RepairsHistoryGrid.ItemsSource = null;
+            UpdateStatusInfo();
         }
+
+        private void ShowAllClients_Click(object sender, RoutedEventArgs e) => SwitchViewMode(ViewMode.All, BtnAllClients);
+        private void ShowActiveOrders_Click(object sender, RoutedEventArgs e) => SwitchViewMode(ViewMode.Active, BtnActiveOrders);
+        private void ShowArchive_Click(object sender, RoutedEventArgs e) => SwitchViewMode(ViewMode.Archive, BtnArchive);
 
         private bool ClientFilterPredicate(object obj)
         {
@@ -137,7 +125,7 @@ namespace BusinessAccountantService
 
                 if (repairWin.ShowDialog() == true)
                 {
-                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _onlyActive);
+                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
                     UpdateStatusInfo();
                     MessageBox.Show("Заказ успешно добавлен в базу!");
                 }
@@ -194,7 +182,7 @@ namespace BusinessAccountantService
                     }
                     // Обновляем только нижнюю таблицу
                     if (ClientsGrid.SelectedItem is Client c)
-                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(c.Id, _onlyActive);
+                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(c.Id, _currentMode);
                     UpdateStatusInfo();
                 }
             }
@@ -234,7 +222,7 @@ namespace BusinessAccountantService
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
             {
-                var repairs = _repairManager.GetRepairsByClient(selectedClient.Id, _onlyActive);
+                var repairs = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
 
                 RepairsHistoryGrid.ItemsSource = repairs;
             }
@@ -279,7 +267,7 @@ namespace BusinessAccountantService
             BtnAllClients.Background = Brushes.LightGreen;
             BtnActiveOrders.Background = _defaultButtonBrush;
 
-            List<Client> clients = _clientManager.GetAllClients(); // Ваш метод загрузки из SQLite
+            List<Client> clients = _clientManager.GetClientsByMode(_currentMode); // Ваш метод загрузки из SQLite
 
             _clientsView = CollectionViewSource.GetDefaultView(clients);
 
@@ -293,23 +281,39 @@ namespace BusinessAccountantService
         {
             if (_clientsView == null) return;
 
-            int clientCount = 0;
-            int repairCount = 0;
+            int visibleClientsCount = 0;
+            int visibleRepairsCount = 0;
 
-            // Проходим только по тем клиентам, которые сейчас видны в списке (после поиска)
+            // Проходим по клиентам, которые видны в списке прямо сейчас (с учетом поиска и вкладок)
             foreach (var item in _clientsView)
             {
                 if (item is Client client)
                 {
-                    clientCount++;
-                    // Считаем заказы только для этого конкретного (видимого) клиента
-                    // Передаем флаг _onlyActive, чтобы учитывать режим "Заказы в работе"
-                    var repairs = _repairManager.GetRepairsByClient(client.Id, _onlyActive);
-                    repairCount += repairs.Count;
+                    visibleClientsCount++;
+
+                    // Считаем заказы только для этого клиента, 
+                    // передавая текущий режим _currentMode (Active, Archive или All)
+                    var repairs = _repairManager.GetRepairsByClient(client.Id, _currentMode);
+                    visibleRepairsCount += repairs.Count;
                 }
             }
 
-            StatusInfoText.Text = $"Клиентов: {clientCount} | Заказов: {repairCount}";
+            // Меняем текст и цвет в зависимости от режима
+            if (_currentMode == ViewMode.Archive)
+            {
+                StatusInfoText.Text = $"Клиентов в архиве: {visibleClientsCount} | Выдано заказов: {visibleRepairsCount}";
+                StatusInfoText.Foreground = Brushes.RoyalBlue; // Синий для архива
+            }
+            else if (_currentMode == ViewMode.Active)
+            {
+                StatusInfoText.Text = $"Активных клиентов: {visibleClientsCount} | Заказов в работе: {visibleRepairsCount}";
+                StatusInfoText.Foreground = Brushes.SeaGreen; // Зеленый для работы
+            }
+            else
+            {
+                StatusInfoText.Text = $"Всего клиентов: {visibleClientsCount} | Всего заказов: {visibleRepairsCount}";
+                StatusInfoText.Foreground = Brushes.Gray; // Нейтральный для общего списка
+            }
         }
 
     }

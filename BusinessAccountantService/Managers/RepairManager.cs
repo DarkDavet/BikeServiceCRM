@@ -11,7 +11,7 @@ namespace BusinessAccountantService.Managers
 {
     internal class RepairManager
     {
-        public List<RepairRecord> GetRepairsByClient(int clientId, bool onlyActive)
+        public List<RepairRecord> GetRepairsByClient(int clientId, ViewMode mode)
         {
             var list = new List<RepairRecord>();
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
@@ -19,20 +19,14 @@ namespace BusinessAccountantService.Managers
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                // Базовый запрос
-                string query = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status, DateCreated FROM Repairs WHERE ClientId = $id";
+                string sql = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status, DateCreated FROM Repairs WHERE ClientId = $id";
 
-                // Если флаг активен, добавляем условие
-                if (onlyActive)
-                {
-                    query += " AND Status != 'Выдан'";
-                }
+                if (mode == ViewMode.Active) sql += " AND Status != 'Выдан'";
+                else if (mode == ViewMode.Archive) sql += " AND Status = 'Выдан'";
 
-                query += " ORDER BY DateCreated DESC";
-
-                command.CommandText = query;
+                sql += " ORDER BY DateCreated DESC";
+                command.CommandText = sql;
                 command.Parameters.AddWithValue("$id", clientId);
-
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -45,6 +39,7 @@ namespace BusinessAccountantService.Managers
                             WorksPerformed = reader.IsDBNull(3) ? "" : reader.GetString(3),
                             TotalCost = reader.GetDouble(4),
                             Status = reader.IsDBNull(5) ? "Принят" : reader.GetString(5),
+                            // Здесь может быть ошибка, если дата в базе в странном формате
                             DateCreated = reader.IsDBNull(6) ? DateTime.Now : reader.GetDateTime(6)
                         });
                     }
@@ -52,6 +47,7 @@ namespace BusinessAccountantService.Managers
             }
             return list;
         }
+
 
         public int GetActiveRepairsCount()
         {
