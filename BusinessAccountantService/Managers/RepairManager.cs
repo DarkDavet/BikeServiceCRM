@@ -11,14 +11,26 @@ namespace BusinessAccountantService.Managers
 {
     internal class RepairManager
     {
-        public List<RepairRecord> GetRepairsByClient(int clientId)
+        public List<RepairRecord> GetRepairsByClient(int clientId, bool onlyActive)
         {
             var list = new List<RepairRecord>();
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status, DateCreated FROM Repairs WHERE ClientId = $id ORDER BY DateCreated DESC";
+
+                // Базовый запрос
+                string query = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, TotalCost, Status, DateCreated FROM Repairs WHERE ClientId = $id";
+
+                // Если флаг активен, добавляем условие
+                if (onlyActive)
+                {
+                    query += " AND Status != 'Выдан'";
+                }
+
+                query += " ORDER BY DateCreated DESC";
+
+                command.CommandText = query;
                 command.Parameters.AddWithValue("$id", clientId);
 
                 using (var reader = command.ExecuteReader())

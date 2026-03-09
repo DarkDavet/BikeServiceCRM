@@ -48,16 +48,23 @@ namespace BusinessAccountantService
 
         private void ShowAllClients_Click(object sender, RoutedEventArgs e)
         {
-            LoadClients(); 
+            _onlyActive = false;
+            LoadClients();
+
+            RepairsHistoryGrid.ItemsSource = null;
+
+            SearchBox.Text = "";
         }
 
         private void ShowActiveOrders_Click(object sender, RoutedEventArgs e)
         {
+            _onlyActive = true;
             var activeClients = _clientManager.GetClientsWithActiveRepairs();
 
             if (activeClients.Count == 0)
             {
                 MessageBox.Show("На данный момент активных заказов нет.");
+                _onlyActive = false;
             }
 
             // Обновляем View, чтобы поиск по-прежнему работал, но уже по активным
@@ -65,9 +72,7 @@ namespace BusinessAccountantService
             _clientsView.Filter = ClientFilterPredicate; // Используем то же правило поиска
             ClientsGrid.ItemsSource = _clientsView;
 
-            // Подсвечиваем заголовок, чтобы мастер понимал, что видит не всех
-            // (если у вас есть TextBlock с именем, например, ListTitle)
-            // ListTitle.Text = "Активные заказы"; 
+            RepairsHistoryGrid.ItemsSource = null;
         }
 
         private bool ClientFilterPredicate(object obj)
@@ -119,7 +124,7 @@ namespace BusinessAccountantService
 
                 if (repairWin.ShowDialog() == true)
                 {
-                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id);
+                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _onlyActive);
                     MessageBox.Show("Заказ успешно добавлен в базу!");
                 }
             }
@@ -175,7 +180,7 @@ namespace BusinessAccountantService
                     }
                     // Обновляем только нижнюю таблицу
                     if (ClientsGrid.SelectedItem is Client c)
-                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(c.Id);
+                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(c.Id, _onlyActive);
                 }
             }
         }
@@ -209,11 +214,12 @@ namespace BusinessAccountantService
             }
         }
 
+        private bool _onlyActive = false;
         private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
             {
-                var repairs = _repairManager.GetRepairsByClient(selectedClient.Id);
+                var repairs = _repairManager.GetRepairsByClient(selectedClient.Id, _onlyActive);
 
                 RepairsHistoryGrid.ItemsSource = repairs;
             }
