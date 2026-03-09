@@ -48,6 +48,44 @@ namespace BusinessAccountantService.Managers
             return list;
         }
 
+        public void UpdateRepair(RepairRecord r)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                // Используем те же названия колонок, что и в таблице
+                command.CommandText = @"UPDATE Repairs SET 
+                                BikeInfo = $bike, 
+                                ProblemDescription = $prob, 
+                                WorksPerformed = $works, 
+                                TotalCost = $cost,
+                                Status = $status
+                                WHERE Id = $id";
+
+                command.Parameters.AddWithValue("$bike", r.BikeInfo);
+                command.Parameters.AddWithValue("$prob", r.ProblemDescription);
+                command.Parameters.AddWithValue("$works", r.WorksPerformed ?? ""); // Защита от null
+                command.Parameters.AddWithValue("$cost", r.TotalCost);
+                command.Parameters.AddWithValue("$status", r.Status);
+                command.Parameters.AddWithValue("$id", r.Id);
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        // Метод для удаления заказа из базы
+        public void DeleteRepair(int id)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "DELETE FROM Repairs WHERE Id = $id";
+                command.Parameters.AddWithValue("$id", id);
+                command.ExecuteNonQuery();
+            }
+        }
 
         public int GetActiveRepairsCount()
         {

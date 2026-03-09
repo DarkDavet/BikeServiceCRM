@@ -217,7 +217,7 @@ namespace BusinessAccountantService
             }
         }
 
-        private bool _onlyActive = false;
+    
         private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
@@ -315,6 +315,47 @@ namespace BusinessAccountantService
                 StatusInfoText.Foreground = Brushes.Gray; // Нейтральный для общего списка
             }
         }
+
+        // Добавьте событие MouseDoubleClick в XAML для RepairsHistoryGrid
+        private void RepairsHistoryGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // 1. Проверяем, что в таблице действительно выбран заказ
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
+            {
+                // 2. Открываем окно редактирования и передаем в него выбранный заказ
+                EditRepairWindow editWin = new EditRepairWindow(selectedRepair);
+                editWin.Owner = this; // Чтобы окно открывалось по центру главного
+
+                // 3. Ждем закрытия окна. Если нажали "Сохранить" или "Удалить" (DialogResult = true)
+                if (editWin.ShowDialog() == true)
+                {
+                    if (editWin.IsDeleted)
+                    {
+                        // Если в окне нажали кнопку "Удалить"
+                        _repairManager.DeleteRepair(selectedRepair.Id);
+                        MessageBox.Show("Заказ удален.");
+                    }
+                    else
+                    {
+                        // Если нажали "Сохранить"
+                        // (Объект selectedRepair уже содержит новые данные, т.к. мы правили его в окне)
+                        _repairManager.UpdateRepair(selectedRepair);
+                        MessageBox.Show("Изменения сохранены.");
+                    }
+
+                    // 4. ОБЯЗАТЕЛЬНО обновляем данные на экране, чтобы увидеть изменения
+                    if (ClientsGrid.SelectedItem is Client selectedClient)
+                    {
+                        // Перезагружаем список заказов для текущего клиента
+                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
+                    }
+
+                    // Обновляем зеленый счетчик (вдруг мы удалили заказ или изменили его статус)
+                    UpdateStatusInfo();
+                }
+            }
+        }
+
 
     }
 }
