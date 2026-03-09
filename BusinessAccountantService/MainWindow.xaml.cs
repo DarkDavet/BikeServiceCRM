@@ -24,6 +24,8 @@ namespace BusinessAccountantService
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly Brush _defaultButtonBrush = (Brush)new BrushConverter().ConvertFrom("#34495E");
+
         private readonly ClientManager _clientManager = new();
         private readonly RepairManager _repairManager = new();
         private readonly PdfExportManager _pdfmanager = new();
@@ -49,6 +51,10 @@ namespace BusinessAccountantService
         private void ShowAllClients_Click(object sender, RoutedEventArgs e)
         {
             _onlyActive = false;
+
+            BtnActiveOrders.Background = Brushes.LightGreen;
+            BtnAllClients.Background = _defaultButtonBrush;
+
             LoadClients();
 
             RepairsHistoryGrid.ItemsSource = null;
@@ -59,6 +65,10 @@ namespace BusinessAccountantService
         private void ShowActiveOrders_Click(object sender, RoutedEventArgs e)
         {
             _onlyActive = true;
+
+            BtnActiveOrders.Background = Brushes.LightGreen;
+            BtnAllClients.Background = _defaultButtonBrush;
+
             var activeClients = _clientManager.GetClientsWithActiveRepairs();
 
             if (activeClients.Count == 0)
@@ -260,6 +270,9 @@ namespace BusinessAccountantService
 
         private void LoadClients()
         {
+            BtnAllClients.Background = Brushes.LightGreen;
+            BtnActiveOrders.Background = _defaultButtonBrush;
+
             List<Client> clients = _clientManager.GetAllClients(); // Ваш метод загрузки из SQLite
 
             _clientsView = CollectionViewSource.GetDefaultView(clients);
