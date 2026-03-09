@@ -46,6 +46,47 @@ namespace BusinessAccountantService
             }
         }
 
+        private void ShowAllClients_Click(object sender, RoutedEventArgs e)
+        {
+            LoadClients(); 
+        }
+
+        private void ShowActiveOrders_Click(object sender, RoutedEventArgs e)
+        {
+            var activeClients = _clientManager.GetClientsWithActiveRepairs();
+
+            if (activeClients.Count == 0)
+            {
+                MessageBox.Show("На данный момент активных заказов нет.");
+            }
+
+            // Обновляем View, чтобы поиск по-прежнему работал, но уже по активным
+            _clientsView = CollectionViewSource.GetDefaultView(activeClients);
+            _clientsView.Filter = ClientFilterPredicate; // Используем то же правило поиска
+            ClientsGrid.ItemsSource = _clientsView;
+
+            // Подсвечиваем заголовок, чтобы мастер понимал, что видит не всех
+            // (если у вас есть TextBlock с именем, например, ListTitle)
+            // ListTitle.Text = "Активные заказы"; 
+        }
+
+        private bool ClientFilterPredicate(object obj)
+        {
+            // Если в строке поиска пусто — показываем всех
+            if (string.IsNullOrWhiteSpace(SearchBox.Text))
+                return true;
+
+            var client = obj as Client;
+            if (client == null) return false;
+
+            string query = SearchBox.Text.ToLower();
+
+            // Проверяем совпадение в имени или телефоне
+            // Важно: используйте те свойства, которые есть в вашем классе Client (Name или FullName)
+            return (client.Name != null && client.Name.ToLower().Contains(query)) ||
+                   (client.Phone != null && client.Phone.Contains(query));
+        }
+
         private void EntryAct_Click(object sender, RoutedEventArgs e)
         {
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
@@ -213,21 +254,12 @@ namespace BusinessAccountantService
 
         private void LoadClients()
         {
-            var clients = _clientManager.GetAllClients();
+            List<Client> clients = _clientManager.GetAllClients(); // Ваш метод загрузки из SQLite
 
             _clientsView = CollectionViewSource.GetDefaultView(clients);
 
-            _clientsView.Filter = (obj) =>
-            {
-                string searchText = SearchBox.Text; 
-                if (string.IsNullOrWhiteSpace(searchText)) return true;
-
-                var client = obj as Client;
-                string query = searchText.ToLower();
-
-                return (client.Name?.ToLower().Contains(query) ?? false) ||
-                       (client.Phone?.Contains(query) ?? false);
-            };
+            // Привязываем наш метод-фильтр
+            _clientsView.Filter = ClientFilterPredicate;
 
             ClientsGrid.ItemsSource = _clientsView;
         }
