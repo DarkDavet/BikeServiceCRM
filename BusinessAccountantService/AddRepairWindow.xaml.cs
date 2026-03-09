@@ -111,5 +111,24 @@ namespace BusinessAccountantService
             this.DialogResult = false;
         }
 
+        private void ClearCosts_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Очистить список работ и обнулить все суммы?",
+                                         "Сброс расчета", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                WorksBox.Clear();
+                PartsCostBox.Text = "0";
+                CostBox.Text = "0";
+
+                // Фокус на ввод названия, чтобы сразу начать заново
+                ItemNameBox.Focus();
+
+                // Если есть метод пересчета прибыли, вызываем его
+                CostFields_TextChanged(null, null);
+            }
+        }
+
     }
 }

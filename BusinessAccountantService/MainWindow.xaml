@@ -81,7 +81,16 @@
                 <DataGrid x:Name="RepairsHistoryGrid" Height="200"
                           MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
                           CellEditEnding="RepairsHistoryGrid_CellEditEnding"
-                  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"> 
+                  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Статус: Принят" Click="ChangeStatus_Click" Tag="Принят"/>
+                            <MenuItem Header="Статус: В работе" Click="ChangeStatus_Click" Tag="В работе"/>
+                            <MenuItem Header="Статус: Готов" Click="ChangeStatus_Click" Tag="Готов"/>
+                            <Separator/>
+                            <MenuItem Header="Статус: Выдан" Click="ChangeStatus_Click" Tag="Выдан" Foreground="DarkGreen" FontWeight="Bold"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="150" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Проблема" Binding="{Binding ProblemDescription}" Width="*" IsReadOnly="True"/>

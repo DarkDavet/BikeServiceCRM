@@ -9,31 +9,64 @@
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
+            
             <StackPanel Margin="20">
-                <TextBlock Text="Редактирование заказа" FontSize="18" FontWeight="Bold" Margin="0,0,0,15"/>
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <!-- Заголовок займет всё свободное место -->
+                        <ColumnDefinition Width="180"/>
+                        <!-- Фиксированная ширина для комбобокса -->
+                    </Grid.ColumnDefinitions>
 
-            <Label Content="Информация о велосипеде:"/>
+                    <TextBlock Text="Редактирование заказа" 
+               FontSize="18" 
+               FontWeight="Bold" 
+               VerticalAlignment="Bottom"/>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
+                        <Label Content="Статус заказа:" FontSize="11" Foreground="Gray" Margin="0,0,0,-3"/>
+                        <ComboBox x:Name="StatusComboBox" Height="28" VerticalContentAlignment="Center">
+                            <ComboBoxItem Content="Принят"/>
+                            <ComboBoxItem Content="В работе"/>
+                            <ComboBoxItem Content="Готов"/>
+                            <ComboBoxItem Content="Выдан"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+
+                <Label Content="Информация о велосипеде:"/>
             <TextBox x:Name="BikeInfoBox" Margin="0,0,0,10"/>
 
             <Label Content="Описание проблемы:"/>
             <TextBox x:Name="ProblemBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
-            <GroupBox Header="Быстрое добавление запчастей/работ" Margin="0,0,0,10">
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <!-- Название -->
-                        <ColumnDefinition Width="80"/>
-                        <!-- Цена -->
-                        <ColumnDefinition Width="Auto"/>
-                        <!-- Кнопка -->
-                    </Grid.ColumnDefinitions>
+                <GroupBox Header="Расчет запчастей/работ" Margin="0,0,0,10">
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <!-- Колонка 0: Название -->
+                            <ColumnDefinition Width="80"/>
+                            <!-- Колонка 1: Цена -->
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- Колонка 2: Кнопка + -->
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- Колонка 3: Кнопка Reset -->
+                        </Grid.ColumnDefinitions>
 
-                    <TextBox x:Name="ItemNameBox" Grid.Column="0" Margin="0,0,5,0" Tag="Название запчасти или работы..."/>
-                    <TextBox x:Name="ItemPriceBox" Grid.Column="1" Margin="0,0,5,0" Tag="Цена"/>
-                    <Button Content="+" Grid.Column="2" Width="30" Click="AddItem_Click" Background="#3498DB" Foreground="White" FontWeight="Bold"/>
-                </Grid>
-            </GroupBox>
-            <Label Content="Выполненные работы:"/>
+                        <TextBox x:Name="ItemNameBox" Grid.Column="0" Margin="0,0,5,0" Height="25" VerticalContentAlignment="Center"/>
+                        <TextBox x:Name="ItemPriceBox" Grid.Column="1" Margin="0,0,5,0" Height="25" VerticalContentAlignment="Center"/>
+
+                        <!-- Кнопка + в колонке 2 -->
+                        <Button Content="+" Grid.Column="2" Width="30" Click="AddItem_Click" 
+                Background="#3498DB" Foreground="White" FontWeight="Bold"/>
+
+                        <!-- Кнопка Reset в колонке 3 -->
+                        <Button Content="Reset" Grid.Column="3" Width="50" Margin="5,0,0,0" 
+                Click="ClearCosts_Click" Background="#95A5A6" Foreground="White" FontSize="10"/>
+                    </Grid>
+                </GroupBox>
+                <Label Content="Выполненные работы:"/>
             <TextBox x:Name="WorksBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
 
             <!-- НОВЫЙ БЛОК ДЛЯ РАСХОДОВ И ПРИБЫЛИ -->

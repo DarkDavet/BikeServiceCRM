@@ -35,6 +35,15 @@ namespace BusinessAccountantService
             // Добавьте это:
             PartsCostBox.Text = repair.PartsCost.ToString();
             TotalCostBox.Text = repair.TotalCost.ToString();
+
+            foreach (ComboBoxItem item in StatusComboBox.Items)
+            {
+                if (item.Content.ToString() == repair.Status)
+                {
+                    StatusComboBox.SelectedItem = item;
+                    break;
+                }
+            }
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -49,6 +58,11 @@ namespace BusinessAccountantService
 
             Repair.PartsCost = parts;
             Repair.TotalCost = total;
+
+            if (StatusComboBox.SelectedItem is ComboBoxItem selectedItem)
+            {
+                Repair.Status = selectedItem.Content.ToString();
+            }
 
             DialogResult = true;
         }
@@ -84,6 +98,25 @@ namespace BusinessAccountantService
             double.TryParse(TotalCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double total);
 
             ProfitText.Text = $"Чистая прибыль: {total - parts} руб.";
+        }
+
+        private void ClearCosts_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Очистить список работ и обнулить все суммы?",
+                                         "Сброс расчета", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                WorksBox.Clear();
+                PartsCostBox.Text = "0";
+                TotalCostBox.Text = "0"; // В AddRepairWindow это CostBox, в Edit - TotalCostBox (проверь имя!)
+
+                // Фокус на ввод названия, чтобы сразу начать заново
+                ItemNameBox.Focus();
+
+                // Если есть метод пересчета прибыли, вызываем его
+                CostFields_TextChanged(null, null);
+            }
         }
 
 

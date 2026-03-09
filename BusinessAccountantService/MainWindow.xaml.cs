@@ -356,6 +356,41 @@ namespace BusinessAccountantService
                 }
             }
         }
+        private void ChangeStatus_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Проверяем, что в таблице выбран заказ
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
+            {
+                // 2. Получаем новый статус из свойства Tag нажатого пункта меню
+                var menuItem = sender as MenuItem;
+                if (menuItem == null) return;
+
+                string newStatus = menuItem.Tag.ToString();
+
+                // 3. Обновляем статус в базе данных (используем ваш существующий метод)
+                UpdateRepairStatus(selectedRepair.Id, newStatus);
+
+                // 4. Обновляем статус в самом объекте (таблица перекрасится сама благодаря INotifyPropertyChanged)
+                selectedRepair.Status = newStatus;
+
+                // 5. Если включен фильтр "В работе" или "Архив", и статус перестал подходить — обновляем список
+                if (_currentMode != ViewMode.All)
+                {
+                    if (ClientsGrid.SelectedItem is Client selectedClient)
+                    {
+                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
+                    }
+                }
+
+                // 6. Обновляем счетчики прибыли и заказов
+                UpdateStatusInfo();
+            }
+            else
+            {
+                MessageBox.Show("Сначала выберите заказ в таблице!");
+            }
+        }
+
 
 
     }
