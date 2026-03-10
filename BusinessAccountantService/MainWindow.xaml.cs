@@ -47,10 +47,12 @@ namespace BusinessAccountantService
             if (InventoryGrid.Visibility == Visibility.Visible)
             {
                 // ЛОГИКА ДЛЯ СКЛАДА
-                AddItemToInventoryWindow addWin = new AddItemToInventoryWindow();
-                if (addWin.ShowDialog() == true)
+                AddItemToInventoryWindow addItemWin = new AddItemToInventoryWindow { Owner = this };
+                if (addItemWin.ShowDialog() == true)
                 {
+                    // Обновляем список товаров на складе
                     InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+                    StatusInfoText.Text = $"Товаров в базе: {InventoryGrid.Items.Count}";
                 }
             }
             else
