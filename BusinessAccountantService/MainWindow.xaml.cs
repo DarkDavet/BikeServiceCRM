@@ -410,52 +410,45 @@ namespace BusinessAccountantService
 
         private void ShowMonthlyStats_Click(object sender, RoutedEventArgs e)
         {
-            // Берем дату из календаря или текущую
             DateTime selectedDate = StatsDatePicker.SelectedDate ?? DateTime.Now;
 
-            // Получаем данные за выбранный месяц
-            var stats = _repairManager.GetStatsByMonth(selectedDate);
+            // Данные за месяц
+            var monthly = _repairManager.GetStatsByMonth(selectedDate);
+            // Данные за все время
+            var global = _repairManager.GetGlobalStats();
 
-            // Получаем данные за ПРЕДЫДУЩИЙ месяц для сравнения
-            var lastMonthStats = _repairManager.GetStatsByMonth(selectedDate.AddMonths(-1));
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"📊 ОТЧЕТ ЗА {selectedDate:MMMM yyyy.ToUpper()}");
+            sb.AppendLine($"💰 Выручка: {monthly.rev:N0} руб.");
+            sb.AppendLine($"📈 Прибыль: {monthly.prof:N0} руб.");
+            sb.AppendLine($"🛠 Ремонтов выполнено: {monthly.count} шт.");
 
-            string trend = "";
-            if (lastMonthStats.prof > 0)
-            {
-                double diff = ((stats.prof - lastMonthStats.prof) / lastMonthStats.prof) * 100;
-                trend = $"\nДинамика к пред. месяцу: {(diff >= 0 ? "+" : "")}{diff:F1}%";
-            }
+            sb.AppendLine("\n" + new string('─', 25) + "\n");
 
-            string message = $"📊 ОТЧЕТ ЗА {selectedDate:MMMM yyyy}\n\n" +
-                             $"💰 Выручка: {stats.rev:N0} руб.\n" +
-                             $"📈 Прибыль: {stats.prof:N0} руб.\n" +
-                             $"🛠 Выдано: {stats.count} шт.\n" +
-                             $"{trend}";
+            sb.AppendLine("🌍 ЗА ВСЁ ВРЕМЯ РАБОТЫ:");
+            sb.AppendLine($"💰 Общий оборот: {global.totalRev:N0} руб.");
+            sb.AppendLine($"💎 Чистая прибыль: {global.totalProf:N0} руб.");
+            sb.AppendLine($"🚲 Всего ремонтов: {global.totalCount} шт.");
 
-            MessageBox.Show(message, $"Статистика: {selectedDate:MMMM}", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(sb.ToString(), "Финансовая аналитика", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
         private void StatsDatePicker_CalendarOpened(object sender, RoutedEventArgs e)
         {
             var datePicker = sender as DatePicker;
             if (datePicker == null) return;
 
-            // Находим всплывающее окно
             var popup = datePicker.Template.FindName("PART_Popup", datePicker) as System.Windows.Controls.Primitives.Popup;
             if (popup != null && popup.Child is System.Windows.Controls.Calendar calendar)
             {
-                // Сразу включаем режим выбора месяцев
                 calendar.DisplayMode = CalendarMode.Year;
 
-                // Подписываемся на событие изменения режима (когда пользователь кликнул по месяцу)
                 calendar.DisplayModeChanged += (s, args) =>
                 {
-                    // Если пользователь выбрал месяц и календарь хочет показать дни (Month)
                     if (calendar.DisplayMode == CalendarMode.Month)
                     {
-                        // Записываем выбранную дату в DatePicker
                         datePicker.SelectedDate = calendar.DisplayDate;
-                        // Принудительно закрываем выпадающее окно
                         datePicker.IsDropDownOpen = false;
                     }
                 };

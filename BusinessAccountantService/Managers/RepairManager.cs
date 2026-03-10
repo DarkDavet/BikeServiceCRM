@@ -142,6 +142,30 @@ namespace BusinessAccountantService.Managers
             return (0, 0, 0);
         }
 
+        public (double totalRev, double totalProf, int totalCount) GetGlobalStats()
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+
+                // Считаем суммы по всем выданным заказам за всю историю
+                command.CommandText = @"
+            SELECT SUM(TotalCost), SUM(TotalCost - PartsCost), COUNT(*) 
+            FROM Repairs 
+            WHERE Status = 'Выдан'";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        return (reader.GetDouble(0), reader.GetDouble(1), reader.GetInt32(2));
+                    }
+                }
+            }
+            return (0, 0, 0);
+        }
+
 
     }
 }
