@@ -113,5 +113,35 @@ namespace BusinessAccountantService.Managers
             }
         }
 
+        public (double rev, double prof, int count) GetStatsByMonth(DateTime date)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+
+                // Формируем строку года и месяца из выбранной даты (например "2023-10")
+                string yearMonth = date.ToString("yyyy-MM");
+
+                command.CommandText = @"
+            SELECT SUM(TotalCost), SUM(TotalCost - PartsCost), COUNT(*) 
+            FROM Repairs 
+            WHERE Status = 'Выдан' 
+            AND strftime('%Y-%m', DateCreated) = $ym";
+
+                command.Parameters.AddWithValue("$ym", yearMonth);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        return (reader.GetDouble(0), reader.GetDouble(1), reader.GetInt32(2));
+                    }
+                }
+            }
+            return (0, 0, 0);
+        }
+
+
     }
 }

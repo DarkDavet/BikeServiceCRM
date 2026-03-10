@@ -33,6 +33,7 @@ namespace BusinessAccountantService
         public MainWindow()
         {
             InitializeComponent();
+            StatsDatePicker.SelectedDate = DateTime.Now;
             //DatabaseService.ResetDatabase();
             DatabaseService.Initialize();
             LoadClients();
@@ -97,7 +98,7 @@ namespace BusinessAccountantService
         private void EntryAct_Click(object sender, RoutedEventArgs e)
         {
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
-                ClientsGrid.SelectedItem is Client selectedClient) 
+                ClientsGrid.SelectedItem is Client selectedClient)
             {
                 UpdateRepairStatus(selectedRepair.Id, "Принят");
                 selectedRepair.Status = "Принят";
@@ -115,7 +116,7 @@ namespace BusinessAccountantService
         private void FinalAct_Click(object sender, RoutedEventArgs e)
         {
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
-                ClientsGrid.SelectedItem is Client selectedClient) 
+                ClientsGrid.SelectedItem is Client selectedClient)
             {
                 UpdateRepairStatus(selectedRepair.Id, "Выдан");
                 selectedRepair.Status = "Выдан";
@@ -159,8 +160,8 @@ namespace BusinessAccountantService
                 {
                     _clientManager.DeleteClient(selectedClient);
                     UpdateStatusInfo();
-                    LoadClients(); 
-                    RepairsHistoryGrid.ItemsSource = null; 
+                    LoadClients();
+                    RepairsHistoryGrid.ItemsSource = null;
                 }
             }
         }
@@ -215,7 +216,7 @@ namespace BusinessAccountantService
             }
         }
 
-    
+
         private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
@@ -314,7 +315,7 @@ namespace BusinessAccountantService
             }
         }
 
-        
+
         private void RepairsHistoryGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             // 1. Проверяем, что в таблице действительно выбран заказ
@@ -407,7 +408,78 @@ namespace BusinessAccountantService
             }
         }
 
+        private void ShowMonthlyStats_Click(object sender, RoutedEventArgs e)
+        {
+            // Берем дату из календаря или текущую
+            DateTime selectedDate = StatsDatePicker.SelectedDate ?? DateTime.Now;
 
+            // Получаем данные за выбранный месяц
+            var stats = _repairManager.GetStatsByMonth(selectedDate);
+
+            // Получаем данные за ПРЕДЫДУЩИЙ месяц для сравнения
+            var lastMonthStats = _repairManager.GetStatsByMonth(selectedDate.AddMonths(-1));
+
+            string trend = "";
+            if (lastMonthStats.prof > 0)
+            {
+                double diff = ((stats.prof - lastMonthStats.prof) / lastMonthStats.prof) * 100;
+                trend = $"\nДинамика к пред. месяцу: {(diff >= 0 ? "+" : "")}{diff:F1}%";
+            }
+
+            string message = $"📊 ОТЧЕТ ЗА {selectedDate:MMMM yyyy}\n\n" +
+                             $"💰 Выручка: {stats.rev:N0} руб.\n" +
+                             $"📈 Прибыль: {stats.prof:N0} руб.\n" +
+                             $"🛠 Выдано: {stats.count} шт.\n" +
+                             $"{trend}";
+
+            MessageBox.Show(message, $"Статистика: {selectedDate:MMMM}", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void StatsDatePicker_CalendarOpened(object sender, RoutedEventArgs e)
+        {
+            var datePicker = sender as DatePicker;
+            if (datePicker == null) return;
+
+            // Находим всплывающее окно
+            var popup = datePicker.Template.FindName("PART_Popup", datePicker) as System.Windows.Controls.Primitives.Popup;
+            if (popup != null && popup.Child is System.Windows.Controls.Calendar calendar)
+            {
+                // Сразу включаем режим выбора месяцев
+                calendar.DisplayMode = CalendarMode.Year;
+
+                // Подписываемся на событие изменения режима (когда пользователь кликнул по месяцу)
+                calendar.DisplayModeChanged += (s, args) =>
+                {
+                    // Если пользователь выбрал месяц и календарь хочет показать дни (Month)
+                    if (calendar.DisplayMode == CalendarMode.Month)
+                    {
+                        // Записываем выбранную дату в DatePicker
+                        datePicker.SelectedDate = calendar.DisplayDate;
+                        // Принудительно закрываем выпадающее окно
+                        datePicker.IsDropDownOpen = false;
+                    }
+                };
+            }
+        }
+
+        private void StatsDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (StatsDatePicker.SelectedDate is DateTime date)
+            {
+                // Используем Dispatcher, чтобы подменить текст ПРАКТИЧЕСКИ сразу, 
+                // как только WPF вставит туда стандартную дату
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    var textBox = StatsDatePicker.Template.FindName("PART_TextBox", StatsDatePicker) as TextBox;
+                    if (textBox != null)
+                    {
+                        // Задаем нужный формат: MMMM (полное название месяца) yyyy (год)
+                        textBox.Text = date.ToString("MMMM yyyy");
+                    }
+                }), System.Windows.Threading.DispatcherPriority.Background);
+            }
+       
+        }
 
     }
 }
