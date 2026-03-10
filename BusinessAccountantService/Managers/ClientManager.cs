@@ -53,6 +53,46 @@ namespace BusinessAccountantService.Managers
             return clients;
         }
 
+        public void UpdateClient(Client c)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = @"UPDATE Clients SET 
+                                FullName = $name, 
+                                Phone = $phone, 
+                                Address = $address 
+                                WHERE Id = $id";
 
+                command.Parameters.AddWithValue("$name", c.Name);
+                command.Parameters.AddWithValue("$phone", c.Phone);
+                command.Parameters.AddWithValue("$address", c.Address);
+                command.Parameters.AddWithValue("$id", c.Id);
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteClient(Client c)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+
+                // 1. ВКЛЮЧАЕМ КАСКАД (в этом конкретном соединении)
+                using (var pragmaCmd = new SqliteCommand("PRAGMA foreign_keys = ON;", connection))
+                {
+                    pragmaCmd.ExecuteNonQuery();
+                }
+
+                // 2. УДАЛЯЕМ ТОЛЬКО КЛИЕНТА (ремонты удалятся сами)
+                using (var deleteCmd = new SqliteCommand("DELETE FROM Clients WHERE Id = $id", connection))
+                {
+                    deleteCmd.Parameters.AddWithValue("$id", c.Id);
+                    deleteCmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

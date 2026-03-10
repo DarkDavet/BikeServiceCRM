@@ -157,26 +157,10 @@ namespace BusinessAccountantService
                 if (MessageBox.Show($"Удалить {selectedClient.Name} и его историю?", "Удаление",
                     MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
-                    {
-                        connection.Open();
-
-                        // 1. ВКЛЮЧАЕМ КАСКАД (в этом конкретном соединении)
-                        using (var pragmaCmd = new SqliteCommand("PRAGMA foreign_keys = ON;", connection))
-                        {
-                            pragmaCmd.ExecuteNonQuery();
-                        }
-
-                        // 2. УДАЛЯЕМ ТОЛЬКО КЛИЕНТА (ремонты удалятся сами)
-                        using (var deleteCmd = new SqliteCommand("DELETE FROM Clients WHERE Id = $id", connection))
-                        {
-                            deleteCmd.Parameters.AddWithValue("$id", selectedClient.Id);
-                            deleteCmd.ExecuteNonQuery();
-                        }
-                    }
+                    _clientManager.DeleteClient(selectedClient);
                     UpdateStatusInfo();
-                    LoadClients(); // Обновляем список на экране
-                    RepairsHistoryGrid.ItemsSource = null; // Очищаем таблицу ремонтов
+                    LoadClients(); 
+                    RepairsHistoryGrid.ItemsSource = null; 
                 }
             }
         }
@@ -330,7 +314,7 @@ namespace BusinessAccountantService
             }
         }
 
-        // Добавьте событие MouseDoubleClick в XAML для RepairsHistoryGrid
+        
         private void RepairsHistoryGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             // 1. Проверяем, что в таблице действительно выбран заказ
@@ -369,24 +353,44 @@ namespace BusinessAccountantService
                 }
             }
         }
+
+        private void ClientsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (ClientsGrid.SelectedItem is Client selectedClient)
+            {
+                EditClientWindow editWin = new EditClientWindow(selectedClient);
+                editWin.Owner = this;
+
+                if (editWin.ShowDialog() == true)
+                {
+                    if (editWin.IsDeleted)
+                    {
+                        _clientManager.DeleteClient(selectedClient);
+                        UpdateStatusInfo();
+                        LoadClients();
+                        RepairsHistoryGrid.ItemsSource = null;
+                        MessageBox.Show("Клиент удален.");
+                    }
+                    else
+                    {
+                        _clientManager.UpdateClient(selectedClient);
+                        MessageBox.Show("Изменения сохранены.");
+                    }
+                }
+            }
+        }
         private void ChangeStatus_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Проверяем, что в таблице выбран заказ
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
             {
-                // 2. Получаем новый статус из свойства Tag нажатого пункта меню
                 var menuItem = sender as MenuItem;
                 if (menuItem == null) return;
 
                 string newStatus = menuItem.Tag.ToString();
 
-                // 3. Обновляем статус в базе данных (используем ваш существующий метод)
                 UpdateRepairStatus(selectedRepair.Id, newStatus);
-
-                // 4. Обновляем статус в самом объекте (таблица перекрасится сама благодаря INotifyPropertyChanged)
                 selectedRepair.Status = newStatus;
 
-                // 5. Если включен фильтр "В работе" или "Архив", и статус перестал подходить — обновляем список
                 if (_currentMode != ViewMode.All)
                 {
                     if (ClientsGrid.SelectedItem is Client selectedClient)
@@ -395,7 +399,6 @@ namespace BusinessAccountantService
                     }
                 }
 
-                // 6. Обновляем счетчики прибыли и заказов
                 UpdateStatusInfo();
             }
             else

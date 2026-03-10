@@ -63,6 +63,7 @@
             </StackPanel>
             <!-- 1. Таблица КЛИЕНТОВ (называем её ClientsGrid) -->
             <DataGrid x:Name="ClientsGrid" Grid.Row="1" 
+                      MouseDoubleClick="ClientsGrid_MouseDoubleClick"
               AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" CanUserAddRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>

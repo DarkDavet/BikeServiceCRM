@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="EditRepairWindow" Height="550" Width="800">
+        Title="EditRepairWindow" Height="550" Width="600">
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
