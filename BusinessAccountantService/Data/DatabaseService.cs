@@ -43,7 +43,17 @@ namespace BusinessAccountantService.Data
                 Status TEXT DEFAULT 'Принят',
                 DateCreated DATETIME,
                 FOREIGN KEY (ClientId) REFERENCES Clients(Id) ON DELETE CASCADE
-            );";
+            );
+            CREATE TABLE IF NOT EXISTS Inventory (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name TEXT NOT NULL,
+                Quantity INTEGER DEFAULT 0,
+                PurchasePrice REAL DEFAULT 0,
+                RetailPrice REAL DEFAULT 0,
+                Category TEXT -- Запчасти, Велосипеды, Аксессуары
+);
+
+";
                 command.ExecuteNonQuery();
             }
         }

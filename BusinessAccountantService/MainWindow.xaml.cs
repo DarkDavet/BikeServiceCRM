@@ -30,6 +30,7 @@ namespace BusinessAccountantService
         private readonly ClientManager _clientManager = new();
         private readonly RepairManager _repairManager = new();
         private readonly PdfExportManager _pdfmanager = new();
+        private readonly InventoryManager _inventoryManager = new();
         public MainWindow()
         {
             InitializeComponent();
@@ -43,18 +44,27 @@ namespace BusinessAccountantService
 
         private void AddClient_Click(object sender, RoutedEventArgs e)
         {
-            AddClientWindow addWindow = new AddClientWindow();
-            addWindow.Owner = this;
-
-            if (addWindow.ShowDialog() == true)
+            if (InventoryGrid.Visibility == Visibility.Visible)
             {
-                LoadClients();
+                // ЛОГИКА ДЛЯ СКЛАДА
+                AddItemToInventoryWindow addWin = new AddItemToInventoryWindow();
+                if (addWin.ShowDialog() == true)
+                {
+                    InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+                }
+            }
+            else
+            {
+                // ЛОГИКА ДЛЯ КЛИЕНТОВ (ваш старый код)
+                AddClientWindow addWindow = new AddClientWindow { Owner = this };
+                if (addWindow.ShowDialog() == true) LoadClients();
             }
         }
 
         private void SwitchViewMode(ViewMode newMode, Button activeBtn)
         {
             _currentMode = newMode;
+            UpdateUIForMode(isInventory: false);
 
             // Сбрасываем цвета всех кнопок
             BtnAllClients.Background = _defaultButtonBrush;
@@ -229,8 +239,27 @@ namespace BusinessAccountantService
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            _clientsView?.Refresh();
-            UpdateStatusInfo();
+            // Если виден склад — фильтруем его
+            if (InventoryGrid.Visibility == Visibility.Visible)
+            {
+                var view = CollectionViewSource.GetDefaultView(InventoryGrid.ItemsSource);
+                if (view != null)
+                {
+                    view.Filter = obj =>
+                    {
+                        var item = obj as Item;
+                        if (item == null || string.IsNullOrWhiteSpace(SearchBox.Text)) return true;
+                        return item.Name.ToLower().Contains(SearchBox.Text.ToLower()) ||
+                               item.Category.ToLower().Contains(SearchBox.Text.ToLower());
+                    };
+                }
+            }
+            // Иначе фильтруем клиентов (ваш старый код)
+            else
+            {
+                _clientsView?.Refresh();
+                UpdateStatusInfo();
+            }
         }
 
         private void RepairsHistoryGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -472,6 +501,57 @@ namespace BusinessAccountantService
                 }), System.Windows.Threading.DispatcherPriority.Background);
             }
        
+        }
+
+        private void ShowInventory_Click(object sender, RoutedEventArgs e)
+        {
+            _currentMode = ViewMode.All; // Сбрасываем фильтры заказов
+
+            // Переключаем интерфейс на Склад
+            UpdateUIForMode(isInventory: true);
+
+            // Загружаем данные в таблицу склада
+            InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+
+            // Подсвечиваем кнопку Склад и гасим кнопку Клиенты
+            BtnInventory.Background = Brushes.SeaGreen;
+            BtnAllClients.Background = _defaultButtonBrush;
+            BtnActiveOrders.Background = _defaultButtonBrush;
+            BtnArchive.Background = _defaultButtonBrush;
+        }
+        private void UpdateUIForMode(bool isInventory)
+        {
+            if (isInventory)
+            {
+                // РЕЖИМ СКЛАДА
+                MainTitleText.Text = "Склад запчастей";
+                ClientsGrid.Visibility = Visibility.Collapsed;
+                InventoryGrid.Visibility = Visibility.Visible;
+                RepairsPanel.Visibility = Visibility.Collapsed; // Скрываем историю
+                PdfButtonsPanel.Visibility = Visibility.Collapsed; // Скрываем PDF
+
+                // Кнопки управления
+                BtnAddPrimary.Content = "Приход товара";
+                BtnAddSecondary.Content = "Списание / Брак";
+
+                // Обновляем счетчик сверху под склад
+                StatusInfoText.Foreground = Brushes.SlateBlue;
+                StatusInfoText.Text = $"Товаров в базе: {InventoryGrid.Items.Count}";
+            }
+            else
+            {
+                // РЕЖИМ КЛИЕНТОВ (Возвращаем как было)
+                MainTitleText.Text = "Список клиентов";
+                ClientsGrid.Visibility = Visibility.Visible;
+                InventoryGrid.Visibility = Visibility.Collapsed;
+                RepairsPanel.Visibility = Visibility.Visible;
+                PdfButtonsPanel.Visibility = Visibility.Visible;
+
+                BtnAddPrimary.Content = "Добавить клиента";
+                BtnAddSecondary.Content = "Новый заказ";
+
+                UpdateStatusInfo();
+            }
         }
 
     }
