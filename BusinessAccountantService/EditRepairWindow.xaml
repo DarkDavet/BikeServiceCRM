@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="EditRepairWindow" Height="550" Width="600">
+        Title="EditRepairWindow" Height="600" Width="500" WindowStartupLocation="CenterOwner">
 
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -92,11 +92,11 @@
             <!-- КОНЕЦ НОВОГО БЛОКА -->
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Удалить заказ" Width="120" Margin="0,0,50,0" 
+                    <Button Content="Удалить заказ" Width="120" Height="30" Margin="0,0,70,0" 
                         Click="Delete_Click" Background="#C0392B" Foreground="White"/>
-                <Button Content="Сохранить" Width="100" Margin="0,0,10,0" 
+                    <Button Content="Сохранить" Width="100" Height="30" Margin="0,0,10,0" 
                         Click="Save_Click" Background="#27AE60" Foreground="White"/>
-                <Button Content="Отмена" Width="100" Click="Cancel_Click"/>
+                <Button Content="Отмена" Width="100" Height="30" Click="Cancel_Click"/>
             </StackPanel>
         </StackPanel>
         </ScrollViewer>
