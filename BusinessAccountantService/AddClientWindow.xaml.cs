@@ -30,6 +30,7 @@ namespace BusinessAccountantService
         {
             string name = FullNameBox.Text;
             string phone = PhoneBox.Text;
+            string address = AddressBox.Text;
 
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -41,9 +42,10 @@ namespace BusinessAccountantService
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "INSERT INTO Clients (FullName, Phone) VALUES ($name, $phone)";
+                command.CommandText = "INSERT INTO Clients (FullName, Phone, Address) VALUES ($name, $phone, $address)";
                 command.Parameters.AddWithValue("$name", name);
                 command.Parameters.AddWithValue("$phone", phone);
+                command.Parameters.AddWithValue("$address", address);
 
                 command.ExecuteNonQuery();
             }

@@ -66,8 +66,9 @@
               AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" CanUserAddRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
-                    <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="400"/>
                     <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
+                    <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="200"/>
                 </DataGrid.Columns>
             </DataGrid>
 

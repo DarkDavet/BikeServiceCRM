@@ -28,7 +28,8 @@ namespace BusinessAccountantService.Data
             CREATE TABLE IF NOT EXISTS Clients (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 FullName TEXT NOT NULL,
-                Phone TEXT
+                Phone TEXT,
+                Address TEXT
             );
 
             CREATE TABLE IF NOT EXISTS Repairs (

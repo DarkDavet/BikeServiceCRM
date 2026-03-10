@@ -38,7 +38,6 @@ namespace BusinessAccountantService.Managers
                             BikeInfo = reader.GetString(1),
                             ProblemDescription = reader.GetString(2),
                             WorksPerformed = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                            // Считываем новые данные
                             PartsCost = reader.IsDBNull(4) ? 0 : reader.GetDouble(4),
                             TotalCost = reader.GetDouble(5),
                             Status = reader.IsDBNull(6) ? "Принят" : reader.GetString(6),

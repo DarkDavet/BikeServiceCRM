@@ -23,8 +23,8 @@ namespace BusinessAccountantService.Managers
             };
 
             string query = mode == ViewMode.All
-                ? "SELECT Id, FullName, Phone FROM Clients"
-                : $@"SELECT DISTINCT c.Id, c.FullName, c.Phone 
+                ? "SELECT Id, FullName, Phone, Address FROM Clients"
+                : $@"SELECT DISTINCT c.Id, c.FullName, c.Phone, c.Address 
              FROM Clients c 
              JOIN Repairs r ON c.Id = r.ClientId 
              {statusCondition}";
@@ -44,7 +44,8 @@ namespace BusinessAccountantService.Managers
                         {
                             Id = reader.GetInt32(0),
                             Name = reader.IsDBNull(1) ? "" : reader.GetString(1),
-                            Phone = reader.IsDBNull(2) ? "" : reader.GetString(2)
+                            Phone = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                            Address = reader.IsDBNull(3) ? "" : reader.GetString(3)
                         });
                     }
                 }
