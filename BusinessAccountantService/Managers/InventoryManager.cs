@@ -39,5 +39,23 @@ namespace BusinessAccountantService.Managers
             return items;
         }
 
+        public void DecreaseQuantity(int itemId, int count)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+
+                // UPDATE уменьшает количество на указанное число
+                // Условие AND Quantity >= $count страхует от ухода в минус
+                command.CommandText = "UPDATE Inventory SET Quantity = Quantity - $count WHERE Id = $id AND Quantity >= $count";
+
+                command.Parameters.AddWithValue("$count", count);
+                command.Parameters.AddWithValue("$id", itemId);
+
+                command.ExecuteNonQuery();
+            }
+        }
+
     }
 }

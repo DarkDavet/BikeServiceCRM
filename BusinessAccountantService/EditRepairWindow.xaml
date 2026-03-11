@@ -41,31 +41,33 @@
 
             <Label Content="Описание проблемы:"/>
             <TextBox x:Name="ProblemBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
-                <GroupBox Header="Расчет запчастей/работ" Margin="0,0,0,10">
+                <GroupBox Header="Быстрый расчет со склада" Margin="0,0,0,10">
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <!-- Колонка 0: Название -->
+                            <!-- Название (ComboBox) -->
                             <ColumnDefinition Width="80"/>
-                            <!-- Колонка 1: Цена -->
+                            <!-- Цена -->
                             <ColumnDefinition Width="Auto"/>
-                            <!-- Колонка 2: Кнопка + -->
+                            <!-- Кнопка + -->
                             <ColumnDefinition Width="Auto"/>
-                            <!-- Колонка 3: Кнопка Reset -->
+                            <!-- Кнопка Reset -->
                         </Grid.ColumnDefinitions>
 
-                        <TextBox x:Name="ItemNameBox" Grid.Column="0" Margin="0,0,5,0" Height="25" VerticalContentAlignment="Center"/>
+                        <!-- IsEditable="True" позволяет и искать, и писать свой текст -->
+                        <ComboBox x:Name="ItemSearchBox" Grid.Column="0" Margin="0,0,5,0" Height="25" 
+                  IsEditable="True" StaysOpenOnEdit="True" IsTextSearchEnabled="False"
+                  DisplayMemberPath="Name" TextSearch.TextPath="Name"
+                  SelectionChanged="ItemSearchBox_SelectionChanged"
+                  KeyUp="ItemSearchBox_KeyUp"/>
+
                         <TextBox x:Name="ItemPriceBox" Grid.Column="1" Margin="0,0,5,0" Height="25" VerticalContentAlignment="Center"/>
 
-                        <!-- Кнопка + в колонке 2 -->
-                        <Button Content="+" Grid.Column="2" Width="30" Click="AddItem_Click" 
-                Background="#3498DB" Foreground="White" FontWeight="Bold"/>
-
-                        <!-- Кнопка Reset в колонке 3 -->
-                        <Button Content="Reset" Grid.Column="3" Width="50" Margin="5,0,0,0" 
-                Click="ClearCosts_Click" Background="#95A5A6" Foreground="White" FontSize="10"/>
+                        <Button Content="+" Grid.Column="2" Width="30" Click="AddItem_Click" Background="#3498DB" Foreground="White" FontWeight="Bold"/>
+                        <Button Content="Reset" Grid.Column="3" Width="50" Margin="5,0,0,0" Click="ClearCosts_Click" Background="#95A5A6" Foreground="White" FontSize="10"/>
                     </Grid>
                 </GroupBox>
+
                 <Label Content="Выполненные работы:"/>
             <TextBox x:Name="WorksBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
 
