@@ -24,7 +24,7 @@ namespace BusinessAccountantService
         private readonly InventoryManager _inventoryManager = new();
         public RepairRecord Repair { get; private set; }
         public bool IsDeleted { get; private set; } = false;
-
+        private List<int> _itemsToSubtract = new List<int>();
 
         public EditRepairWindow(RepairRecord repair)
         {
@@ -63,6 +63,11 @@ namespace BusinessAccountantService
 
             if (StatusComboBox.SelectedItem is ComboBoxItem selectedItem)
                 Repair.Status = selectedItem.Content.ToString();
+
+            foreach (int itemId in _itemsToSubtract)
+            {
+                _inventoryManager.DecreaseQuantity(itemId, 1);
+            }
 
             DialogResult = true;
         }
@@ -103,6 +108,7 @@ namespace BusinessAccountantService
 
             if (result == MessageBoxResult.Yes)
             {
+                _itemsToSubtract.Clear();
                 WorksBox.Clear();
                 PartsCostBox.Text = "0";
 
@@ -121,13 +127,14 @@ namespace BusinessAccountantService
         {
             if (ItemSearchBox.SelectedItem is Item selectedItem)
             {
-                if (selectedItem.Quantity <= 0)
+                int alreadySelected = _itemsToSubtract.Count(id => id == selectedItem.Id);
+                if (selectedItem.Quantity - alreadySelected <= 0)
                 {
                     MessageBox.Show("Товар закончился на складе!", "Склад", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                _inventoryManager.DecreaseQuantity(selectedItem.Id, 1);
+                _itemsToSubtract.Add(selectedItem.Id);
 
                 double.TryParse(PartsCostBox.Text, out double currentParts);
                 PartsCostBox.Text = (currentParts + selectedItem.PurchasePrice).ToString();
