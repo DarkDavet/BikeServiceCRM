@@ -71,6 +71,17 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-
+        public void UpdateRepairStatus(int repairId, string newStatus)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Repairs SET Status = $status WHERE Id = $id";
+                command.Parameters.AddWithValue("$status", newStatus);
+                command.Parameters.AddWithValue("$id", repairId);
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }

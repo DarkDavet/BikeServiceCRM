@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace BusinessAccountantService.Managers
 {
-    internal class PdfExportManager
+    public class PdfExportManager
     {
         public void ExportEntryAct(Client client, RepairRecord repair)
         {

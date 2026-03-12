@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BusinessAccountantService.Managers
 {
-    internal class RepairManager
+    public class RepairManager
     {
         public List<RepairRecord> GetRepairsByClient(int clientId, ViewMode mode)
         {
@@ -164,6 +164,19 @@ namespace BusinessAccountantService.Managers
                 }
             }
             return (0, 0, 0);
+        }
+
+        public void UpdateStatus(int repairId, string newStatus)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "UPDATE Repairs SET Status = $status WHERE Id = $id";
+                command.Parameters.AddWithValue("$status", newStatus);
+                command.Parameters.AddWithValue("$id", repairId);
+                command.ExecuteNonQuery();
+            }
         }
 
 

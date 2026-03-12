@@ -11,7 +11,7 @@ using System.Windows.Data;
 
 namespace BusinessAccountantService.Managers
 {
-    internal class ClientManager
+    public class ClientManager
     {
         public List<Client> GetClientsByMode(ViewMode mode)
         {
