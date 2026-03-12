@@ -145,22 +145,45 @@ namespace BusinessAccountantService
 
         private void AddRepair_Click(object sender, RoutedEventArgs e)
         {
-            if (ClientsGrid.SelectedItem is Client selectedClient)
+            if (InventoryGrid.Visibility == Visibility.Visible)
             {
-                AddRepairWindow repairWin = new AddRepairWindow(selectedClient.Id);
-                repairWin.Owner = this;
-
-                if (repairWin.ShowDialog() == true)
+                if (InventoryGrid.SelectedItem is Item selectedItem)
                 {
-                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
-                    UpdateStatusInfo();
-                    MessageBox.Show("Заказ успешно добавлен в базу!");
+                    var result = MessageBox.Show($"Списать 1 ед. товара '{selectedItem.Name}' как брак/утерю?",
+                                                 "Списание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        _inventoryManager.ScrapItem(selectedItem.Id, 1);
+                        // Обновляем таблицу склада
+                        InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Выберите товар в таблице для списания!");
                 }
             }
             else
             {
-                MessageBox.Show("Сначала выберите клиента из списка выше!");
+                if (ClientsGrid.SelectedItem is Client selectedClient)
+                {
+                    AddRepairWindow repairWin = new AddRepairWindow(selectedClient.Id);
+                    repairWin.Owner = this;
+
+                    if (repairWin.ShowDialog() == true)
+                    {
+                        RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
+                        UpdateStatusInfo();
+                        MessageBox.Show("Заказ успешно добавлен в базу!");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Сначала выберите клиента из списка выше!");
+                }
             }
+            
         }
 
         private void DeleteClient_Click(object sender, RoutedEventArgs e)
@@ -507,13 +530,14 @@ namespace BusinessAccountantService
 
         private void ShowInventory_Click(object sender, RoutedEventArgs e)
         {
-            _currentMode = ViewMode.All; // Сбрасываем фильтры заказов
+            _currentMode = ViewMode.All; 
 
-            // Переключаем интерфейс на Склад
+            var items = _inventoryManager.GetAllItems();
+            InventoryGrid.ItemsSource = items;
+
             UpdateUIForMode(isInventory: true);
 
-            // Загружаем данные в таблицу склада
-            InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+            StatusInfoText.Text = $"Товаров на складе: {items.Count}";
 
             // Подсвечиваем кнопку Склад и гасим кнопку Клиенты
             BtnInventory.Background = Brushes.SeaGreen;
