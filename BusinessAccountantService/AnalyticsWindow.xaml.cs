@@ -28,6 +28,7 @@ namespace BusinessAccountantService
             InitializeComponent();
             MonthPicker.SelectedDate = DateTime.Now;
             LoadData(DateTime.Now);
+            LoadYearlyData();
         }
         private void LoadData(DateTime date)
         {
@@ -64,6 +65,30 @@ namespace BusinessAccountantService
             {
                 Title = "Дни месяца",
                 Labels = dailyData.Select(x => x.day).ToArray()
+            });
+        }
+
+        private void LoadYearlyData()
+        {
+            var yearlyData = _repairManager.GetYearlyStats();
+
+            // Названия месяцев для оси X
+            string[] monthNames = { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" };
+
+            YearlyChart.Series = new SeriesCollection
+    {
+        new ColumnSeries
+        {
+            Title = "Чистая прибыль",
+            Values = new ChartValues<double>(yearlyData.Select(x => x.profit)),
+            Fill = System.Windows.Media.Brushes.MediumSeaGreen
+        }
+    };
+
+            YearlyChart.AxisX.Clear();
+            YearlyChart.AxisX.Add(new Axis
+            {
+                Labels = yearlyData.Select(x => monthNames[int.Parse(x.month) - 1]).ToArray()
             });
         }
 

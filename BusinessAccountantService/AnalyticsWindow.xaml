@@ -6,63 +6,101 @@
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-        Title="Аналитика сервиса" Height="600" Width="900" Background="#F5F6FA">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Заголовок и выбор месяца -->
-            <RowDefinition Height="Auto"/>
-            <!-- Карточки с цифрами -->
-            <RowDefinition Height="*"/>
-            <!-- График -->
-        </Grid.RowDefinitions>
+        Title="Аналитика сервиса" Height="650" Width="950" Background="#F5F6FA">
+    <Grid Margin="15">
+        <TabControl Background="Transparent" BorderThickness="0">
 
-        <!-- 0: Заголовок -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-            <TextBlock Text="ФИНАНСОВЫЙ ОТЧЕТ:" FontSize="24" FontWeight="Bold" Foreground="#2C3E50"/>
-            <DatePicker x:Name="MonthPicker" Margin="20,0,0,0" Width="150" Height="30" 
-                        CalendarOpened="MonthPicker_CalendarOpened" 
-                        SelectedDateChanged="MonthPicker_SelectedDateChanged"/>
-        </StackPanel>
+            <!-- ВКЛАДКА 1: ДЕТАЛЬНО ЗА МЕСЯЦ -->
+            <TabItem Header="Анализ месяца" FontSize="14" Padding="10,5">
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Заголовок и выбор месяца -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Карточки -->
+                        <RowDefinition Height="*"/>
+                        <!-- График -->
+                    </Grid.RowDefinitions>
 
-        <!-- 1: КАРТОЧКИ (Плитки) -->
-        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,20">
-            <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
-                <StackPanel>
-                    <TextBlock Text="ВЫРУЧКА" Foreground="Gray" FontSize="12"/>
-                    <TextBlock x:Name="RevText" Text="0 ₽" FontSize="20" FontWeight="Bold" Foreground="#2980B9"/>
-                </StackPanel>
-            </Border>
-            <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
-                <StackPanel>
-                    <TextBlock Text="ЗАПЧАСТИ" Foreground="Gray" FontSize="12"/>
-                    <TextBlock x:Name="PartsText" Text="0 ₽" FontSize="20" FontWeight="Bold" Foreground="#C0392B"/>
-                </StackPanel>
-            </Border>
-            <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
-                <StackPanel>
-                    <TextBlock Text="ПРИБЫЛЬ" Foreground="Gray" FontSize="12"/>
-                    <TextBlock x:Name="ProfitText" Text="0 ₽" FontSize="20" FontWeight="Bold" Foreground="#27AE60"/>
-                </StackPanel>
-            </Border>
-            <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
-                <StackPanel>
-                    <TextBlock Text="ЗАКАЗОВ" Foreground="Gray" FontSize="12"/>
-                    <TextBlock x:Name="CountText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#8E44AD"/>
-                </StackPanel>
-            </Border>
-        </UniformGrid>
+                    <!-- 0: Управление месяцем -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="ОТЧЕТ ЗА ПЕРИОД:" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                        <DatePicker x:Name="MonthPicker" Margin="20,0,0,0" Width="180" Height="30" 
+                                    CalendarOpened="MonthPicker_CalendarOpened" 
+                                    SelectedDateChanged="MonthPicker_SelectedDateChanged"/>
+                    </StackPanel>
 
-        <!-- 2: ГРАФИК -->
-        <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="20">
-            <lvc:CartesianChart x:Name="FinanceChart" LegendLocation="Bottom">
-                <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Title="Дни месяца" Labels="{Binding Labels}"/>
-                </lvc:CartesianChart.AxisX>
-                <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Сумма (₽)"/>
-                </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>
-        </Border>
+                    <!-- 1: КАРТОЧКИ -->
+                    <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,15">
+                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="ВЫРУЧКА" Foreground="Gray" FontSize="11"/>
+                                <TextBlock x:Name="RevText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#2980B9"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="ЗАПЧАСТИ" Foreground="Gray" FontSize="11"/>
+                                <TextBlock x:Name="PartsText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#C0392B"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="ПРИБЫЛЬ" Foreground="Gray" FontSize="11"/>
+                                <TextBlock x:Name="ProfitText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#27AE60"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="ЗАКАЗОВ" Foreground="Gray" FontSize="11"/>
+                                <TextBlock x:Name="CountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#8E44AD"/>
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- 2: МЕСЯЧНЫЙ ГРАФИК -->
+                    <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="15">
+                        <lvc:CartesianChart x:Name="FinanceChart" LegendLocation="Bottom">
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Сумма (₽)" LabelFormatter="{Binding Formatter}"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ВКЛАДКА 2: ИТОГИ ГОДА -->
+            <TabItem Header="Динамика года" FontSize="14" Padding="10,5">
+                <Grid Margin="0,20,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="ЧИСТАЯ ПРИБЫЛЬ ПО МЕСЯЦАМ" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="5,0,0,15"/>
+
+                    <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
+                        <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="None">
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Прибыль (₽)"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
     </Grid>
 </Window>

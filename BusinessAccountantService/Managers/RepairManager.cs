@@ -206,6 +206,28 @@ namespace BusinessAccountantService.Managers
             return stats;
         }
 
+        public List<(string month, double profit)> GetYearlyStats()
+        {
+            var stats = new List<(string month, double profit)>();
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                    SELECT strftime('%m', DateCreated) as Month, SUM(TotalCost - PartsCost) 
+                    FROM Repairs 
+                    WHERE Status = 'Выдан' AND strftime('%Y', DateCreated) = strftime('%Y', 'now')
+                    GROUP BY Month ORDER BY Month ASC";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        stats.Add((reader.GetString(0), reader.GetDouble(1)));
+                }
+            }
+            return stats;
+        }
+
 
     }
 }
