@@ -36,7 +36,7 @@ namespace BusinessAccountantService
         {
             InitializeComponent();
             DatabaseService.Initialize();
-            StatsDatePicker.SelectedDate = DateTime.Now;
+            
 
             // При запуске сразу открываем страницу клиентов
             ShowAllClients_Click(null, null);
@@ -79,73 +79,14 @@ namespace BusinessAccountantService
                 activeBtn.Background = Brushes.LightGreen; // Или ваш цвет активной кнопки
         }
 
-        // Статистика и DatePicker остаются здесь, так как они в боковом меню
         private void ShowMonthlyStats_Click(object sender, RoutedEventArgs e)
         {
-            DateTime selectedDate = StatsDatePicker.SelectedDate ?? DateTime.Now;
-
-            var monthly = _repairManager.GetStatsByMonth(selectedDate);
-            var global = _repairManager.GetGlobalStats();
-            double inventoryValue = _inventoryManager.GetTotalInventoryValue();
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"📊 ОТЧЕТ ЗА {selectedDate:MMMM yyyy.ToUpper()}");
-            sb.AppendLine($"💰 Выручка: {monthly.rev:N0} руб.");
-            sb.AppendLine($"💸 Затраты на з/п: {monthly.parts:N0} руб.");
-            sb.AppendLine($"📈 Чистая прибыль: {monthly.prof:N0} руб.");
-            sb.AppendLine($"🚲 Выдано заказов: {monthly.count} шт.");
-
-            sb.AppendLine("\n" + new string('─', 25) + "\n");
-
-            sb.AppendLine("🌍 ЗА ВСЁ ВРЕМЯ РАБОТЫ:");
-            sb.AppendLine($"💰 Общий оборот: {global.totalRev:N0} руб.");
-            sb.AppendLine($"💸 Всего на з/п: {global.totalParts:N0} руб.");
-            sb.AppendLine($"💎 Общая прибыль: {global.totalProf:N0} руб.");
-            sb.AppendLine($"🚲 Всего обслужено: {global.totalCount} шт.");
-
-            sb.AppendLine("\n📦 СКЛАД СЕЙЧАС:");
-            sb.AppendLine($"💎 Стоимость остатков: {inventoryValue:N0} руб.");
-
-            MessageBox.Show(sb.ToString(), "Финансовая аналитика", MessageBoxButton.OK, MessageBoxImage.Information);
+            AnalyticsWindow analyticsWin = new AnalyticsWindow();
+            analyticsWin.Owner = this; 
+            analyticsWin.ShowDialog();
         }
 
-
-        private void StatsDatePicker_CalendarOpened(object sender, RoutedEventArgs e)
-        {
-            var datePicker = sender as DatePicker;
-            if (datePicker == null) return;
-
-            var popup = datePicker.Template.FindName("PART_Popup", datePicker) as System.Windows.Controls.Primitives.Popup;
-            if (popup != null && popup.Child is System.Windows.Controls.Calendar calendar)
-            {
-                calendar.DisplayMode = CalendarMode.Year;
-
-                calendar.DisplayModeChanged += (s, args) =>
-                {
-                    if (calendar.DisplayMode == CalendarMode.Month)
-                    {
-                        datePicker.SelectedDate = calendar.DisplayDate;
-                        datePicker.IsDropDownOpen = false;
-                    }
-                };
-            }
-        }
-
-        private void StatsDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (StatsDatePicker.SelectedDate is DateTime date)
-            {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    var textBox = StatsDatePicker.Template.FindName("PART_TextBox", StatsDatePicker) as TextBox;
-                    if (textBox != null)
-                    {
-                        textBox.Text = date.ToString("MMMM yyyy");
-                    }
-                }), System.Windows.Threading.DispatcherPriority.Background);
-            }
-
-        }
+        
 
         private void ResetDb_Click(object sender, RoutedEventArgs e)
         {

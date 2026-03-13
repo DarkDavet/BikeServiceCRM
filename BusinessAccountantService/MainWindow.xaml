@@ -29,13 +29,6 @@
 
             <Separator Margin="10" Background="#7F8C8D"/>
 
-            <!-- БЛОК СТАТИСТИКИ -->
-            <TextBlock Text="ПЕРИОД СТАТИСТИКИ:" Foreground="#7F8C8D" FontSize="10" Margin="15,10,0,0" FontWeight="Bold"/>
-            <DatePicker x:Name="StatsDatePicker" Margin="10,2,10,5" Height="30" 
-                        CalendarOpened="StatsDatePicker_CalendarOpened"
-                        SelectedDateChanged="StatsDatePicker_SelectedDateChanged"
-                VerticalContentAlignment="Center" BorderThickness="0"/>
-
             <Button Content="Итоги месяца" Click="ShowMonthlyStats_Click" 
             Background="#8E44AD" Foreground="White" Height="40" Margin="10,0,10,5" BorderThickness="0"/>
 
