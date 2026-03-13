@@ -183,29 +183,29 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-        public List<(string day, double dailyRev)> GetDailyRevenue(DateTime date)
+        public List<(string day, double dailyRev, double dailyParts)> GetDailyStats(DateTime date)
         {
-            var stats = new List<(string day, double dailyRev)>();
+            var stats = new List<(string day, double dailyRev, double dailyParts)>();
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                // Группируем доход по дням выбранного месяца
                 command.CommandText = @"
-            SELECT strftime('%d', DateCreated) as Day, SUM(TotalCost) 
-            FROM Repairs 
-            WHERE Status = 'Выдан' AND strftime('%Y-%m', DateCreated) = $ym
-            GROUP BY Day ORDER BY Day ASC";
+                    SELECT strftime('%d', DateCreated) as Day, SUM(TotalCost), SUM(PartsCost)
+                    FROM Repairs 
+                    WHERE Status = 'Выдан' AND strftime('%Y-%m', DateCreated) = $ym
+                    GROUP BY Day ORDER BY Day ASC";
                 command.Parameters.AddWithValue("$ym", date.ToString("yyyy-MM"));
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
-                        stats.Add((reader.GetString(0), reader.GetDouble(1)));
+                        stats.Add((reader.GetString(0), reader.GetDouble(1), reader.GetDouble(2)));
                 }
             }
             return stats;
         }
+
 
     }
 }

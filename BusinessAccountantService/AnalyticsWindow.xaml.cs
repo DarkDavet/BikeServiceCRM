@@ -37,7 +37,7 @@ namespace BusinessAccountantService
             ProfitText.Text = $"{stats.prof:N0} ₽";
             CountText.Text = stats.count.ToString();
 
-            var dailyData = _repairManager.GetDailyRevenue(date);
+            var dailyData = _repairManager.GetDailyStats(date);
 
             FinanceChart.Series = new SeriesCollection
     {
@@ -47,7 +47,15 @@ namespace BusinessAccountantService
             Values = new ChartValues<double>(dailyData.Select(x => x.dailyRev)),
             PointGeometry = DefaultGeometries.Circle,
             Stroke = Brushes.DodgerBlue,
-            Fill = Brushes.Transparent 
+            Fill = Brushes.Transparent
+        },
+        new LineSeries
+        {
+            Title = "Затраты на запчасти",
+            Values = new ChartValues<double>(dailyData.Select(x => x.dailyParts)),
+            PointGeometry = DefaultGeometries.Square, 
+            Stroke = Brushes.Tomato,
+            Fill = Brushes.Transparent
         }
     };
 
@@ -58,6 +66,7 @@ namespace BusinessAccountantService
                 Labels = dailyData.Select(x => x.day).ToArray()
             });
         }
+
 
         private void MonthPicker_CalendarOpened(object sender, RoutedEventArgs e)
         {
