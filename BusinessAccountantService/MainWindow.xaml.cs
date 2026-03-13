@@ -83,21 +83,32 @@ namespace BusinessAccountantService
         private void ShowMonthlyStats_Click(object sender, RoutedEventArgs e)
         {
             DateTime selectedDate = StatsDatePicker.SelectedDate ?? DateTime.Now;
+
             var monthly = _repairManager.GetStatsByMonth(selectedDate);
             var global = _repairManager.GetGlobalStats();
+            double inventoryValue = _inventoryManager.GetTotalInventoryValue();
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"📊 ОТЧЕТ ЗА {selectedDate:MMMM yyyy.ToUpper()}");
             sb.AppendLine($"💰 Выручка: {monthly.rev:N0} руб.");
-            sb.AppendLine($"📈 Прибыль: {monthly.prof:N0} руб.");
-            sb.AppendLine($"🛠 Ремонтов: {monthly.count} шт.");
-            sb.AppendLine("\n" + new string('─', 25) + "\n");
-            sb.AppendLine("🌍 ЗА ВСЁ ВРЕМЯ:");
-            sb.AppendLine($"💰 Оборот: {global.totalRev:N0} руб.");
-            sb.AppendLine($"💎 Прибыль: {global.totalProf:N0} руб.");
+            sb.AppendLine($"💸 Затраты на з/п: {monthly.parts:N0} руб.");
+            sb.AppendLine($"📈 Чистая прибыль: {monthly.prof:N0} руб.");
+            sb.AppendLine($"🚲 Выдано заказов: {monthly.count} шт.");
 
-            MessageBox.Show(sb.ToString(), "Аналитика", MessageBoxButton.OK, MessageBoxImage.Information);
+            sb.AppendLine("\n" + new string('─', 25) + "\n");
+
+            sb.AppendLine("🌍 ЗА ВСЁ ВРЕМЯ РАБОТЫ:");
+            sb.AppendLine($"💰 Общий оборот: {global.totalRev:N0} руб.");
+            sb.AppendLine($"💸 Всего на з/п: {global.totalParts:N0} руб.");
+            sb.AppendLine($"💎 Общая прибыль: {global.totalProf:N0} руб.");
+            sb.AppendLine($"🚲 Всего обслужено: {global.totalCount} шт.");
+
+            sb.AppendLine("\n📦 СКЛАД СЕЙЧАС:");
+            sb.AppendLine($"💎 Стоимость остатков: {inventoryValue:N0} руб.");
+
+            MessageBox.Show(sb.ToString(), "Финансовая аналитика", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
         private void StatsDatePicker_CalendarOpened(object sender, RoutedEventArgs e)
         {
@@ -129,7 +140,6 @@ namespace BusinessAccountantService
                     var textBox = StatsDatePicker.Template.FindName("PART_TextBox", StatsDatePicker) as TextBox;
                     if (textBox != null)
                     {
-                        // Задаем нужный формат: MMMM (полное название месяца) yyyy (год)
                         textBox.Text = date.ToString("MMMM yyyy");
                     }
                 }), System.Windows.Threading.DispatcherPriority.Background);
@@ -142,7 +152,6 @@ namespace BusinessAccountantService
             if (MessageBox.Show("Вы уверены? Это удалит все данные!", "ВНИМАНИЕ", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 DatabaseService.ResetDatabase();
-                // После сброса обновляем текущую страницу
                 MainFrame.Refresh();
             }
         }

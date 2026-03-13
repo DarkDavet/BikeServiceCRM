@@ -55,7 +55,6 @@ namespace BusinessAccountantService.Managers
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                // Используем те же названия колонок, что и в таблице
                 command.CommandText = @"UPDATE Repairs SET 
                                 BikeInfo = $bike, 
                                 ProblemDescription = $prob, 
@@ -77,7 +76,6 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-        // Метод для удаления заказа из базы
         public void DeleteRepair(int id)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
@@ -113,21 +111,22 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-        public (double rev, double prof, int count) GetStatsByMonth(DateTime date)
+        public (double rev, double parts, double prof, int count) GetStatsByMonth(DateTime date)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-
-                // Формируем строку года и месяца из выбранной даты (например "2023-10")
                 string yearMonth = date.ToString("yyyy-MM");
 
+                // Индексы: 0-TotalCost, 1-PartsCost, 2-Profit, 3-Count
                 command.CommandText = @"
-            SELECT SUM(TotalCost), SUM(TotalCost - PartsCost), COUNT(*) 
+            SELECT SUM(TotalCost), 
+                   SUM(PartsCost), 
+                   SUM(TotalCost - PartsCost), 
+                   COUNT(*) 
             FROM Repairs 
-            WHERE Status = 'Выдан' 
-            AND strftime('%Y-%m', DateCreated) = $ym";
+            WHERE Status = 'Выдан' AND strftime('%Y-%m', DateCreated) = $ym";
 
                 command.Parameters.AddWithValue("$ym", yearMonth);
 
@@ -135,23 +134,27 @@ namespace BusinessAccountantService.Managers
                 {
                     if (reader.Read() && !reader.IsDBNull(0))
                     {
-                        return (reader.GetDouble(0), reader.GetDouble(1), reader.GetInt32(2));
+                        return (reader.GetDouble(0), reader.GetDouble(1), reader.GetDouble(2), reader.GetInt32(3));
                     }
                 }
             }
-            return (0, 0, 0);
+            return (0, 0, 0, 0);
         }
 
-        public (double totalRev, double totalProf, int totalCount) GetGlobalStats()
+
+
+        public (double totalRev, double totalParts, double totalProf, int totalCount) GetGlobalStats()
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                // Считаем суммы по всем выданным заказам за всю историю
                 command.CommandText = @"
-            SELECT SUM(TotalCost), SUM(TotalCost - PartsCost), COUNT(*) 
+            SELECT SUM(TotalCost), 
+                   SUM(PartsCost), 
+                   SUM(TotalCost - PartsCost), 
+                   COUNT(*) 
             FROM Repairs 
             WHERE Status = 'Выдан'";
 
@@ -159,12 +162,13 @@ namespace BusinessAccountantService.Managers
                 {
                     if (reader.Read() && !reader.IsDBNull(0))
                     {
-                        return (reader.GetDouble(0), reader.GetDouble(1), reader.GetInt32(2));
+                        return (reader.GetDouble(0), reader.GetDouble(1), reader.GetDouble(2), reader.GetInt32(3));
                     }
                 }
             }
-            return (0, 0, 0);
+            return (0, 0, 0, 0);
         }
+
 
         public void UpdateStatus(int repairId, string newStatus)
         {

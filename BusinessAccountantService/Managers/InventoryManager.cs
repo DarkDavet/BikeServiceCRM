@@ -141,5 +141,18 @@ namespace BusinessAccountantService.Managers
             }
         }
 
+        public double GetTotalInventoryValue()
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT SUM(Quantity * PurchasePrice) FROM Inventory";
+
+                var result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToDouble(result) : 0;
+            }
+        }
+
     }
 }
