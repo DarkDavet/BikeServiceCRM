@@ -47,7 +47,9 @@
         <Grid Grid.Row="2" Margin="0,15,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                 <!-- Убедитесь, что имена методов Click совпадают с C# кодом InventoryPage -->
-                <Button Content="Добавить товар" Click="AddItem_Click" 
+                <Button Content="Добавить позицию" Click="AddItem_Click" 
+                        Width="130" Height="30" Margin="0,0,10,0" Background="#27AE60" Foreground="White" BorderThickness="0"/>
+                <Button Content="Пополнить позицию" Click="RefillItem_Click" 
                         Width="130" Height="30" Margin="0,0,10,0" Background="#27AE60" Foreground="White" BorderThickness="0"/>
 
                 <Button Content="Списать единицу" Click="ScrapItem_Click" 

@@ -83,5 +83,24 @@ namespace BusinessAccountantService.Managers
                 command.ExecuteNonQuery();
             }
         }
+
+        public void RefillItem(int itemId, int addQty, double newPrice)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                // Увеличиваем количество и обновляем цену закупки на актуальную
+                command.CommandText = @"UPDATE Inventory SET 
+                                Quantity = Quantity + $qty, 
+                                PurchasePrice = $price 
+                                WHERE Id = $id";
+
+                command.Parameters.AddWithValue("$qty", addQty);
+                command.Parameters.AddWithValue("$price", newPrice);
+                command.Parameters.AddWithValue("$id", itemId);
+                command.ExecuteNonQuery();
+            }
+        }
     }
 }

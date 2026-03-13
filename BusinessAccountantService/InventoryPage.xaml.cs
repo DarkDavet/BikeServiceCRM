@@ -87,5 +87,23 @@ namespace BusinessAccountantService
                 };
             }
         }
+
+        private void RefillItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (InventoryGrid.SelectedItem is Item selectedItem)
+            {
+                RefillItemWindow refillWin = new RefillItemWindow(selectedItem);
+
+                if (refillWin.ShowDialog() == true)
+                {
+                    // Обновляем таблицу склада
+                    InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Сначала выберите товар из списка!");
+            }
+        }
     }
 }
