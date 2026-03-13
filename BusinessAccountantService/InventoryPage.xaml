@@ -33,6 +33,7 @@
 
         <!-- 1: ТАБЛИЦА СКЛАДА -->
         <DataGrid Grid.Row="1" x:Name="InventoryGrid"
+                  MouseDoubleClick="InventoryGrid_MouseDoubleClick"
                   AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>

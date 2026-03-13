@@ -102,5 +102,44 @@ namespace BusinessAccountantService.Managers
                 command.ExecuteNonQuery();
             }
         }
+
+        // Обновление всей карточки товара
+        public void UpdateItem(Item item)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = @"UPDATE Inventory SET 
+                                Name = $name, 
+                                Quantity = $qty, 
+                                PurchasePrice = $pPrice, 
+                                RetailPrice = $rPrice, 
+                                Category = $cat 
+                                WHERE Id = $id";
+
+                command.Parameters.AddWithValue("$name", item.Name);
+                command.Parameters.AddWithValue("$qty", item.Quantity);
+                command.Parameters.AddWithValue("$pPrice", item.PurchasePrice);
+                command.Parameters.AddWithValue("$rPrice", item.RetailPrice);
+                command.Parameters.AddWithValue("$cat", item.Category ?? "Разное");
+                command.Parameters.AddWithValue("$id", item.Id);
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void DeleteItem(int id)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "DELETE FROM Inventory WHERE Id = $id";
+                command.Parameters.AddWithValue("$id", id);
+                command.ExecuteNonQuery();
+            }
+        }
+
     }
 }

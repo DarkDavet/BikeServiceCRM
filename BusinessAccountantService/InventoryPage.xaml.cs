@@ -105,5 +105,23 @@ namespace BusinessAccountantService
                 MessageBox.Show("Сначала выберите товар из списка!");
             }
         }
+
+        private void InventoryGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (InventoryGrid.SelectedItem is Item selectedItem)
+            {
+                var editWin = new EditItemWindow(selectedItem);
+                if (editWin.ShowDialog() == true)
+                {
+                    if (editWin.IsDeleted)
+                        _inventoryManager.DeleteItem(selectedItem.Id); 
+                    else
+                        _inventoryManager.UpdateItem(selectedItem); 
+
+                    InventoryGrid.ItemsSource = _inventoryManager.GetAllItems();
+                }
+            }
+        }
+
     }
 }
