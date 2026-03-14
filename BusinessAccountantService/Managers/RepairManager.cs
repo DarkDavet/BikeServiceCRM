@@ -238,29 +238,45 @@ namespace BusinessAccountantService.Managers
 
 
 
-        public List<(string month, double profit)> GetYearlyStats()
+        public List<(string month, double rev, double parts, double prof, int count)> GetYearlyStats(int year)
         {
-            var stats = new List<(string month, double profit)>();
+            var stats = new List<(string month, double rev, double parts, double prof, int count)>();
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
+
+                // Добавляем COUNT(*) в конец SELECT
                 command.CommandText = @"
             SELECT strftime('%m', DateClosed) as Month, 
-                   SUM(TotalCost - PartsCost) 
+                   SUM(TotalCost), 
+                   SUM(PartsCost), 
+                   SUM(TotalCost - PartsCost),
+                   COUNT(*)
             FROM Repairs 
-            WHERE Status = 'Выдан' 
-            AND strftime('%Y', DateClosed) = strftime('%Y', 'now')
+            WHERE Status = 'Выдан' AND strftime('%Y', DateClosed) = $year
             GROUP BY Month ORDER BY Month ASC";
+
+                command.Parameters.AddWithValue("$year", year.ToString());
 
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
-                        stats.Add((reader.GetString(0), reader.GetDouble(1)));
+                    {
+                        stats.Add((
+                            reader.GetString(0), // Месяц
+                            reader.GetDouble(1), // Выручка
+                            reader.GetDouble(2), // Запчасти
+                            reader.GetDouble(3), // Прибыль
+                            reader.GetInt32(4)   // Кол-во заказов (Новое!)
+                        ));
+                    }
                 }
             }
             return stats;
         }
+
+
 
 
     }

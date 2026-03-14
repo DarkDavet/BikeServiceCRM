@@ -8,103 +8,97 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         Title="Аналитика сервиса" Height="650" Width="950" Background="#F5F6FA">
     <Grid Margin="15">
-        <TabControl Background="Transparent" BorderThickness="0">
+        <!-- Определяем три четкие строки для всего окна -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- 0: Заголовок и Календарь -->
+            <RowDefinition Height="Auto"/>
+            <!-- 1: Общие карточки -->
+            <RowDefinition Height="*"/>
+            <!-- 2: Вкладки с графиками -->
+        </Grid.RowDefinitions>
 
-            <!-- ВКЛАДКА 1: ДЕТАЛЬНО ЗА МЕСЯЦ -->
-            <TabItem Header="Анализ месяца" FontSize="14" Padding="10,5">
-                <Grid Margin="0,10,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <!-- Заголовок и выбор месяца -->
-                        <RowDefinition Height="Auto"/>
-                        <!-- Карточки -->
-                        <RowDefinition Height="*"/>
-                        <!-- График -->
-                    </Grid.RowDefinitions>
+        <!-- Строка 0: ШАПКА (Общая) -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5,0,0,15">
+            <TextBlock Text="АНАЛИТИКА СЕРВИСА" FontSize="22" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
+            <DatePicker x:Name="MonthPicker" Margin="25,0,0,0" Width="180" Height="30" 
+                    VerticalContentAlignment="Center"
+                    CalendarOpened="MonthPicker_CalendarOpened" 
+                    SelectedDateChanged="MonthPicker_SelectedDateChanged"/>
+        </StackPanel>
 
-                    <!-- 0: Управление месяцем -->
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="ОТЧЕТ ЗА ПЕРИОД:" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
-                        <DatePicker x:Name="MonthPicker" Margin="20,0,0,0" Width="180" Height="30" 
-                                    CalendarOpened="MonthPicker_CalendarOpened" 
-                                    SelectedDateChanged="MonthPicker_SelectedDateChanged"/>
-                    </StackPanel>
+        <!-- Строка 1: КАРТОЧКИ (Общие) -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,10">
+            <Border x:Name="CardRev" MouseDown="Card_MouseDown" Tag="Revenue" Cursor="Hand" 
+                BorderBrush="#2980B9" BorderThickness="2" Background="White" Margin="5" Padding="15" CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                </Border.Effect>
+                <StackPanel IsHitTestVisible="False">
+                    <TextBlock Text="ВЫРУЧКА" Foreground="Gray" FontSize="11"/>
+                    <TextBlock x:Name="RevText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#2980B9"/>
+                </StackPanel>
+            </Border>
 
-                    <!-- 1: КАРТОЧКИ -->
-                    <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,15">
-                        <Border x:Name="CardRev" MouseDown="Card_MouseDown" Tag="Revenue" Cursor="Hand" 
-                                BorderBrush="#2980B9" Background="White" Margin="5" Padding="15" CornerRadius="8">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
-                            </Border.Effect>
-                            <StackPanel IsHitTestVisible="False">
-                                <TextBlock Text="ВЫРУЧКА" Foreground="Gray" FontSize="11"/>
-                                <TextBlock x:Name="RevText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#2980B9"/>
-                            </StackPanel>
-                        </Border>
-                        <Border x:Name="CardParts" MouseDown="Card_MouseDown" Tag="Parts" Cursor="Hand" 
-                                BorderBrush="Transparent" Background="White" Margin="5" Padding="15" CornerRadius="8">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
-                            </Border.Effect>
-                            <StackPanel IsHitTestVisible="False">
-                                <TextBlock Text="ЗАПЧАСТИ" Foreground="Gray" FontSize="11"/>
-                                <TextBlock x:Name="PartsText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#C0392B"/>
-                            </StackPanel>
-                        </Border>
-                        <Border x:Name="CardProfit" MouseDown="Card_MouseDown" Tag="Profit" Cursor="Hand" 
-                                BorderBrush="Transparent" Background="White" Margin="5" Padding="15" CornerRadius="8">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
-                            </Border.Effect>
-                            <StackPanel IsHitTestVisible="False">
-                                <TextBlock Text="ПРИБЫЛЬ" Foreground="Gray" FontSize="11"/>
-                                <TextBlock x:Name="ProfitText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#27AE60"/>
-                            </StackPanel>
-                        </Border>
-                        <Border x:Name="CardOrders" MouseDown="Card_MouseDown" Tag="Orders" Cursor="Hand" 
-                                BorderBrush="Transparent" Background="White" Margin="5" Padding="15" CornerRadius="8">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
-                            </Border.Effect>
-                            <StackPanel IsHitTestVisible="False">
-                                <TextBlock Text="ЗАКАЗОВ" Foreground="Gray" FontSize="11"/>
-                                <TextBlock x:Name="CountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#8E44AD"/>
-                            </StackPanel>
-                        </Border>
-                    </UniformGrid>
+            <Border x:Name="CardParts" MouseDown="Card_MouseDown" Tag="Parts" Cursor="Hand" 
+                BorderBrush="Transparent" BorderThickness="2" Background="White" Margin="5" Padding="15" CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                </Border.Effect>
+                <StackPanel IsHitTestVisible="False">
+                    <TextBlock Text="ЗАПЧАСТИ" Foreground="Gray" FontSize="11"/>
+                    <TextBlock x:Name="PartsText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#C0392B"/>
+                </StackPanel>
+            </Border>
 
-                    <!-- 2: МЕСЯЧНЫЙ ГРАФИК -->
-                    <Border Grid.Row="2" Background="White" CornerRadius="8" Padding="15">
-                        <lvc:CartesianChart x:Name="FinanceChart" LegendLocation="Bottom">
-                            <lvc:CartesianChart.AxisY>
-                                <lvc:Axis Title="Сумма (₽)" LabelFormatter="{Binding Formatter}"/>
-                            </lvc:CartesianChart.AxisY>
-                        </lvc:CartesianChart>
-                    </Border>
-                </Grid>
+            <Border x:Name="CardProfit" MouseDown="Card_MouseDown" Tag="Profit" Cursor="Hand" 
+                BorderBrush="Transparent" BorderThickness="2" Background="White" Margin="5" Padding="15" CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                </Border.Effect>
+                <StackPanel IsHitTestVisible="False">
+                    <TextBlock Text="ПРИБЫЛЬ" Foreground="Gray" FontSize="11"/>
+                    <TextBlock x:Name="ProfitText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#27AE60"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="CardOrders" MouseDown="Card_MouseDown" Tag="Orders" Cursor="Hand" 
+                BorderBrush="Transparent" BorderThickness="2" Background="White" Margin="5" Padding="15" CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
+                </Border.Effect>
+                <StackPanel IsHitTestVisible="False">
+                    <TextBlock Text="ЗАКАЗОВ" Foreground="Gray" FontSize="11"/>
+                    <TextBlock x:Name="CountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#8E44AD"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Строка 2: Вкладки с графиками -->
+        <TabControl x:Name="MainTabControl" Grid.Row="2" Background="Transparent" BorderThickness="0" 
+                SelectionChanged="MonthPicker_SelectedDateChanged">
+            <!-- Пересчитываем при смене вкладок -->
+
+            <TabItem Header="Анализ месяца" FontSize="14" Padding="15,5">
+                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                    <lvc:CartesianChart x:Name="FinanceChart" LegendLocation="Bottom">
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="Значение" LabelFormatter="{Binding Formatter}"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Border>
             </TabItem>
 
-            <!-- ВКЛАДКА 2: ИТОГИ ГОДА -->
-            <TabItem Header="Динамика года" FontSize="14" Padding="10,5">
-                <Grid Margin="0,20,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Text="ЧИСТАЯ ПРИБЫЛЬ ПО МЕСЯЦАМ" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="5,0,0,15"/>
-
-                    <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
-                        <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="None">
-                            <lvc:CartesianChart.AxisY>
-                                <lvc:Axis Title="Прибыль (₽)"/>
-                            </lvc:CartesianChart.AxisY>
-                        </lvc:CartesianChart>
-                    </Border>
-                </Grid>
+            <TabItem Header="Динамика года" FontSize="14" Padding="15,5">
+                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,10,0,0">
+                    <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="Bottom">
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis Title="Значение"/>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Border>
             </TabItem>
-
         </TabControl>
     </Grid>
+
 </Window>

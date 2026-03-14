@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace BusinessAccountantService
 {
@@ -34,14 +35,6 @@ namespace BusinessAccountantService
         {
             InitializeComponent();
             MonthPicker.SelectedDate = DateTime.Now;
-
-            UpdateCardVisuals(CardRev, _showRevenue, "#2980B9");
-            UpdateCardVisuals(CardParts, _showParts, "#C0392B");
-            UpdateCardVisuals(CardProfit, _showProfit, "#27AE60");
-            UpdateCardVisuals(CardOrders, _showCount, "#8E44AD");
-
-            LoadData(DateTime.Now);
-            LoadYearlyData();
         }
         private void LoadData(DateTime date)
         {
@@ -109,26 +102,58 @@ namespace BusinessAccountantService
 
         private void LoadYearlyData()
         {
-            var yearlyData = _repairManager.GetYearlyStats();
+            int year = (MonthPicker.SelectedDate ?? DateTime.Now).Year;
+            var yearlyData = _repairManager.GetYearlyStats(year);
 
-            string[] monthNames = { "Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек" };
+            var series = new SeriesCollection();
+            string[] monthNames = { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
 
-            YearlyChart.Series = new SeriesCollection
-    {
-        new ColumnSeries
-        {
-            Title = "Чистая прибыль",
-            Values = new ChartValues<double>(yearlyData.Select(x => x.profit)),
-            Fill = System.Windows.Media.Brushes.MediumSeaGreen
-        }
-    };
+            if (_showCount)
+            {
+                series.Add(new ColumnSeries
+                {
+                    Title = "Заказы",
+                    Values = new ChartValues<double>(yearlyData.Select(x => (double)x.count)),
+                    Fill = Brushes.BlueViolet,
+                    DataLabels = true
+                });
+            }
+            else
+            {
+                if (_showRevenue) series.Add(new ColumnSeries { Title = "Выручка", Values = new ChartValues<double>(yearlyData.Select(x => x.rev)), Fill = Brushes.DodgerBlue });
+                if (_showParts) series.Add(new ColumnSeries { Title = "Запчасти", Values = new ChartValues<double>(yearlyData.Select(x => x.parts)), Fill = Brushes.Tomato });
+                if (_showProfit) series.Add(new ColumnSeries { Title = "Прибыль", Values = new ChartValues<double>(yearlyData.Select(x => x.prof)), Fill = Brushes.MediumSeaGreen });
+            }
+
+            YearlyChart.Series = series;
+
+            YearlyChart.AxisY.Clear();
+            if (_showCount)
+            {
+                YearlyChart.AxisY.Add(new Axis
+                {
+                    Title = "Заказы (шт.)",
+                    LabelFormatter = value => value.ToString("N0") + " шт.",
+                    Separator = new LiveCharts.Wpf.Separator { Step = 1 }
+                });
+            }
+            else
+            {
+                YearlyChart.AxisY.Add(new Axis
+                {
+                    Title = "Сумма (₽)",
+                    LabelFormatter = value => value.ToString("N0") + " ₽"
+                });
+            }
 
             YearlyChart.AxisX.Clear();
             YearlyChart.AxisX.Add(new Axis
             {
-                Labels = yearlyData.Select(x => monthNames[int.Parse(x.month) - 1]).ToArray()
+                Labels = yearlyData.Select(x => monthNames[int.Parse(x.month) - 1]).ToArray(),
+                Separator = new LiveCharts.Wpf.Separator { Step = 1 }
             });
         }
+
 
 
         private void MonthPicker_CalendarOpened(object sender, RoutedEventArgs e)
@@ -156,16 +181,12 @@ namespace BusinessAccountantService
         {
             if (MonthPicker.SelectedDate is DateTime date)
             {
-                LoadData(date);
+                RefreshAll();
 
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
+                Dispatcher.BeginInvoke(new Action(() => {
                     var textBox = MonthPicker.Template.FindName("PART_TextBox", MonthPicker) as TextBox;
-                    if (textBox != null)
-                    {
-                        textBox.Text = date.ToString("MMMM yyyy");
-                    }
-                }), System.Windows.Threading.DispatcherPriority.Background);
+                    if (textBox != null) textBox.Text = date.ToString("MMMM yyyy");
+                }), DispatcherPriority.Background);
             }
         }
 
@@ -173,7 +194,6 @@ namespace BusinessAccountantService
         {
             var card = sender as Border;
             if (card == null || card.Tag == null) return;
-
             string type = card.Tag.ToString();
 
             if (type == "Orders")
@@ -184,18 +204,11 @@ namespace BusinessAccountantService
             else
             {
                 _showCount = false;
-
                 if (type == "Revenue") _showRevenue = !_showRevenue;
                 if (type == "Parts") _showParts = !_showParts;
                 if (type == "Profit") _showProfit = !_showProfit;
             }
-
-            UpdateCardVisuals(CardRev, _showRevenue, "#2980B9");
-            UpdateCardVisuals(CardParts, _showParts, "#C0392B");
-            UpdateCardVisuals(CardProfit, _showProfit, "#27AE60");
-            UpdateCardVisuals(CardOrders, _showCount, "#8E44AD"); 
-
-            if (MonthPicker.SelectedDate is DateTime date) LoadData(date);
+            RefreshAll();
         }
 
         private void UpdateCardVisuals(Border card, bool isActive, string colorHex)
@@ -215,6 +228,63 @@ namespace BusinessAccountantService
                 card.BorderThickness = new Thickness(2); 
                 card.Opacity = 0.5;
             }
+        }
+
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.OriginalSource is TabControl)
+            {
+                RefreshAll();
+            }
+        }
+
+        private void RefreshAll()
+        {
+            // Проверяем, что все важные элементы UI уже созданы
+            if (MainTabControl == null || MonthPicker?.SelectedDate == null) return;
+
+            DateTime date = MonthPicker.SelectedDate.Value;
+
+            // 1. Обновляем рамки карточек
+            UpdateCardVisuals(CardRev, _showRevenue, "#2980B9");
+            UpdateCardVisuals(CardParts, _showParts, "#C0392B");
+            UpdateCardVisuals(CardProfit, _showProfit, "#27AE60");
+            UpdateCardVisuals(CardOrders, _showCount, "#8E44AD");
+
+            // 2. Обновляем графики
+            LoadData(date);
+            LoadYearlyData();
+
+            // 3. Обновляем цифры в карточках
+            if (MainTabControl.SelectedIndex == 0) // Вкладка месяца
+            {
+                var dailyData = _repairManager.GetDailyStats(date);
+                UpdateCardTexts(
+                    dailyData.Sum(x => x.dailyRev),
+                    dailyData.Sum(x => x.dailyParts),
+                    dailyData.Sum(x => x.dailyRev - x.dailyParts),
+                    dailyData.Sum(x => x.dailyCount)
+                );
+            }
+            else // Вкладка года
+            {
+                var yearlyData = _repairManager.GetYearlyStats(date.Year);
+                UpdateCardTexts(
+                    yearlyData.Sum(x => x.rev),
+                    yearlyData.Sum(x => x.parts),
+                    yearlyData.Sum(x => x.prof),
+                    yearlyData.Sum(x => x.count)
+                );
+            }
+        }
+
+
+        private void UpdateCardTexts(double rev, double parts, double prof, int count)
+        {
+            RevText.Text = $"{rev:N0} ₽";
+            PartsText.Text = $"{parts:N0} ₽";
+            ProfitText.Text = $"{prof:N0} ₽";
+            CountText.Text = count.ToString();
         }
 
 
