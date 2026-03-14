@@ -42,6 +42,7 @@ namespace BusinessAccountantService.Data
                 TotalCost REAL,
                 Status TEXT DEFAULT 'Принят',
                 DateCreated DATETIME,
+                DateClosed DATETIME,
                 FOREIGN KEY (ClientId) REFERENCES Clients(Id) ON DELETE CASCADE
             );
             CREATE TABLE IF NOT EXISTS Inventory (

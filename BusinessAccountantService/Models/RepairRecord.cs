@@ -44,6 +44,7 @@ namespace BusinessAccountantService.Models
 
         public DateTime DateCreated { get; set; }
         public string DateFormatted => DateCreated.ToString("dd.MM.yyyy HH:mm");
+        public DateTime? DateClosed { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)

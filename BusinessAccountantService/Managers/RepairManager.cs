@@ -55,22 +55,30 @@ namespace BusinessAccountantService.Managers
             {
                 connection.Open();
                 var command = connection.CreateCommand();
+
+                // Добавляем логику: если статус "Выдан", ставим текущую дату (если её еще нет)
+                // Если статус не "Выдан", зануляем дату закрытия
                 command.CommandText = @"UPDATE Repairs SET 
-                                BikeInfo = $bike, 
-                                ProblemDescription = $prob, 
-                                WorksPerformed = $works, 
-                                PartsCost = $parts,
-                                TotalCost = $cost,
-                                Status = $status
-                                WHERE Id = $id";
+                        BikeInfo = $bike, 
+                        ProblemDescription = $prob, 
+                        WorksPerformed = $works, 
+                        PartsCost = $parts,
+                        TotalCost = $cost,
+                        Status = $status,
+                        DateClosed = CASE 
+                            WHEN $status = 'Выдан' AND DateClosed IS NULL THEN $date 
+                            WHEN $status != 'Выдан' THEN NULL 
+                            ELSE DateClosed END
+                        WHERE Id = $id";
 
                 command.Parameters.AddWithValue("$bike", r.BikeInfo);
                 command.Parameters.AddWithValue("$prob", r.ProblemDescription);
                 command.Parameters.AddWithValue("$works", r.WorksPerformed ?? "");
-                command.Parameters.AddWithValue("$parts", r.PartsCost); // Сохраняем расходы
+                command.Parameters.AddWithValue("$parts", r.PartsCost);
                 command.Parameters.AddWithValue("$cost", r.TotalCost);
                 command.Parameters.AddWithValue("$status", r.Status);
                 command.Parameters.AddWithValue("$id", r.Id);
+                command.Parameters.AddWithValue("$date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 command.ExecuteNonQuery();
             }
@@ -126,7 +134,7 @@ namespace BusinessAccountantService.Managers
                    SUM(TotalCost - PartsCost), 
                    COUNT(*) 
             FROM Repairs 
-            WHERE Status = 'Выдан' AND strftime('%Y-%m', DateCreated) = $ym";
+            WHERE Status = 'Выдан' AND strftime('%Y-%m', DateClosed) = $ym";
 
                 command.Parameters.AddWithValue("$ym", yearMonth);
 
@@ -176,7 +184,15 @@ namespace BusinessAccountantService.Managers
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "UPDATE Repairs SET Status = $status WHERE Id = $id";
+                if (newStatus == "Выдан")
+                {
+                    command.CommandText = "UPDATE Repairs SET Status = $status, DateClosed = $date WHERE Id = $id";
+                    command.Parameters.AddWithValue("$date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                }
+                else
+                {
+                    command.CommandText = "UPDATE Repairs SET Status = $status, DateClosed = NULL WHERE Id = $id";
+                }
                 command.Parameters.AddWithValue("$status", newStatus);
                 command.Parameters.AddWithValue("$id", repairId);
                 command.ExecuteNonQuery();
@@ -191,15 +207,16 @@ namespace BusinessAccountantService.Managers
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                // Добавляем COUNT(*) для подсчета количества заказов в этот день
                 command.CommandText = @"
-            SELECT strftime('%d', DateCreated) as Day, 
+            SELECT strftime('%d', DateClosed) as Day, 
                    SUM(TotalCost), 
                    SUM(PartsCost), 
                    COUNT(*)
             FROM Repairs 
-            WHERE Status = 'Выдан' AND strftime('%Y-%m', DateCreated) = $ym
-            GROUP BY Day ORDER BY Day ASC";
+            WHERE Status = 'Выдан' 
+            AND strftime('%Y-%m', DateClosed) = $ym
+            GROUP BY Day 
+            ORDER BY Day ASC";
 
                 command.Parameters.AddWithValue("$ym", date.ToString("yyyy-MM"));
 
@@ -208,16 +225,17 @@ namespace BusinessAccountantService.Managers
                     while (reader.Read())
                     {
                         stats.Add((
-                            reader.GetString(0), // День
-                            reader.GetDouble(1), // Выручка
-                            reader.GetDouble(2), // Запчасти
-                            reader.GetInt32(3)   // Кол-во заказов (Новое!)
+                            reader.IsDBNull(0) ? "00" : reader.GetString(0),
+                            reader.IsDBNull(1) ? 0 : reader.GetDouble(1),
+                            reader.IsDBNull(2) ? 0 : reader.GetDouble(2),
+                            reader.GetInt32(3)
                         ));
                     }
                 }
             }
             return stats;
         }
+
 
 
         public List<(string month, double profit)> GetYearlyStats()
@@ -228,10 +246,12 @@ namespace BusinessAccountantService.Managers
                 connection.Open();
                 var command = connection.CreateCommand();
                 command.CommandText = @"
-                    SELECT strftime('%m', DateCreated) as Month, SUM(TotalCost - PartsCost) 
-                    FROM Repairs 
-                    WHERE Status = 'Выдан' AND strftime('%Y', DateCreated) = strftime('%Y', 'now')
-                    GROUP BY Month ORDER BY Month ASC";
+            SELECT strftime('%m', DateClosed) as Month, 
+                   SUM(TotalCost - PartsCost) 
+            FROM Repairs 
+            WHERE Status = 'Выдан' 
+            AND strftime('%Y', DateClosed) = strftime('%Y', 'now')
+            GROUP BY Month ORDER BY Month ASC";
 
                 using (var reader = command.ExecuteReader())
                 {
