@@ -54,21 +54,26 @@ namespace BusinessAccountantService
 
             try
             {
-                // 3. Обновляем количество и цену в карточке товара на складе
+                // 3. Обновляем остатки в базе
                 _inventoryManager.RefillItem(_currentItem.Id, qty, price);
 
                 // 4. ФИКСИРУЕМ РЕАЛЬНЫЙ РАСХОД ДЕНЕГ
-                // Считаем общую сумму затрат на эту поставку
                 double totalSpent = price * qty;
+
+                // Берем категорию прямо из карточки товара (Инструмент, Запчасти и т.д.)
+                string itemCategory = string.IsNullOrWhiteSpace(_currentItem.Category)
+                                      ? "Запчасти"
+                                      : _currentItem.Category;
 
                 _inventoryManager.AddExpense(
                     $"Пополнение: {_currentItem.Name} (x{qty})",
                     totalSpent,
-                    "Запчасти"
+                    itemCategory // <-- Теперь диаграмма в аналитике разложит это по нужным кускам
                 );
 
                 this.DialogResult = true;
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при сохранении: {ex.Message}");

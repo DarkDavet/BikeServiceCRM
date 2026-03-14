@@ -100,6 +100,8 @@ namespace BusinessAccountantService
                 command.Parameters.AddWithValue("$date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 command.ExecuteNonQuery();
+
+
             }
 
             // Закрываем окно с результатом "Успех"

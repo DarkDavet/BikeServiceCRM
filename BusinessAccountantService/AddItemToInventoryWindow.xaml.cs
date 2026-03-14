@@ -62,6 +62,12 @@ namespace BusinessAccountantService
                 command.Parameters.AddWithValue("$cat", category);
 
                 command.ExecuteNonQuery();
+
+                double totalSpent = pPrice * qty; 
+                if (totalSpent > 0)
+                {
+                    _inventoryManager.AddExpense($"Приход: {itemName} (x{qty})", totalSpent, category);
+                }
             }
 
             // 2. ФИКСИРУЕМ РАСХОД ДЕНЕГ (если количество и цена закупки больше 0)

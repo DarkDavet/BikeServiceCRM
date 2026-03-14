@@ -123,5 +123,17 @@ namespace BusinessAccountantService
             }
         }
 
+        private void AddManualExpense_Click(object sender, RoutedEventArgs e)
+        {
+            var expenseWin = new AddManualExpenseWindow();
+
+            expenseWin.Owner = Window.GetWindow(this);
+
+            if (expenseWin.ShowDialog() == true)
+            {
+                MessageBox.Show("Расход успешно зафиксирован!");
+            }
+        }
+
     }
 }

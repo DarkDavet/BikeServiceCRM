@@ -261,6 +261,7 @@ namespace BusinessAccountantService
             // 2. Обновляем графики
             LoadData(date);
             LoadYearlyData();
+            LoadExpensesStructure(date);
 
             // 3. Обновляем цифры в карточках
             if (MainTabControl.SelectedIndex == 0) // Вкладка месяца
@@ -292,6 +293,28 @@ namespace BusinessAccountantService
             PartsText.Text = $"{parts:N0} ₽";
             ProfitText.Text = $"{prof:N0} ₽";
             CountText.Text = count.ToString();
+        }
+
+        private void LoadExpensesStructure(DateTime date)
+        {
+            var categoryStats = _repairManager.GetExpensesByCategory(date);
+
+            // 1. Обновляем таблицу под графиком
+            ExpensesDetailGrid.ItemsSource = categoryStats;
+
+            // 2. Обновляем круговую диаграмму
+            var pieSeries = new SeriesCollection();
+            foreach (var stat in categoryStats)
+            {
+                pieSeries.Add(new PieSeries
+                {
+                    Title = stat.CategoryName, // Было stat.category
+                    Values = new ChartValues<double> { stat.Amount }, // Было stat.amount
+                    DataLabels = true,
+                    LabelPoint = chartPoint => $"{chartPoint.Y:N0} ₽"
+                });
+            }
+            ExpensesPieChart.Series = pieSeries;
         }
 
 

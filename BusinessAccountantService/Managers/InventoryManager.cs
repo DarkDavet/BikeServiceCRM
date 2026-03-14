@@ -171,6 +171,5 @@ namespace BusinessAccountantService.Managers
                 command.ExecuteNonQuery();
             }
         }
-
     }
 }

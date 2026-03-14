@@ -304,7 +304,41 @@ namespace BusinessAccountantService.Managers
             return stats;
         }
 
+        public List<ExpenseCategory> GetExpensesByCategory(DateTime date)
+        {
+            var stats = new List<ExpenseCategory>();
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                string ym = date.ToString("yyyy-MM");
 
+                command.CommandText = @"SELECT Category, SUM(Amount) FROM Expenses 
+                                WHERE strftime('%Y-%m', DateOperation) = $ym
+                                GROUP BY Category";
+                command.Parameters.AddWithValue("$ym", ym);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        stats.Add(new ExpenseCategory // Создаем объект класса
+                        {
+                            CategoryName = reader.IsDBNull(0) ? "Прочее" : reader.GetString(0),
+                            Amount = reader.GetDouble(1)
+                        });
+                    }
+                }
+            }
+            return stats;
+        }
+
+        // Вспомогательный класс для удобной привязки к таблице и графику
+        public class ExpenseCategory
+        {
+            public string CategoryName { get; set; }
+            public double Amount { get; set; }
+        }
 
 
 
