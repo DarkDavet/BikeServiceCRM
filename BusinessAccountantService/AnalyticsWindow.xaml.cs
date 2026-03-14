@@ -46,6 +46,17 @@ namespace BusinessAccountantService
         private void LoadData(DateTime date)
         {
             var dailyData = _repairManager.GetDailyStats(date);
+
+            double totalRev = dailyData.Sum(x => x.dailyRev);
+            double totalParts = dailyData.Sum(x => x.dailyParts);
+            double totalProfit = totalRev - totalParts;
+            int totalCount = dailyData.Sum(x => x.dailyCount);
+
+            RevText.Text = $"{totalRev:N0} ₽";
+            PartsText.Text = $"{totalParts:N0} ₽";
+            ProfitText.Text = $"{totalProfit:N0} ₽";
+            CountText.Text = totalCount.ToString();
+
             var series = new SeriesCollection();
 
             if (_showCount)
