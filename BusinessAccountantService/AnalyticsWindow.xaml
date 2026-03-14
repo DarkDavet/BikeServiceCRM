@@ -8,17 +8,16 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         Title="Аналитика сервиса" Height="650" Width="950" Background="#F5F6FA">
     <Grid Margin="15">
-        <!-- Определяем три четкие строки для всего окна -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- 0: Заголовок и Календарь -->
+            <!-- 0: Шапка -->
             <RowDefinition Height="Auto"/>
-            <!-- 1: Общие карточки -->
+            <!-- 1: Карточки -->
             <RowDefinition Height="*"/>
-            <!-- 2: Вкладки с графиками -->
+            <!-- 2: Вкладки -->
         </Grid.RowDefinitions>
 
-        <!-- Строка 0: ШАПКА (Общая) -->
+        <!-- Строка 0: ШАПКА -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5,0,0,15">
             <TextBlock Text="АНАЛИТИКА СЕРВИСА" FontSize="22" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
             <DatePicker x:Name="MonthPicker" Margin="25,0,0,0" Width="180" Height="30" 
@@ -27,7 +26,7 @@
                     SelectedDateChanged="MonthPicker_SelectedDateChanged"/>
         </StackPanel>
 
-        <!-- Строка 1: КАРТОЧКИ (Общие) -->
+        <!-- Строка 1: КАРТОЧКИ -->
         <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,10">
             <Border x:Name="CardRev" MouseDown="Card_MouseDown" Tag="Revenue" Cursor="Hand" 
                 BorderBrush="#2980B9" BorderThickness="2" Background="White" Margin="5" Padding="15" CornerRadius="8">
@@ -74,31 +73,51 @@
             </Border>
         </UniformGrid>
 
-        <!-- Строка 2: Вкладки с графиками -->
+        <!-- Строка 2: Вкладки -->
         <TabControl x:Name="MainTabControl" Grid.Row="2" Background="Transparent" BorderThickness="0" 
                 SelectionChanged="MonthPicker_SelectedDateChanged">
-            <!-- Пересчитываем при смене вкладок -->
 
             <TabItem Header="Анализ месяца" FontSize="14" Padding="15,5">
-                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,10,0,0">
-                    <lvc:CartesianChart x:Name="FinanceChart" LegendLocation="Bottom">
-                        <lvc:CartesianChart.AxisY>
-                            <lvc:Axis Title="Значение" LabelFormatter="{Binding Formatter}"/>
-                        </lvc:CartesianChart.AxisY>
-                    </lvc:CartesianChart>
-                </Border>
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Для подписи -->
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="MonthLabel" Grid.Row="0" HorizontalAlignment="Right" 
+                               FontSize="14" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,10,5"/>
+
+                    <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
+                        <lvc:CartesianChart x:Name="FinanceChart" LegendLocation="Bottom">
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Значение" />
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Border>
+                </Grid>
             </TabItem>
 
             <TabItem Header="Динамика года" FontSize="14" Padding="15,5">
-                <Border Background="White" CornerRadius="8" Padding="15" Margin="0,10,0,0">
-                    <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="Bottom">
-                        <lvc:CartesianChart.AxisY>
-                            <lvc:Axis Title="Значение"/>
-                        </lvc:CartesianChart.AxisY>
-                    </lvc:CartesianChart>
-                </Border>
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Для подписи -->
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="YearLabel" Grid.Row="0" HorizontalAlignment="Right" 
+                               FontSize="14" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,10,5"/>
+
+                    <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
+                        <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="Bottom">
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Значение"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </Border>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>
-
 </Window>

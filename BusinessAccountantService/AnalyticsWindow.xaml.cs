@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Globalization;
 
 namespace BusinessAccountantService
 {
@@ -49,6 +50,8 @@ namespace BusinessAccountantService
             PartsText.Text = $"{totalParts:N0} ₽";
             ProfitText.Text = $"{totalProfit:N0} ₽";
             CountText.Text = totalCount.ToString();
+
+            MonthLabel.Text = date.ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
 
             var series = new SeriesCollection();
 
@@ -102,7 +105,11 @@ namespace BusinessAccountantService
 
         private void LoadYearlyData()
         {
-            int year = (MonthPicker.SelectedDate ?? DateTime.Now).Year;
+            DateTime selectedDate = MonthPicker.SelectedDate ?? DateTime.Now;
+            int year = selectedDate.Year;
+
+            // Обновляем надпись над графиком года
+            YearLabel.Text = $"{year} ГОД";
             var yearlyData = _repairManager.GetYearlyStats(year);
 
             var series = new SeriesCollection();
@@ -185,7 +192,7 @@ namespace BusinessAccountantService
 
                 Dispatcher.BeginInvoke(new Action(() => {
                     var textBox = MonthPicker.Template.FindName("PART_TextBox", MonthPicker) as TextBox;
-                    if (textBox != null) textBox.Text = date.ToString("MMMM yyyy");
+                    if (textBox != null) textBox.Text = date.ToString("MMMM yyyy", new CultureInfo("ru-RU"));
                 }), DispatcherPriority.Background);
             }
         }
