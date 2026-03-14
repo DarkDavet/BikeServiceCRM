@@ -75,7 +75,7 @@
 
         <!-- Строка 2: Вкладки -->
         <TabControl x:Name="MainTabControl" Grid.Row="2" Background="Transparent" BorderThickness="0" 
-                SelectionChanged="MonthPicker_SelectedDateChanged">
+                SelectionChanged="TabControl_SelectionChanged">
 
             <TabItem Header="Анализ месяца" FontSize="14" Padding="15,5">
                 <Grid Margin="0,10,0,0">
@@ -118,9 +118,10 @@
                                 <lvc:PieChart Grid.Row="1" x:Name="ExpensesPieChart" Height="180" LegendLocation="Bottom" Hoverable="True"/>
 
                                 <DataGrid Grid.Row="2" x:Name="ExpensesDetailGrid" Margin="0,10,0,0" 
-                              AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
+                                          AutoGenerateColumns="False" IsReadOnly="True" Background="Transparent" BorderThickness="0">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Категория" Binding="{Binding CategoryName}" Width="*"/>
+                                        <DataGridTextColumn Header="Дата" Binding="{Binding DateFormatted}" Width="85"/>
+                                        <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
                                         <DataGridTextColumn Header="Сумма" Binding="{Binding Amount, StringFormat={}{0:N0} ₽}" Width="Auto"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
@@ -132,24 +133,35 @@
 
             <TabItem Header="Динамика года" FontSize="14" Padding="15,5">
                 <Grid Margin="0,10,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <!-- Для подписи -->
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <!-- Столбчатый график -->
+                        <ColumnDefinition Width="1*"/>
+                        <!-- Годовая диаграмма -->
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="YearLabel" Grid.Row="0" HorizontalAlignment="Right" 
-                               FontSize="14" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,10,5"/>
+                    <!-- Существующий YearlyChart -->
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="YearLabel" Grid.Row="0" HorizontalAlignment="Right" FontSize="14" FontWeight="SemiBold" Foreground="#34495E" Margin="0,0,10,5"/>
+                        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
+                            <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="Bottom"/>
+                        </Border>
+                    </Grid>
 
-                    <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15">
-                        <lvc:CartesianChart x:Name="YearlyChart" LegendLocation="Bottom">
-                            <lvc:CartesianChart.AxisY>
-                                <lvc:Axis Title="Значение"/>
-                            </lvc:CartesianChart.AxisY>
-                        </lvc:CartesianChart>
+                    <!-- НОВАЯ КРУГОВАЯ ДИАГРАММА ЗА ГОД -->
+                    <Border Grid.Column="1" Background="White" CornerRadius="8" Margin="10,32,0,0" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="РАСХОДЫ ЗА ГОД" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                            <lvc:PieChart x:Name="YearlyExpensesPieChart" Height="250" LegendLocation="Bottom" Hoverable="True"/>
+                        </StackPanel>
                     </Border>
                 </Grid>
             </TabItem>
+
         </TabControl>
     </Grid>
 </Window>

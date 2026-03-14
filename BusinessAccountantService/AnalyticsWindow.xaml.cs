@@ -159,6 +159,21 @@ namespace BusinessAccountantService
                 Labels = yearlyData.Select(x => monthNames[int.Parse(x.month) - 1]).ToArray(),
                 Separator = new LiveCharts.Wpf.Separator { Step = 1 }
             });
+
+            var yearlyExpenses = _repairManager.GetExpensesByYear(year);
+            var pieSeries = new SeriesCollection();
+
+            foreach (var stat in yearlyExpenses)
+            {
+                pieSeries.Add(new PieSeries
+                {
+                    Title = stat.Category,
+                    Values = new ChartValues<double> { stat.Amount },
+                    DataLabels = true,
+                    LabelPoint = p => $"{p.Y:N0} ₽"
+                });
+            }
+            YearlyExpensesPieChart.Series = pieSeries;
         }
 
 
@@ -215,7 +230,7 @@ namespace BusinessAccountantService
                 if (type == "Parts") _showParts = !_showParts;
                 if (type == "Profit") _showProfit = !_showProfit;
             }
-            RefreshAll();
+            RefreshGraphs(); 
         }
 
         private void UpdateCardVisuals(Border card, bool isActive, string colorHex)
@@ -247,23 +262,17 @@ namespace BusinessAccountantService
 
         private void RefreshAll()
         {
-            // Проверяем, что все важные элементы UI уже созданы
             if (MainTabControl == null || MonthPicker?.SelectedDate == null) return;
-
             DateTime date = MonthPicker.SelectedDate.Value;
 
-            // 1. Обновляем рамки карточек
-            UpdateCardVisuals(CardRev, _showRevenue, "#2980B9");
-            UpdateCardVisuals(CardParts, _showParts, "#C0392B");
-            UpdateCardVisuals(CardProfit, _showProfit, "#27AE60");
-            UpdateCardVisuals(CardOrders, _showCount, "#8E44AD");
+            // 1. Обновляем всё легкое (рамки карточек и линейные графики)
+            RefreshGraphs();
 
-            // 2. Обновляем графики
-            LoadData(date);
-            LoadYearlyData();
+            // 2. Обновляем тяжелые диаграммы (сработают только при смене даты/таба)
             LoadExpensesStructure(date);
+            LoadYearlyExpensesPie(date.Year);
 
-            // 3. Обновляем цифры в карточках
+            // 3. Обновляем цифры в карточках (зависит от того, месяц это или год)
             if (MainTabControl.SelectedIndex == 0) // Вкладка месяца
             {
                 var dailyData = _repairManager.GetDailyStats(date);
@@ -287,6 +296,22 @@ namespace BusinessAccountantService
         }
 
 
+        private void RefreshGraphs()
+        {
+            if (MonthPicker?.SelectedDate == null) return;
+            DateTime date = MonthPicker.SelectedDate.Value;
+ 
+            UpdateCardVisuals(CardRev, _showRevenue, "#2980B9");
+            UpdateCardVisuals(CardParts, _showParts, "#C0392B");
+            UpdateCardVisuals(CardProfit, _showProfit, "#27AE60");
+            UpdateCardVisuals(CardOrders, _showCount, "#8E44AD");
+
+            // 2. Обновляем только ГРАФИКИ (LoadExpensesStructure НЕ ВЫЗЫВАЕМ)
+            LoadData(date);
+            LoadYearlyData();
+        }
+
+
         private void UpdateCardTexts(double rev, double parts, double prof, int count)
         {
             RevText.Text = $"{rev:N0} ₽";
@@ -297,26 +322,46 @@ namespace BusinessAccountantService
 
         private void LoadExpensesStructure(DateTime date)
         {
+            // 1. Для таблицы — берем историю (каждую запись отдельно)
+            ExpensesDetailGrid.ItemsSource = _repairManager.GetExpensesHistory(date);
+
+            // 2. Для круговой диаграммы — по-прежнему используем группировку по категориям
             var categoryStats = _repairManager.GetExpensesByCategory(date);
-
-            // 1. Обновляем таблицу под графиком
-            ExpensesDetailGrid.ItemsSource = categoryStats;
-
-            // 2. Обновляем круговую диаграмму
             var pieSeries = new SeriesCollection();
             foreach (var stat in categoryStats)
             {
                 pieSeries.Add(new PieSeries
                 {
-                    Title = stat.CategoryName, // Было stat.category
-                    Values = new ChartValues<double> { stat.Amount }, // Было stat.amount
+                    Title = stat.Category,
+                    Values = new ChartValues<double> { stat.Amount },
                     DataLabels = true,
-                    LabelPoint = chartPoint => $"{chartPoint.Y:N0} ₽"
+                    LabelPoint = point => $"{point.SeriesView.Title}: {point.Y:N0} ₽"
                 });
             }
             ExpensesPieChart.Series = pieSeries;
         }
 
+        private void LoadYearlyExpensesPie(int year)
+        {
+            // Получаем сгруппированные данные по категориям за весь год
+            var yearlyExpenses = _repairManager.GetExpensesByYear(year);
+
+            var pieSeries = new SeriesCollection();
+
+            foreach (var stat in yearlyExpenses)
+            {
+                pieSeries.Add(new PieSeries
+                {
+                    Title = stat.Category,
+                    Values = new ChartValues<double> { stat.Amount },
+                    DataLabels = true,
+                    LabelPoint = p => $"{p.SeriesView.Title}: {p.Y:N0} ₽"
+                });
+            }
+
+            // Привязываем к новой диаграмме на второй вкладке
+            YearlyExpensesPieChart.Series = pieSeries;
+        }
 
     }
 }
