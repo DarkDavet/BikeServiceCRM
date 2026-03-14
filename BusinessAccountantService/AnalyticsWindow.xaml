@@ -32,38 +32,42 @@
 
                     <!-- 1: КАРТОЧКИ -->
                     <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,15">
-                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                        <Border x:Name="CardRev" MouseDown="Card_MouseDown" Tag="Revenue" Cursor="Hand" 
+                                BorderBrush="#2980B9" Background="White" Margin="5" Padding="15" CornerRadius="8">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
                             </Border.Effect>
-                            <StackPanel>
+                            <StackPanel IsHitTestVisible="False">
                                 <TextBlock Text="ВЫРУЧКА" Foreground="Gray" FontSize="11"/>
                                 <TextBlock x:Name="RevText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#2980B9"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                        <Border x:Name="CardParts" MouseDown="Card_MouseDown" Tag="Parts" Cursor="Hand" 
+                                BorderBrush="Transparent" Background="White" Margin="5" Padding="15" CornerRadius="8">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
                             </Border.Effect>
-                            <StackPanel>
+                            <StackPanel IsHitTestVisible="False">
                                 <TextBlock Text="ЗАПЧАСТИ" Foreground="Gray" FontSize="11"/>
                                 <TextBlock x:Name="PartsText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#C0392B"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                        <Border x:Name="CardProfit" MouseDown="Card_MouseDown" Tag="Profit" Cursor="Hand" 
+                                BorderBrush="Transparent" Background="White" Margin="5" Padding="15" CornerRadius="8">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
                             </Border.Effect>
-                            <StackPanel>
+                            <StackPanel IsHitTestVisible="False">
                                 <TextBlock Text="ПРИБЫЛЬ" Foreground="Gray" FontSize="11"/>
                                 <TextBlock x:Name="ProfitText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#27AE60"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="White" Margin="5" Padding="15" CornerRadius="8">
+                        <Border x:Name="CardOrders" MouseDown="Card_MouseDown" Tag="Orders" Cursor="Hand" 
+                                BorderBrush="Transparent" Background="White" Margin="5" Padding="15" CornerRadius="8">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
                             </Border.Effect>
-                            <StackPanel>
+                            <StackPanel IsHitTestVisible="False">
                                 <TextBlock Text="ЗАКАЗОВ" Foreground="Gray" FontSize="11"/>
                                 <TextBlock x:Name="CountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#8E44AD"/>
                             </StackPanel>
