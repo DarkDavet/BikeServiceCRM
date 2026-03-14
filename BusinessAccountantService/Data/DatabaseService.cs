@@ -52,7 +52,14 @@ namespace BusinessAccountantService.Data
                 PurchasePrice REAL DEFAULT 0,
                 RetailPrice REAL DEFAULT 0,
                 Category TEXT -- Запчасти, Велосипеды, Аксессуары
-);
+            );
+            CREATE TABLE IF NOT EXISTS Expenses (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                Description TEXT,  
+                Amount REAL,         
+                Category TEXT,      
+                DateOperation DATETIME 
+            );
 
 ";
                 command.ExecuteNonQuery();

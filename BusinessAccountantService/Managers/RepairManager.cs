@@ -208,15 +208,28 @@ namespace BusinessAccountantService.Managers
                 var command = connection.CreateCommand();
 
                 command.CommandText = @"
-            SELECT strftime('%d', DateClosed) as Day, 
-                   SUM(TotalCost), 
-                   SUM(PartsCost), 
-                   COUNT(*)
-            FROM Repairs 
-            WHERE Status = 'Выдан' 
-            AND strftime('%Y-%m', DateClosed) = $ym
-            GROUP BY Day 
-            ORDER BY Day ASC";
+            SELECT Day, SUM(Rev), SUM(Exp), SUM(Cnt) FROM (
+                -- Часть 1: Доходы из ремонтов
+                SELECT strftime('%d', DateClosed) as Day, 
+                       SUM(TotalCost) as Rev, 
+                       0 as Exp, 
+                       COUNT(*) as Cnt
+                FROM Repairs 
+                WHERE Status = 'Выдан' AND strftime('%Y-%m', DateClosed) = $ym
+                GROUP BY Day
+                
+                UNION ALL
+                
+                -- Часть 2: Расходы из таблицы Expenses (закупки)
+                SELECT strftime('%d', DateOperation) as Day, 
+                       0 as Rev, 
+                       SUM(Amount) as Exp, 
+                       0 as Cnt
+                FROM Expenses 
+                WHERE strftime('%Y-%m', DateOperation) = $ym
+                GROUP BY Day
+            ) 
+            GROUP BY Day ORDER BY Day ASC";
 
                 command.Parameters.AddWithValue("$ym", date.ToString("yyyy-MM"));
 
@@ -225,9 +238,9 @@ namespace BusinessAccountantService.Managers
                     while (reader.Read())
                     {
                         stats.Add((
-                            reader.IsDBNull(0) ? "00" : reader.GetString(0),
-                            reader.IsDBNull(1) ? 0 : reader.GetDouble(1),
-                            reader.IsDBNull(2) ? 0 : reader.GetDouble(2),
+                            reader.GetString(0),
+                            reader.GetDouble(1),
+                            reader.GetDouble(2),
                             reader.GetInt32(3)
                         ));
                     }
@@ -235,6 +248,7 @@ namespace BusinessAccountantService.Managers
             }
             return stats;
         }
+
 
 
 
@@ -246,15 +260,29 @@ namespace BusinessAccountantService.Managers
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                // Добавляем COUNT(*) в конец SELECT
+                // Используем UNION для объединения доходов от клиентов и расходов на склад
                 command.CommandText = @"
-            SELECT strftime('%m', DateClosed) as Month, 
-                   SUM(TotalCost), 
-                   SUM(PartsCost), 
-                   SUM(TotalCost - PartsCost),
-                   COUNT(*)
-            FROM Repairs 
-            WHERE Status = 'Выдан' AND strftime('%Y', DateClosed) = $year
+            SELECT Month, SUM(Rev), SUM(Exp), SUM(Rev - Exp), SUM(Cnt) FROM (
+                -- Доходы из выданных ремонтов
+                SELECT strftime('%m', DateClosed) as Month, 
+                       SUM(TotalCost) as Rev, 
+                       0 as Exp, 
+                       COUNT(*) as Cnt
+                FROM Repairs 
+                WHERE Status = 'Выдан' AND strftime('%Y', DateClosed) = $year
+                GROUP BY Month
+                
+                UNION ALL
+                
+                -- Расходы из закупок на склад
+                SELECT strftime('%m', DateOperation) as Month, 
+                       0 as Rev, 
+                       SUM(Amount) as Exp, 
+                       0 as Cnt
+                FROM Expenses 
+                WHERE strftime('%Y', DateOperation) = $year
+                GROUP BY Month
+            ) 
             GROUP BY Month ORDER BY Month ASC";
 
                 command.Parameters.AddWithValue("$year", year.ToString());
@@ -264,17 +292,18 @@ namespace BusinessAccountantService.Managers
                     while (reader.Read())
                     {
                         stats.Add((
-                            reader.GetString(0), // Месяц
+                            reader.GetString(0), // Месяц (01, 02...)
                             reader.GetDouble(1), // Выручка
-                            reader.GetDouble(2), // Запчасти
-                            reader.GetDouble(3), // Прибыль
-                            reader.GetInt32(4)   // Кол-во заказов (Новое!)
+                            reader.GetDouble(2), // Реальные расходы на запчасти
+                            reader.GetDouble(3), // Чистая прибыль (кассовая)
+                            reader.GetInt32(4)   // Количество заказов
                         ));
                     }
                 }
             }
             return stats;
         }
+
 
 
 

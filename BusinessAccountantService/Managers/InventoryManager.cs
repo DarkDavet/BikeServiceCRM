@@ -154,5 +154,23 @@ namespace BusinessAccountantService.Managers
             }
         }
 
+        public void AddExpense(string desc, double totalAmount, string category)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = @"INSERT INTO Expenses (Description, Amount, Category, DateOperation) 
+                               VALUES ($desc, $amount, $cat, $date)";
+
+                command.Parameters.AddWithValue("$desc", desc);
+                command.Parameters.AddWithValue("$amount", totalAmount);
+                command.Parameters.AddWithValue("$cat", category);
+                command.Parameters.AddWithValue("$date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                command.ExecuteNonQuery();
+            }
+        }
+
     }
 }

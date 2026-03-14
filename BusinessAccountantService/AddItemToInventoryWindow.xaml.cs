@@ -1,4 +1,5 @@
 ﻿using BusinessAccountantService.Data;
+using BusinessAccountantService.Managers;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace BusinessAccountantService
     /// </summary>
     public partial class AddItemToInventoryWindow : Window
     {
+        private readonly InventoryManager _inventoryManager = new();
         public AddItemToInventoryWindow()
         {
             InitializeComponent();
@@ -34,31 +36,50 @@ namespace BusinessAccountantService
                 return;
             }
 
+            // Подготавливаем переменные заранее, чтобы использовать их в двух таблицах
+            string itemName = ItemNameBox.Text;
+            int qty = int.TryParse(QuantityBox.Text, out int q) ? q : 0;
+
+            double.TryParse(PurchasePriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double pPrice);
+            double.TryParse(RetailPriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double rPrice);
+
+            string category = CategoryBox.Text ?? "Разное";
+
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
+
+                // 1. Сохраняем товар в инвентарь
                 command.CommandText = @"
-            INSERT INTO Inventory (Name, Quantity, PurchasePrice, RetailPrice, Category) 
-            VALUES ($name, $qty, $pPrice, $rPrice, $cat)";
+                INSERT INTO Inventory (Name, Quantity, PurchasePrice, RetailPrice, Category) 
+                VALUES ($name, $qty, $pPrice, $rPrice, $cat)";
 
-                command.Parameters.AddWithValue("$name", ItemNameBox.Text);
-                command.Parameters.AddWithValue("$qty", int.TryParse(QuantityBox.Text, out int q) ? q : 0);
-
-                // Парсим цены (с защитой от запятых, как мы делали раньше)
-                double.TryParse(PurchasePriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double pPrice);
-                double.TryParse(RetailPriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double rPrice);
-
+                command.Parameters.AddWithValue("$name", itemName);
+                command.Parameters.AddWithValue("$qty", qty);
                 command.Parameters.AddWithValue("$pPrice", pPrice);
                 command.Parameters.AddWithValue("$rPrice", rPrice);
-                command.Parameters.AddWithValue("$cat", CategoryBox.Text);
+                command.Parameters.AddWithValue("$cat", category);
 
                 command.ExecuteNonQuery();
             }
+
+            // 2. ФИКСИРУЕМ РАСХОД ДЕНЕГ (если количество и цена закупки больше 0)
+            if (qty > 0 && pPrice > 0)
+            {
+                double totalSpent = pPrice * qty;
+                _inventoryManager.AddExpense(
+                    $"Закупка (новый): {itemName} x{qty}",
+                    totalSpent,
+                    "Запчасти"
+                );
+            }
+
             this.DialogResult = true;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e) => this.DialogResult = false;
+
 
     }
 }

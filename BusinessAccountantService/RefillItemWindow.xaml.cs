@@ -36,12 +36,14 @@ namespace BusinessAccountantService
 
         private void SaveRefill_Click(object sender, RoutedEventArgs e)
         {
+            // 1. Валидация количества
             if (!int.TryParse(RefillQtyBox.Text, out int qty) || qty <= 0)
             {
                 MessageBox.Show("Введите корректное количество (целое число > 0)");
                 return;
             }
 
+            // 2. Валидация цены закупки (универсальный парсинг)
             if (!double.TryParse(NewPurchasePriceBox.Text.Replace(",", "."),
                 System.Globalization.NumberStyles.Any,
                 System.Globalization.CultureInfo.InvariantCulture, out double price))
@@ -52,16 +54,27 @@ namespace BusinessAccountantService
 
             try
             {
+                // 3. Обновляем количество и цену в карточке товара на складе
                 _inventoryManager.RefillItem(_currentItem.Id, qty, price);
 
+                // 4. ФИКСИРУЕМ РЕАЛЬНЫЙ РАСХОД ДЕНЕГ
+                // Считаем общую сумму затрат на эту поставку
+                double totalSpent = price * qty;
 
-                this.DialogResult = true; 
+                _inventoryManager.AddExpense(
+                    $"Пополнение: {_currentItem.Name} (x{qty})",
+                    totalSpent,
+                    "Запчасти"
+                );
+
+                this.DialogResult = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при сохранении: {ex.Message}");
             }
         }
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
