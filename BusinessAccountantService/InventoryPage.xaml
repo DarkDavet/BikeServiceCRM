@@ -53,6 +53,8 @@
                 <Button Content="Пополнить запас" Click="RefillItem_Click" 
                 Width="130" Height="30" Margin="0,0,10,0" Background="#2980B9" Foreground="White" BorderThickness="0"/>
                 <Button Content="Списать единицу" Click="ScrapItem_Click" 
+                Width="130" Height="30" Margin="0,0,10,0" Background="#C0392B" Foreground="White" BorderThickness="0"/>
+                <Button Content="Удалить позицию" Click="DeleteItem_Click" 
                 Width="130" Height="30" Background="#C0392B" Foreground="White" BorderThickness="0"/>
             </StackPanel>
 

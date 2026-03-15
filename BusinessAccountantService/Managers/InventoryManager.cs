@@ -65,17 +65,15 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-
-        public void ScrapItem(int itemId, int count)
+        public void DeleteItemPermanently(int id)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                // Уменьшаем остаток
-                command.CommandText = "UPDATE Inventory SET Quantity = Quantity - $count WHERE Id = $id AND Quantity >= $count";
-                command.Parameters.AddWithValue("$count", count);
-                command.Parameters.AddWithValue("$id", itemId);
+                // Удаляем саму позицию из склада
+                command.CommandText = "DELETE FROM Inventory WHERE Id = $id";
+                command.Parameters.AddWithValue("$id", id);
                 command.ExecuteNonQuery();
             }
         }

@@ -55,21 +55,26 @@ namespace BusinessAccountantService
 
         private void ScrapItem_Click(object sender, RoutedEventArgs e)
         {
-            if (InventoryGrid.SelectedItem is Item selectedItem)
+            if (InventoryGrid.SelectedItem is Item selected)
             {
-                var result = MessageBox.Show($"Списать 1 ед. товара '{selectedItem.Name}' как брак/утерю?",
-                                             "Списание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if (result == MessageBoxResult.Yes)
+                var win = new ScrapItemWindow(selected) { Owner = Window.GetWindow(this) };
+                if (win.ShowDialog() == true) LoadData();
+            }
+        }
+
+        private void DeleteItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (InventoryGrid.SelectedItem is Item selected)
+            {
+                if (MessageBox.Show($"Удалить ПОЛНОСТЬЮ '{selected.Name}' из списка?", "Внимание",
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
                 {
-                    _inventoryManager.ScrapItem(selectedItem.Id, 1);
+                    _inventoryManager.DeleteItemPermanently(selected.Id);
                     LoadData();
                 }
             }
-            else
-            {
-                MessageBox.Show("Выберите товар в таблице для списания!");
-            }
         }
+
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
