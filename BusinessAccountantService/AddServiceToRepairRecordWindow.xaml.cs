@@ -61,6 +61,16 @@ namespace BusinessAccountantService
             }
         }
 
+        private void ServiceSearchBox_DropDownOpened(object sender, EventArgs e)
+        {
+            // Если поле пустое, загружаем весь список услуг
+            if (string.IsNullOrWhiteSpace(ServiceSearchBox.Text))
+            {
+                var allServices = _repairManager.GetServiceSuggestions(""); // Передаем пустую строку для получения всех
+                ServiceSearchBox.ItemsSource = allServices;
+            }
+        }
+
         private void Add_Click(object sender, RoutedEventArgs e)
         {
             string name = ServiceSearchBox.Text;

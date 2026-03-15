@@ -56,6 +56,19 @@ namespace BusinessAccountantService
             }
         }
 
+        private void PartSearchBox_DropDownOpened(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(PartSearchBox.Text))
+            {
+                // Загружаем все товары, где количество > 0
+                var allItems = _inventoryManager.GetAllItems()
+                                                .Where(i => i.Quantity > 0)
+                                                .OrderBy(i => i.Name)
+                                                .ToList();
+                PartSearchBox.ItemsSource = allItems;
+            }
+        }
+
         private void Add_Click(object sender, RoutedEventArgs e)
         {
             if (_foundItem == null) return;
