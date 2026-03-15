@@ -53,6 +53,33 @@ namespace BusinessAccountantService.Managers
             return clients;
         }
 
+        public Client GetClientById(int clientId)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT Id, FullName, Phone, Address FROM Clients WHERE Id = $id";
+                command.Parameters.AddWithValue("$id", clientId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new Client
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Phone = reader.IsDBNull(2) ? "" : reader.GetString(2),
+                            Address = reader.IsDBNull(3) ? "" : reader.GetString(3)
+                        };
+                    }
+                }
+            }
+            return null;
+        }
+
+
         public void UpdateClient(Client c)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))

@@ -49,6 +49,35 @@ namespace BusinessAccountantService.Managers
             return list;
         }
 
+        public int AddRepair(RepairRecord repair)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+
+                // Убрали IsStockDeducted из списка колонок и из VALUES
+                command.CommandText = @"
+            INSERT INTO Repairs (ClientId, BikeInfo, ProblemDescription, Status, DateCreated, TotalCost, PartsCost) 
+            VALUES ($cid, $bike, $prob, $status, $date, $total, $parts);
+            SELECT last_insert_rowid();";
+
+                command.Parameters.AddWithValue("$cid", repair.ClientId);
+                command.Parameters.AddWithValue("$bike", repair.BikeInfo);
+                command.Parameters.AddWithValue("$prob", repair.ProblemDescription);
+                command.Parameters.AddWithValue("$status", repair.Status);
+                command.Parameters.AddWithValue("$date", repair.DateCreated.ToString("yyyy-MM-dd HH:mm:ss"));
+
+                // SQLite любит double, поэтому приводим decimal для базы
+                command.Parameters.AddWithValue("$total", (double)repair.TotalCost);
+                command.Parameters.AddWithValue("$parts", (double)repair.PartsCost);
+
+                var result = command.ExecuteScalar();
+                return Convert.ToInt32(result);
+            }
+        }
+
+
         public void UpdateRepair(RepairRecord r)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))

@@ -5,71 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Оформление ремонта" Height="600" Width="500" WindowStartupLocation="CenterOwner">
+        Title="Приемка велосипеда" Height="500" Width="450" WindowStartupLocation="CenterOwner" Background="#F5F6FA">
     <Grid Margin="20">
         <StackPanel>
-            <TextBlock Text="ОФОРМЛЕНИЕ НОВОГО ЗАКАЗА" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2C3E50"/>
-
-            <Label Content="Марка и модель велосипеда:"/>
-            <TextBox x:Name="BikeInfoBox" Margin="0,0,0,10" Height="28" VerticalContentAlignment="Center" Foreground="Gray" GotFocus="TextBox_GotFocus"/>
-
-            <Label Content="Описание проблемы:"/>
-            <TextBox x:Name="ProblemBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
-
-            <!-- Блок быстрого добавления (калькулятор) -->
-            <GroupBox Header="Предварительный расчет запчастей/работ" Margin="0,0,0,10">
-                <Grid Margin="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <!-- Колонка 0: Название -->
-                        <ColumnDefinition Width="80"/>
-                        <!-- Колонка 1: Цена -->
-                        <ColumnDefinition Width="Auto"/>
-                        <!-- Колонка 2: Кнопка + -->
-                        <ColumnDefinition Width="Auto"/>
-                        <!-- Колонка 3: Кнопка Reset -->
-                    </Grid.ColumnDefinitions>
-
-                    <TextBox x:Name="ItemNameBox" Grid.Column="0" Margin="0,0,5,0" Height="25" VerticalContentAlignment="Center"/>
-                    <TextBox x:Name="ItemPriceBox" Grid.Column="1" Margin="0,0,5,0" Height="25" VerticalContentAlignment="Center"/>
-
-                    <!-- Кнопка + в колонке 2 -->
-                    <Button Content="+" Grid.Column="2" Width="30" Click="AddItem_Click" 
-                Background="#3498DB" Foreground="White" FontWeight="Bold"/>
-
-                    <!-- Кнопка Reset в колонке 3 -->
-                    <Button Content="Reset" Grid.Column="3" Width="50" Margin="5,0,0,0" 
-                Click="ClearCosts_Click" Background="#95A5A6" Foreground="White" FontSize="10"/>
-                </Grid>
-            </GroupBox>
-
-            <Label Content="Заметки / Предварительный список работ:"/>
-            <TextBox x:Name="WorksBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
-
-            <!-- Финансовый блок -->
-            <Grid Margin="0,0,0,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                    <Label Content="Расходы (запчасти):" Foreground="#C0392B" FontWeight="Bold"/>
-                    <TextBox x:Name="PartsCostBox" Text="0" Height="28" VerticalContentAlignment="Center" TextChanged="CostFields_TextChanged"/>
+            <!-- ШАПКА С ИНФО О КЛИЕНТЕ -->
+            <Border Background="#EBFAFF" CornerRadius="8" Padding="15" Margin="0,0,0,20" BorderBrush="#BEE5F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="НОВЫЙ ЗАКАЗ" FontSize="14" FontWeight="Bold" Foreground="#2980B9" Margin="0,0,0,5"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Клиент: " Foreground="Gray" FontSize="14"/>
+                        <TextBlock x:Name="ClientNameText" Grid.Column="1" Text="Иванов Иван Иванович" FontSize="14" FontWeight="Bold" Foreground="#2C3E50"/>
+                    </Grid>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                    <Label Content="Итого к оплате:" Foreground="#27AE60" FontWeight="Bold"/>
-                    <TextBox x:Name="CostBox" Text="0" Height="28" VerticalContentAlignment="Center" TextChanged="CostFields_TextChanged"/>
-                </StackPanel>
-            </Grid>
+            </Border>
 
-            <TextBlock x:Name="ProfitText" Text="Предварительная прибыль: 0 руб." 
-                   HorizontalAlignment="Right" FontSize="13" FontWeight="Bold" Foreground="#2980B9" Margin="0,0,0,15"/>
+            <Label Content="Информация о велосипеде (Марка, модель, цвет):" FontWeight="SemiBold"/>
+            <TextBox x:Name="BikeInfoBox" Height="32" VerticalContentAlignment="Center" Margin="0,0,0,15" Padding="5"/>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Принять в работу" Click="SaveRepair_Click" Width="140" Height="35" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
-                <Button Content="Отмена" Click="Cancel_Click" Width="90" Height="35" Margin="10,0,0,0" BorderThickness="1"/>
-            </StackPanel>
+            <Label Content="Описание проблемы (жалобы клиента):" FontWeight="SemiBold"/>
+            <TextBox x:Name="ProblemBox" Height="100" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,25" Padding="5"/>
+
+            <Button Content="ОФОРМИТЬ ЗАКАЗ" Click="Save_Click" 
+                    Height="45" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="5"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button Content="Отмена" Click="Cancel_Click" Width="100" Height="30" Margin="0,15,0,0" Background="Transparent" Foreground="Gray" BorderThickness="0"/>
         </StackPanel>
     </Grid>
-
 </Window>
