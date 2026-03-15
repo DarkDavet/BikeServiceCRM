@@ -36,7 +36,6 @@ namespace BusinessAccountantService
                 return;
             }
 
-            // Подготавливаем переменные заранее, чтобы использовать их в двух таблицах
             string itemName = ItemNameBox.Text;
             int qty = int.TryParse(QuantityBox.Text, out int q) ? q : 0;
 
@@ -52,8 +51,8 @@ namespace BusinessAccountantService
 
                 // 1. Сохраняем товар в инвентарь
                 command.CommandText = @"
-                INSERT INTO Inventory (Name, Quantity, PurchasePrice, RetailPrice, Category) 
-                VALUES ($name, $qty, $pPrice, $rPrice, $cat)";
+                   INSERT INTO Inventory (Name, Quantity, PurchasePrice, RetailPrice, Category) 
+                   VALUES ($name, $qty, $pPrice, $rPrice, $cat)";
 
                 command.Parameters.AddWithValue("$name", itemName);
                 command.Parameters.AddWithValue("$qty", qty);
@@ -63,26 +62,19 @@ namespace BusinessAccountantService
 
                 command.ExecuteNonQuery();
 
-                double totalSpent = pPrice * qty; 
-                if (totalSpent > 0)
+                // 2. ФИКСИРУЕМ РАСХОД (ОДИН РАЗ!)
+                double totalSpent = pPrice * qty;
+                if (totalSpent > 0 && pPrice > 0)
                 {
                     _inventoryManager.AddExpense($"Приход: {itemName} (x{qty})", totalSpent, category);
                 }
             }
 
-            // 2. ФИКСИРУЕМ РАСХОД ДЕНЕГ (если количество и цена закупки больше 0)
-            if (qty > 0 && pPrice > 0)
-            {
-                double totalSpent = pPrice * qty;
-                _inventoryManager.AddExpense(
-                    $"Закупка (новый): {itemName} x{qty}",
-                    totalSpent,
-                    "Запчасти"
-                );
-            }
+            // ТУТ БЫЛ ЛИШНИЙ БЛОК, ЕГО МЫ УДАЛИЛИ
 
             this.DialogResult = true;
         }
+
 
         private void Cancel_Click(object sender, RoutedEventArgs e) => this.DialogResult = false;
 
