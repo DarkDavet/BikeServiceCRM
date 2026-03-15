@@ -63,9 +63,18 @@ namespace BusinessAccountantService.Data
             CREATE TABLE IF NOT EXISTS ServicePriceList (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ServiceName TEXT UNIQUE, -- Название услуги
-                DefaultPrice REAL   
-
-";
+                DefaultPrice REAL 
+            );
+            CREATE TABLE IF NOT EXISTS RepairItems (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                RepairId INTEGER,      
+                ProductId INTEGER,     
+                ItemName TEXT,         
+                Quantity INTEGER,      
+                Price REAL,            
+                PurchasePrice REAL,    
+                FOREIGN KEY (RepairId) REFERENCES Repairs(Id) ON DELETE CASCADE
+)";
                 command.ExecuteNonQuery();
             }
         }

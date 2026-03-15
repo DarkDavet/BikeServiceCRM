@@ -225,9 +225,9 @@ namespace BusinessAccountantService
 
                 if (editWin.ShowDialog() == true)
                 {
-                    if (editWin.IsDeleted)
-                        _repairManager.DeleteRepair(selectedRepair.Id);
-                    else
+                    //if (editWin.IsDeleted)
+                      //  _repairManager.DeleteRepair(selectedRepair.Id);
+                   // else
                         _repairManager.UpdateRepair(selectedRepair);
 
                     if (ClientsGrid.SelectedItem is Client selectedClient)

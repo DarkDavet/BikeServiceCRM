@@ -2,6 +2,7 @@
 using BusinessAccountantService.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,215 +22,162 @@ namespace BusinessAccountantService
     /// </summary>
     public partial class EditRepairWindow : Window
     {
-        private readonly InventoryManager _inventoryManager = new();
-        public RepairRecord Repair { get; private set; }
-        public bool IsDeleted { get; private set; } = false;
-        private List<int> _itemsToSubtract = new List<int>();
+        private RepairRecord _currentRepair;
+        private readonly RepairManager _repairManager = new();
+        private InventoryManager _inventoryManager => ((MainWindow)Application.Current.MainWindow)._inventoryManager;
+
+        private List<RepairItem> _sessionAddedParts = new(); 
+        private List<RepairItem> _sessionRemovedParts = new();
+
+        // Коллекция, которая "живет" в таблице
+        private ObservableCollection<RepairItem> _orderItems = new();
 
         public EditRepairWindow(RepairRecord repair)
         {
             InitializeComponent();
-            Repair = repair;
+            _currentRepair = repair;
 
+            // Заполняем поля данными из заказа
+            OrderDateText.Text = $"Заказ от {repair.DateCreated:dd.MM.yyyy}";
             BikeInfoBox.Text = repair.BikeInfo;
             ProblemBox.Text = repair.ProblemDescription;
-            WorksBox.Text = repair.WorksPerformed;
-            PartsCostBox.Text = repair.PartsCost.ToString();
-            TotalCostBox.Text = repair.TotalCost.ToString();
+            StatusComboBox.Text = repair.Status;
 
-            RefreshSearchList();
+            // Загружаем состав заказа из БД
+            var itemsFromDb = _repairManager.GetRepairItems(repair.Id);
+            _orderItems = new ObservableCollection<RepairItem>(itemsFromDb);
 
-            foreach (ComboBoxItem item in StatusComboBox.Items)
+            // Привязываем коллекцию к таблице
+            OrderItemsGrid.ItemsSource = _orderItems;
+
+            // Подписываемся на изменения в таблице для автопересчета итогов
+            _orderItems.CollectionChanged += (s, e) => UpdateTotals();
+            UpdateTotals();
+        }
+
+        private void UpdateTotals()
+        {
+            double total = _orderItems.Sum(x => x.Total);
+
+            // Прибыль = (Цена работы) + (Маржа запчасти: Розница - Закупка)
+            double profit = _orderItems.Sum(x => x.ProductId.HasValue
+                ? (x.Price - x.PurchasePrice) * x.Quantity
+                : x.Total);
+
+            TotalCostText.Text = $"{total:N0} ₽";
+            ProfitText.Text = $"Чистая прибыль: {profit:N0} руб.";
+        }
+
+        // Кнопка + ЗАПЧАСТЬ
+        private void OpenPartSearch_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new AddPartToRepairRecordWindow { Owner = this };
+            if (win.ShowDialog() == true)
             {
-                if (item.Content?.ToString() == repair.Status)
-                {
-                    StatusComboBox.SelectedItem = item;
-                    break;
-                }
+                var newItem = win.SelectedResult;
+                _inventoryManager.DecreaseQuantity(newItem.ProductId.Value, newItem.Quantity);
+                _orderItems.Add(newItem);
+
+                // Запоминаем, что мы это добавили
+                _sessionAddedParts.Add(newItem);
+                UpdateTotals();
             }
         }
+
+        // Кнопка + РАБОТА
+        private void OpenServiceSearch_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new AddServiceToRepairRecordWindow { Owner = this };
+            if (win.ShowDialog() == true)
+            {
+                _orderItems.Add(win.SelectedResult);
+                UpdateTotals();
+            }
+        }
+
+        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (OrderItemsGrid.SelectedItem is RepairItem selected)
+            {
+                // 1. Если это была запчасть — возвращаем на склад
+                if (selected.ProductId.HasValue)
+                {
+                    _inventoryManager.IncreaseQuantity(selected.ProductId.Value, selected.Quantity);
+
+                    // Запоминаем, что мы это вернули на склад
+                    _sessionRemovedParts.Add(selected);
+                }
+
+                // 2. Удаляем из таблицы
+                _orderItems.Remove(selected);
+                UpdateTotals();
+            }
+        }
+
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            Repair.BikeInfo = BikeInfoBox.Text;
-            Repair.ProblemDescription = ProblemBox.Text;
-            Repair.WorksPerformed = WorksBox.Text;
+            _currentRepair.BikeInfo = BikeInfoBox.Text;
+            _currentRepair.ProblemDescription = ProblemBox.Text;
+            _currentRepair.Status = StatusComboBox.Text;
+            _currentRepair.TotalCost = _orderItems.Sum(x => x.Total);
+            _currentRepair.PartsCost = _orderItems.Where(x => x.ProductId.HasValue).Sum(x => x.PurchasePrice * x.Quantity);
 
-            double.TryParse(PartsCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parts);
-            double.TryParse(TotalCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double total);
-
-            Repair.PartsCost = parts;
-            Repair.TotalCost = total;
-
-            if (StatusComboBox.SelectedItem is ComboBoxItem selectedItem)
-                Repair.Status = selectedItem.Content.ToString();
-
-            foreach (int itemId in _itemsToSubtract)
+            try
             {
-                _inventoryManager.DecreaseQuantity(itemId, 1);
+                // 1. Обновляем основную карточку заказа
+                _repairManager.UpdateRepair(_currentRepair);
+
+                // 2. Сохраняем состав заказа (удаляем старые строки и пишем новые)
+                _repairManager.SaveRepairItems(_currentRepair.Id, _orderItems);
+
+                _sessionAddedParts.Clear();
+                _sessionRemovedParts.Clear();
+
+                this.DialogResult = true;
             }
-
-            DialogResult = true;
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}");
+            }
         }
-
-        private void Cancel_Click(object sender, RoutedEventArgs e) => DialogResult = false;
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Вы уверены, что хотите удалить этот заказ?",
-                                         "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (result == MessageBoxResult.Yes)
+            if (MessageBox.Show("Удалить этот заказ навсегда?", "Удаление", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                IsDeleted = true;
-                DialogResult = true; 
+                _repairManager.DeleteRepair(_currentRepair.Id);
+                this.DialogResult = true;
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            WorksBox.Focus();
-            WorksBox.SelectionStart = WorksBox.Text.Length;
+            RollbackChanges();
+            this.DialogResult = false;
         }
 
-        private void CostFields_TextChanged(object sender, TextChangedEventArgs e)
+        // Вызываем это и при закрытии окна через X (событие Closing)
+        private void RollbackChanges()
         {
-            if (ProfitText == null || PartsCostBox == null || TotalCostBox == null) return;
+            // 1. Возвращаем на склад то, что добавили в этом сеансе
+            foreach (var item in _sessionAddedParts)
+            {
+                _inventoryManager.IncreaseQuantity(item.ProductId.Value, item.Quantity);
+            }
 
-            double.TryParse(PartsCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parts);
-            double.TryParse(TotalCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double total);
+            // 2. Снова списываем то, что пытались удалить
+            foreach (var item in _sessionRemovedParts)
+            {
+                _inventoryManager.DecreaseQuantity(item.ProductId.Value, item.Quantity);
+            }
 
-            ProfitText.Text = $"Чистая прибыль: {total - parts} руб.";
+            // Очищаем списки, чтобы не сработало дважды
+            _sessionAddedParts.Clear();
+            _sessionRemovedParts.Clear();
         }
-
-        private void ClearCosts_Click(object sender, RoutedEventArgs e)
-        {
-            var result = MessageBox.Show("Очистить список и обнулить суммы?\nВнимание: списанные со склада товары не вернутся автоматически!",
-                                 "Сброс расчета", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                _itemsToSubtract.Clear();
-                WorksBox.Clear();
-                PartsCostBox.Text = "0";
-
-                if (TotalCostBox != null) TotalCostBox.Text = "0";
-
-                ItemSearchBox.SelectedIndex = -1;
-                ItemSearchBox.Text = "";
-                ItemSearchBox.Focus();
-
-                CostFields_TextChanged(null, null);
-            }
-        }
-
-
-        private void AddItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (ItemSearchBox.SelectedItem is Item selectedItem)
-            {
-                int alreadySelected = _itemsToSubtract.Count(id => id == selectedItem.Id);
-                if (selectedItem.Quantity - alreadySelected <= 0)
-                {
-                    MessageBox.Show("Товар закончился на складе!", "Склад", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                _itemsToSubtract.Add(selectedItem.Id);
-
-                double.TryParse(PartsCostBox.Text, out double currentParts);
-                PartsCostBox.Text = (currentParts + selectedItem.PurchasePrice).ToString();
-
-                double.TryParse(TotalCostBox.Text, out double currentTotal);
-                TotalCostBox.Text = (currentTotal + selectedItem.RetailPrice).ToString();
-
-                WorksBox.Text += $"— {selectedItem.Name}: {selectedItem.RetailPrice} руб.\n";
-
-                ItemSearchBox.SelectedIndex = -1;
-                ItemSearchBox.Text = "";
-            }
-            else if (!string.IsNullOrWhiteSpace(ItemSearchBox.Text)) 
-            {
-                string manualName = ItemSearchBox.Text;
-                if (!double.TryParse(ItemPriceBox.Text.Replace(",", "."), out double price))
-                {
-                    MessageBox.Show("Введите корректную цену для ручного ввода!");
-                    return;
-                }
-
-                var result = MessageBox.Show($"Это запчасть (Расход)?\n'Да' — добавит в расходы.\n'Нет' — добавит в итоговую стоимость.",
-                                             "Тип записи", MessageBoxButton.YesNoCancel);
-
-                if (result == MessageBoxResult.Yes) 
-                {
-                    double.TryParse(PartsCostBox.Text, out double currentParts);
-                    PartsCostBox.Text = (currentParts + price).ToString();
-
-                    double.TryParse(TotalCostBox.Text, out double currentTotal);
-                    TotalCostBox.Text = (currentTotal + price).ToString();
-
-                    WorksBox.Text += $"— {manualName}: {price} руб.\n";
-                }
-                else if (result == MessageBoxResult.No) 
-                {
-                    double.TryParse(TotalCostBox.Text, out double currentTotal);
-                    TotalCostBox.Text = (currentTotal + price).ToString();
-
-                    WorksBox.Text += $"— {manualName}: {price} руб.\n";
-                }
-
-                ItemSearchBox.Text = "";
-                ItemPriceBox.Clear();
-            }
-
-        }
-
-        private void ItemSearchBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (ItemSearchBox.SelectedItem is Item selectedItem)
-            {
-                ItemPriceBox.Text = selectedItem.RetailPrice.ToString();
-            }
-        }
-
-        private void ItemSearchBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Enter) return;
-
-            string query = ItemSearchBox.Text;
-
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                RefreshSearchList();
-                ItemSearchBox.IsDropDownOpen = true;
-                return;
-            }
-
-            RefreshSearchList(query);
-
-            ItemSearchBox.IsDropDownOpen = ItemSearchBox.HasItems;
-
-            var textBox = ItemSearchBox.Template.FindName("PART_TextBox", ItemSearchBox) as TextBox;
-            if (textBox != null)
-            {
-                textBox.SelectionStart = query.Length;
-            }
-        }
-
-        private void RefreshSearchList(string query = "")
-        {
-            var allItems = _inventoryManager.GetAllItems();
-
-            var availableItems = allItems.Where(i => i.Quantity > 0);
-
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                availableItems = availableItems.Where(i => i.Name.ToLower().Contains(query.ToLower()));
-            }
-
-            ItemSearchBox.ItemsSource = availableItems.ToList();
-        }
-
-
 
 
     }

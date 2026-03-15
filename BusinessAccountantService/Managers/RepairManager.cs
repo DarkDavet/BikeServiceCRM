@@ -432,6 +432,70 @@ namespace BusinessAccountantService.Managers
             }
         }
 
+        public void SaveRepairItems(int repairId, IEnumerable<RepairItem> items)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var transaction = connection.BeginTransaction(); // Используем транзакцию для скорости
+                try
+                {
+                    // 1. Удаляем старый состав заказа
+                    var deleteCmd = connection.CreateCommand();
+                    deleteCmd.CommandText = "DELETE FROM RepairItems WHERE RepairId = $rid";
+                    deleteCmd.Parameters.AddWithValue("$rid", repairId);
+                    deleteCmd.ExecuteNonQuery();
+
+                    // 2. Записываем новый состав
+                    foreach (var item in items)
+                    {
+                        var insertCmd = connection.CreateCommand();
+                        insertCmd.CommandText = @"
+                    INSERT INTO RepairItems (RepairId, ProductId, ItemName, Quantity, Price, PurchasePrice) 
+                    VALUES ($rid, $pid, $name, $qty, $price, $pPrice)";
+
+                        insertCmd.Parameters.AddWithValue("$rid", repairId);
+                        insertCmd.Parameters.AddWithValue("$pid", (object)item.ProductId ?? DBNull.Value);
+                        insertCmd.Parameters.AddWithValue("$name", item.Name);
+                        insertCmd.Parameters.AddWithValue("$qty", item.Quantity);
+                        insertCmd.Parameters.AddWithValue("$price", item.Price);
+                        insertCmd.Parameters.AddWithValue("$pPrice", item.PurchasePrice);
+                        insertCmd.ExecuteNonQuery();
+                    }
+                    transaction.Commit();
+                }
+                catch { transaction.Rollback(); throw; }
+            }
+        }
+
+        public List<RepairItem> GetRepairItems(int repairId)
+        {
+            var list = new List<RepairItem>();
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT ProductId, ItemName, Quantity, Price, PurchasePrice FROM RepairItems WHERE RepairId = $rid";
+                command.Parameters.AddWithValue("$rid", repairId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new RepairItem
+                        {
+                            ProductId = reader.IsDBNull(0) ? (int?)null : reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Quantity = reader.GetInt32(2),
+                            Price = reader.GetDouble(3),
+                            PurchasePrice = reader.GetDouble(4)
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
 
 
 

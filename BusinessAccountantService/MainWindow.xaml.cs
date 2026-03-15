@@ -34,7 +34,7 @@ namespace BusinessAccountantService
 
         public MainWindow()
         {
-            //DatabaseService.ResetDatabase();
+           // DatabaseService.ResetDatabase();
             InitializeComponent();
             DatabaseService.Initialize();
             
