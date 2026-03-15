@@ -2,6 +2,7 @@
 using BusinessAccountantService.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -25,29 +26,44 @@ namespace BusinessAccountantService
         private readonly RepairManager _repairManager = new();
         public RepairItem SelectedResult { get; private set; }
 
+        private ICollectionView _serviceView;
+
         public AddServiceToRepairRecordWindow()
         {
             InitializeComponent();
+
+            // Загружаем полный список ОДИН РАЗ при открытии
+            var allServices = _repairManager.GetServiceSuggestions("");
+            _serviceView = CollectionViewSource.GetDefaultView(allServices);
+            ServiceSearchBox.ItemsSource = _serviceView;
+
             ServiceSearchBox.Focus();
         }
 
         // Поиск в прайс-листе по мере ввода текста
         private void ServiceSearchBox_KeyUp(object sender, KeyEventArgs e)
         {
-            // Игнорируем системные клавиши
-            if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Enter) return;
+            // Игнорируем навигационные клавиши
+            if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Enter || e.Key == Key.Escape) return;
 
-            string query = ServiceSearchBox.Text;
-            if (query.Length < 2)
+            string query = ServiceSearchBox.Text.ToLower();
+
+            // Фильтруем коллекцию вместо перезаписи ItemsSource
+            _serviceView.Filter = item =>
             {
-                ServiceSearchBox.IsDropDownOpen = false;
-                return;
+                if (string.IsNullOrEmpty(query)) return true;
+                var service = item as ServiceItem;
+                return service.Name.ToLower().Contains(query);
+            };
+
+            var textBox = (TextBox)ServiceSearchBox.Template.FindName("SERVICE_EditableTextBox", ServiceSearchBox);
+            if (textBox != null)
+            {
+                textBox.SelectionStart = textBox.Text.Length;
+                textBox.SelectionLength = 0;
             }
 
-            // Получаем подсказки из БД (таблица ServicePriceList)
-            var suggestions = _repairManager.GetServiceSuggestions(query);
-            ServiceSearchBox.ItemsSource = suggestions;
-            ServiceSearchBox.IsDropDownOpen = suggestions.Any();
+            ServiceSearchBox.IsDropDownOpen = true;
         }
 
         // Если выбрали готовую услугу — подставляем её цену

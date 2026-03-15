@@ -2,6 +2,7 @@
 using BusinessAccountantService.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,25 +25,45 @@ namespace BusinessAccountantService
         private readonly InventoryManager _inventoryManager = new();
         public RepairItem SelectedResult { get; private set; }
         private Item _foundItem;
+        private ICollectionView _partView;
 
         public AddPartToRepairRecordWindow()
         {
             InitializeComponent();
+
+            // Загружаем полный список ОДИН РАЗ при открытии
+            var allServices =
+            _partView = CollectionViewSource.GetDefaultView(_inventoryManager.GetAllItems());
+            PartSearchBox.ItemsSource = _partView;
+
             PartSearchBox.Focus();
         }
 
         private void PartSearchBox_KeyUp(object sender, KeyEventArgs e)
         {
-            string query = PartSearchBox.Text;
-            if (query.Length < 2) return;
+            if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Enter || e.Key == Key.Escape) return;
 
-            // Фильтруем только то, что есть в наличии
-            var items = _inventoryManager.GetAllItems()
-                .Where(i => i.Name.ToLower().Contains(query.ToLower()) && i.Quantity > 0)
-                .ToList();
+            string query = PartSearchBox.Text.ToLower();
 
-            PartSearchBox.ItemsSource = items;
-            PartSearchBox.IsDropDownOpen = items.Any();
+            _partView.Filter = obj =>
+            {
+                if (string.IsNullOrEmpty(query)) return true;
+
+                // ВАЖНО: Приводим к классу Item (тот, что в вашем Inventory)
+                var item = obj as Item;
+                if (item == null) return false;
+
+                // Фильтруем по названию
+                return item.Name.ToLower().Contains(query);
+            };
+            var textBox = (TextBox)PartSearchBox.Template.FindName("PART_EditableTextBox", PartSearchBox);
+            if (textBox != null)
+            {
+                textBox.SelectionStart = textBox.Text.Length;
+                textBox.SelectionLength = 0;
+            }
+            PartSearchBox.IsDropDownOpen = true;
+
         }
 
         private void PartSearchBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
