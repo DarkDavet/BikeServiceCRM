@@ -31,11 +31,24 @@ namespace BusinessAccountantService
         {
             InitializeComponent();
 
-            // Загружаем полный список ОДИН РАЗ при открытии
-            var allServices =
-            _partView = CollectionViewSource.GetDefaultView(_inventoryManager.GetAllItems());
-            PartSearchBox.ItemsSource = _partView;
+            var allItems = _inventoryManager.GetAllItems();
+            _partView = CollectionViewSource.GetDefaultView(allItems);
 
+            _partView.Filter = obj =>
+            {
+                if (obj is not Item item) return false;
+
+                string itemCat = (item.Category ?? "").Trim().ToLower();
+                string query = (PartSearchBox.Text ?? "").Trim().ToLower();
+
+                bool isPart = itemCat == "запчасти";
+                bool hasStock = item.Quantity > 0;
+                bool matchesQuery = string.IsNullOrEmpty(query) || item.Name.ToLower().Contains(query);
+
+                return isPart && hasStock && matchesQuery;
+            };
+
+            PartSearchBox.ItemsSource = _partView;
             PartSearchBox.Focus();
         }
 
@@ -43,26 +56,16 @@ namespace BusinessAccountantService
         {
             if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Enter || e.Key == Key.Escape) return;
 
-            string query = PartSearchBox.Text.ToLower();
+            _partView.Refresh();
 
-            _partView.Filter = obj =>
-            {
-                if (string.IsNullOrEmpty(query)) return true;
+            PartSearchBox.IsDropDownOpen = true;
 
-                // ВАЖНО: Приводим к классу Item (тот, что в вашем Inventory)
-                var item = obj as Item;
-                if (item == null) return false;
-
-                // Фильтруем по названию
-                return item.Name.ToLower().Contains(query);
-            };
             var textBox = (TextBox)PartSearchBox.Template.FindName("PART_EditableTextBox", PartSearchBox);
             if (textBox != null)
             {
                 textBox.SelectionStart = textBox.Text.Length;
                 textBox.SelectionLength = 0;
             }
-            PartSearchBox.IsDropDownOpen = true;
 
         }
 
@@ -74,19 +77,6 @@ namespace BusinessAccountantService
                 StockText.Text = $"{item.Quantity} шт.";
                 QtyBox.Focus();
                 QtyBox.SelectAll();
-            }
-        }
-
-        private void PartSearchBox_DropDownOpened(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(PartSearchBox.Text))
-            {
-                // Загружаем все товары, где количество > 0
-                var allItems = _inventoryManager.GetAllItems()
-                                                .Where(i => i.Quantity > 0)
-                                                .OrderBy(i => i.Name)
-                                                .ToList();
-                PartSearchBox.ItemsSource = allItems;
             }
         }
 

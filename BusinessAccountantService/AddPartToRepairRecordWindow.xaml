@@ -14,8 +14,7 @@
             <ComboBox x:Name="PartSearchBox" Height="30" IsEditable="True" 
                       DisplayMemberPath="Name" IsTextSearchEnabled="False"
                       KeyUp="PartSearchBox_KeyUp" 
-                      SelectionChanged="PartSearchBox_SelectionChanged"
-                      DropDownOpened="PartSearchBox_DropDownOpened" />
+                      SelectionChanged="PartSearchBox_SelectionChanged" />
 
             <Grid Margin="0,15,0,20">
                 <Grid.ColumnDefinitions>

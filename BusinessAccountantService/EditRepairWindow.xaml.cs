@@ -117,6 +117,8 @@ namespace BusinessAccountantService
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            OrderItemsGrid.CommitEdit(DataGridEditingUnit.Row, true);
+
             _currentRepair.BikeInfo = BikeInfoBox.Text;
             _currentRepair.ProblemDescription = ProblemBox.Text;
             _currentRepair.Status = StatusComboBox.Text;

@@ -194,6 +194,7 @@ namespace BusinessAccountantService
         {
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
             {
+                RepairsHistoryGrid.CommitEdit(DataGridEditingUnit.Row, true);
                 var menuItem = sender as MenuItem;
                 if (menuItem?.Tag == null) return;
 
