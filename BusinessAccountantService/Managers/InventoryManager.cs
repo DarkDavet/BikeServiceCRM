@@ -29,8 +29,8 @@ namespace BusinessAccountantService.Managers
                             Id = reader.GetInt32(0),
                             Name = reader.GetString(1),
                             Quantity = reader.GetInt32(2),
-                            PurchasePrice = reader.GetDouble(3),
-                            RetailPrice = reader.GetDouble(4),
+                            PurchasePrice = reader.GetDecimal(3),
+                            RetailPrice = reader.GetDecimal(4),
                             Category = reader.IsDBNull(5) ? "Разное" : reader.GetString(5)
                         });
                     }
@@ -93,7 +93,7 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-        public void RefillItem(int itemId, int addQty, double newPrice)
+        public void RefillItem(int itemId, int addQty, decimal newPrice)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
@@ -163,7 +163,7 @@ namespace BusinessAccountantService.Managers
             }
         }
 
-        public void AddExpense(string desc, double totalAmount, string category)
+        public void AddExpense(string desc, decimal totalAmount, string category)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
@@ -200,8 +200,8 @@ namespace BusinessAccountantService.Managers
                             ProductId = reader.IsDBNull(0) ? (int?)null : reader.GetInt32(0),
                             Name = reader.GetString(1),
                             Quantity = reader.GetInt32(2),
-                            Price = reader.GetDouble(3),
-                            PurchasePrice = reader.GetDouble(4)
+                            Price = reader.GetDecimal(3),
+                            PurchasePrice = reader.GetDecimal(4)
                         });
                     }
                 }

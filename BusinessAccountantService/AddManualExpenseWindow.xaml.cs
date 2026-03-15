@@ -33,7 +33,7 @@ namespace BusinessAccountantService
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             // 1. Валидация суммы
-            if (!double.TryParse(AmountBox.Text.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out double amount) || amount <= 0)
+            if (!decimal.TryParse(AmountBox.Text.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal amount) || amount <= 0)
             {
                 MessageBox.Show("Введите корректную сумму расхода!");
                 return;

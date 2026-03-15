@@ -38,8 +38,8 @@ namespace BusinessAccountantService.Managers
                             BikeInfo = reader.GetString(1),
                             ProblemDescription = reader.GetString(2),
                             WorksPerformed = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                            PartsCost = reader.IsDBNull(4) ? 0 : reader.GetDouble(4),
-                            TotalCost = reader.GetDouble(5),
+                            PartsCost = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4),
+                            TotalCost = reader.GetDecimal(5),
                             Status = reader.IsDBNull(6) ? "Принят" : reader.GetString(6),
                             DateCreated = reader.IsDBNull(7) ? DateTime.Now : reader.GetDateTime(7)
                         });
@@ -155,14 +155,14 @@ namespace BusinessAccountantService.Managers
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
-                        list.Add(new ServiceItem { Name = reader.GetString(0), Price = reader.GetDouble(1) });
+                        list.Add(new ServiceItem { Name = reader.GetString(0), Price = reader.GetDecimal(1) });
                 }
             }
             return list;
         }
 
         // Сохранение/Обновление цены в прайсе
-        public void UpdateServicePrice(string name, double price)
+        public void UpdateServicePrice(string name, decimal price)
         {
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {

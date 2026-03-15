@@ -42,9 +42,9 @@ namespace BusinessAccountantService
         {
             var dailyData = _statsManager.GetDailyStats(date);
 
-            double totalRev = dailyData.Sum(x => x.dailyRev);
-            double totalParts = dailyData.Sum(x => x.dailyParts);
-            double totalProfit = totalRev - totalParts;
+            decimal totalRev = dailyData.Sum(x => x.dailyRev);
+            decimal totalParts = dailyData.Sum(x => x.dailyParts);
+            decimal totalProfit = totalRev - totalParts;
             int totalCount = dailyData.Sum(x => x.dailyCount);
 
             RevText.Text = $"{totalRev:N0} ₽";
@@ -61,7 +61,7 @@ namespace BusinessAccountantService
                 series.Add(new LineSeries
                 {
                     Title = "Заказы",
-                    Values = new ChartValues<double>(dailyData.Select(x => (double)x.dailyCount)),
+                    Values = new ChartValues<decimal>(dailyData.Select(x => (decimal)x.dailyCount)),
                     Stroke = Brushes.BlueViolet,
                     PointGeometry = DefaultGeometries.Square,
                     DataLabels = true 
@@ -69,9 +69,9 @@ namespace BusinessAccountantService
             }
             else
             {
-                if (_showRevenue) series.Add(new LineSeries { Title = "Выручка", Values = new ChartValues<double>(dailyData.Select(x => x.dailyRev)), Stroke = Brushes.DodgerBlue, Fill = Brushes.Transparent });
-                if (_showParts) series.Add(new LineSeries { Title = "Запчасти", Values = new ChartValues<double>(dailyData.Select(x => x.dailyParts)), Stroke = Brushes.Tomato, Fill = Brushes.Transparent });
-                if (_showProfit) series.Add(new LineSeries { Title = "Прибыль", Values = new ChartValues<double>(dailyData.Select(x => x.dailyRev - x.dailyParts)), Stroke = Brushes.MediumSeaGreen, Fill = Brushes.Transparent });
+                if (_showRevenue) series.Add(new LineSeries { Title = "Выручка", Values = new ChartValues<decimal>(dailyData.Select(x => x.dailyRev)), Stroke = Brushes.DodgerBlue, Fill = Brushes.Transparent });
+                if (_showParts) series.Add(new LineSeries { Title = "Запчасти", Values = new ChartValues<decimal>(dailyData.Select(x => x.dailyParts)), Stroke = Brushes.Tomato, Fill = Brushes.Transparent });
+                if (_showProfit) series.Add(new LineSeries { Title = "Прибыль", Values = new ChartValues<decimal>(dailyData.Select(x => x.dailyRev - x.dailyParts)), Stroke = Brushes.MediumSeaGreen, Fill = Brushes.Transparent });
             }
 
             FinanceChart.Series = series;
@@ -92,7 +92,7 @@ namespace BusinessAccountantService
                 FinanceChart.AxisY.Add(new Axis
                 {
                     Title = "Сумма (₽)",
-                    LabelFormatter = value => value.ToString("N0") + " ₽"
+                    LabelFormatter = value => value.ToString("N2") + " ₽"
                 });
             }
 
@@ -128,9 +128,9 @@ namespace BusinessAccountantService
             }
             else
             {
-                if (_showRevenue) series.Add(new ColumnSeries { Title = "Выручка", Values = new ChartValues<double>(yearlyData.Select(x => x.rev)), Fill = Brushes.DodgerBlue });
-                if (_showParts) series.Add(new ColumnSeries { Title = "Запчасти", Values = new ChartValues<double>(yearlyData.Select(x => x.parts)), Fill = Brushes.Tomato });
-                if (_showProfit) series.Add(new ColumnSeries { Title = "Прибыль", Values = new ChartValues<double>(yearlyData.Select(x => x.prof)), Fill = Brushes.MediumSeaGreen });
+                if (_showRevenue) series.Add(new ColumnSeries { Title = "Выручка", Values = new ChartValues<decimal>(yearlyData.Select(x => x.rev)), Fill = Brushes.DodgerBlue });
+                if (_showParts) series.Add(new ColumnSeries { Title = "Запчасти", Values = new ChartValues<decimal>(yearlyData.Select(x => x.parts)), Fill = Brushes.Tomato });
+                if (_showProfit) series.Add(new ColumnSeries { Title = "Прибыль", Values = new ChartValues<decimal>(yearlyData.Select(x => x.prof)), Fill = Brushes.MediumSeaGreen });
             }
 
             YearlyChart.Series = series;
@@ -150,7 +150,7 @@ namespace BusinessAccountantService
                 YearlyChart.AxisY.Add(new Axis
                 {
                     Title = "Сумма (₽)",
-                    LabelFormatter = value => value.ToString("N0") + " ₽"
+                    LabelFormatter = value => value.ToString("N2") + " ₽"
                 });
             }
 
@@ -169,9 +169,9 @@ namespace BusinessAccountantService
                 pieSeries.Add(new PieSeries
                 {
                     Title = stat.Category,
-                    Values = new ChartValues<double> { stat.Amount },
+                    Values = new ChartValues<decimal> { stat.Amount },
                     DataLabels = true,
-                    LabelPoint = p => $"{p.Y:N0} ₽"
+                    LabelPoint = p => $"{p.Y:N2} ₽"
                 });
             }
             YearlyExpensesPieChart.Series = pieSeries;
@@ -313,11 +313,11 @@ namespace BusinessAccountantService
         }
 
 
-        private void UpdateCardTexts(double rev, double parts, double prof, int count)
+        private void UpdateCardTexts(decimal rev, decimal parts, decimal prof, int count)
         {
-            RevText.Text = $"{rev:N0} ₽";
-            PartsText.Text = $"{parts:N0} ₽";
-            ProfitText.Text = $"{prof:N0} ₽";
+            RevText.Text = $"{rev:N2} ₽";
+            PartsText.Text = $"{parts:N2} ₽";
+            ProfitText.Text = $"{prof:N2} ₽";
             CountText.Text = count.ToString();
         }
 
@@ -334,9 +334,9 @@ namespace BusinessAccountantService
                 pieSeries.Add(new PieSeries
                 {
                     Title = stat.Category,
-                    Values = new ChartValues<double> { stat.Amount },
+                    Values = new ChartValues<decimal> { stat.Amount },
                     DataLabels = true,
-                    LabelPoint = point => $"{point.SeriesView.Title}: {point.Y:N0} ₽"
+                    LabelPoint = point => $"{point.SeriesView.Title}: {point.Y:N2} ₽"
                 });
             }
             ExpensesPieChart.Series = pieSeries;
@@ -354,9 +354,9 @@ namespace BusinessAccountantService
                 pieSeries.Add(new PieSeries
                 {
                     Title = stat.Category,
-                    Values = new ChartValues<double> { stat.Amount },
+                    Values = new ChartValues<decimal> { stat.Amount },
                     DataLabels = true,
-                    LabelPoint = p => $"{p.SeriesView.Title}: {p.Y:N0} ₽"
+                    LabelPoint = p => $"{p.SeriesView.Title}: {p.Y:N2} ₽"
                 });
             }
 

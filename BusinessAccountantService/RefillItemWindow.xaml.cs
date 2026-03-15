@@ -31,7 +31,7 @@ namespace BusinessAccountantService
 
             ItemTitleText.Text = $"ПОПОЛНЕНИЕ: {item.Name.ToUpper()}";
 
-            NewPurchasePriceBox.Text = item.PurchasePrice.ToString();
+            NewPurchasePriceBox.Text = item.PurchasePrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
         }
 
         private void SaveRefill_Click(object sender, RoutedEventArgs e)
@@ -44,9 +44,9 @@ namespace BusinessAccountantService
             }
 
             // 2. Валидация цены закупки (универсальный парсинг)
-            if (!double.TryParse(NewPurchasePriceBox.Text.Replace(",", "."),
+            if (!decimal.TryParse(NewPurchasePriceBox.Text.Replace(",", "."),
                 System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out double price))
+                System.Globalization.CultureInfo.InvariantCulture, out decimal price))
             {
                 MessageBox.Show("Введите корректную цену закупки");
                 return;
@@ -58,7 +58,7 @@ namespace BusinessAccountantService
                 _inventoryManager.RefillItem(_currentItem.Id, qty, price);
 
                 // 4. ФИКСИРУЕМ РЕАЛЬНЫЙ РАСХОД ДЕНЕГ
-                double totalSpent = price * qty;
+                decimal totalSpent = price * qty;
 
                 // Берем категорию прямо из карточки товара (Инструмент, Запчасти и т.д.)
                 string itemCategory = string.IsNullOrWhiteSpace(_currentItem.Category)

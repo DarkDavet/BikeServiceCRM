@@ -40,7 +40,7 @@ namespace BusinessAccountantService
         {
             if (string.IsNullOrWhiteSpace(ItemNameBox.Text) || !double.TryParse(ItemPriceBox.Text, out double price)) return;
 
-            WorksBox.Text += $"— {ItemNameBox.Text}: {price} руб.\n";
+            WorksBox.Text += $"— {ItemNameBox.Text}: {price:N2} руб.\n";
 
             var result = MessageBox.Show("Это запчасть (Расход)?", "Тип записи", MessageBoxButton.YesNo);
             if (result == MessageBoxResult.Yes)
@@ -62,7 +62,7 @@ namespace BusinessAccountantService
             if (ProfitText == null) return;
             double.TryParse(PartsCostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double p);
             double.TryParse(CostBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double t);
-            ProfitText.Text = $"Предварительная прибыль: {t - p} руб.";
+            ProfitText.Text = $"Предварительная прибыль: {t - p:N2} руб.";
         }
 
 

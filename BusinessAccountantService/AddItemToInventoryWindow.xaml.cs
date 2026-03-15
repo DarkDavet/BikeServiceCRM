@@ -39,8 +39,8 @@ namespace BusinessAccountantService
             string itemName = ItemNameBox.Text;
             int qty = int.TryParse(QuantityBox.Text, out int q) ? q : 0;
 
-            double.TryParse(PurchasePriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double pPrice);
-            double.TryParse(RetailPriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double rPrice);
+            decimal.TryParse(PurchasePriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal pPrice);
+            decimal.TryParse(RetailPriceBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal rPrice);
 
             string category = CategoryBox.Text ?? "Разное";
 
@@ -63,10 +63,10 @@ namespace BusinessAccountantService
                 command.ExecuteNonQuery();
 
                 // 2. ФИКСИРУЕМ РАСХОД (ОДИН РАЗ!)
-                double totalSpent = pPrice * qty;
+                decimal totalSpent = pPrice * qty;
                 if (totalSpent > 0 && pPrice > 0)
                 {
-                    _inventoryManager.AddExpense($"Приход: {itemName} (x{qty})", totalSpent, category);
+                    _inventoryManager.AddExpense($"Закупка: {itemName} (x{qty})", totalSpent, category);
                 }
             }
 

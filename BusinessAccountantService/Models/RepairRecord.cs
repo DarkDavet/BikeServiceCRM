@@ -17,15 +17,15 @@ namespace BusinessAccountantService.Models
         public string ProblemDescription { get; set; }
         public string WorksPerformed { get; set; }
 
-        private double _partsCost;
-        public double PartsCost
+        private decimal _partsCost;
+        public decimal PartsCost
         {
             get => _partsCost;
             set { _partsCost = value; OnPropertyChanged(); OnPropertyChanged(nameof(Profit)); }
         }
 
-        private double _totalCost;
-        public double TotalCost
+        private decimal _totalCost;
+        public decimal TotalCost
         {
             get => _totalCost;
             set { _totalCost = value; OnPropertyChanged(); OnPropertyChanged(nameof(Profit)); }
@@ -33,7 +33,7 @@ namespace BusinessAccountantService.Models
 
         // Это свойство теперь будет само уведомлять таблицу, 
         // если изменились TotalCost или PartsCost
-        public double Profit => TotalCost - _partsCost;
+        public decimal Profit => TotalCost - _partsCost;
 
         private string _status;
         public string Status

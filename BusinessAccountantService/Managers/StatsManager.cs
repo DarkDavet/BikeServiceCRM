@@ -2,6 +2,7 @@
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,9 +69,9 @@ namespace BusinessAccountantService.Managers
             return (0, 0, 0, 0);
         }
 
-        public List<(string day, double dailyRev, double dailyParts, int dailyCount)> GetDailyStats(DateTime date)
+        public List<(string day, decimal dailyRev, decimal dailyParts, int dailyCount)> GetDailyStats(DateTime date)
         {
-            var stats = new List<(string day, double dailyRev, double dailyParts, int dailyCount)>();
+            var stats = new List<(string day, decimal dailyRev, decimal dailyParts, int dailyCount)>();
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
@@ -108,8 +109,8 @@ namespace BusinessAccountantService.Managers
                     {
                         stats.Add((
                             reader.GetString(0),
-                            reader.GetDouble(1),
-                            reader.GetDouble(2),
+                            reader.GetDecimal(1),
+                            reader.GetDecimal(2),
                             reader.GetInt32(3)
                         ));
                     }
@@ -118,9 +119,9 @@ namespace BusinessAccountantService.Managers
             return stats;
         }
 
-        public List<(string month, double rev, double parts, double prof, int count)> GetYearlyStats(int year)
+        public List<(string month, decimal rev, decimal parts, decimal prof, int count)> GetYearlyStats(int year)
         {
-            var stats = new List<(string month, double rev, double parts, double prof, int count)>();
+            var stats = new List<(string month, decimal rev, decimal parts, decimal prof, int count)>();
             using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
             {
                 connection.Open();
@@ -159,9 +160,9 @@ namespace BusinessAccountantService.Managers
                     {
                         stats.Add((
                             reader.GetString(0), // Месяц (01, 02...)
-                            reader.GetDouble(1), // Выручка
-                            reader.GetDouble(2), // Реальные расходы на запчасти
-                            reader.GetDouble(3), // Чистая прибыль (кассовая)
+                            reader.GetDecimal(1), // Выручка
+                            reader.GetDecimal(2), // Реальные расходы на запчасти
+                            reader.GetDecimal(3), // Чистая прибыль (кассовая)
                             reader.GetInt32(4)   // Количество заказов
                         ));
                     }

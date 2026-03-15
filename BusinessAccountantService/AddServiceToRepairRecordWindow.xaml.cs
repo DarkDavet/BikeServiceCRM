@@ -92,7 +92,7 @@ namespace BusinessAccountantService
             string name = ServiceSearchBox.Text;
 
             // Парсим цену с защитой от точек/запятых
-            double.TryParse(PriceBox.Text.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out double price);
+            decimal.TryParse(PriceBox.Text.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal price);
 
             if (string.IsNullOrWhiteSpace(name) || price <= 0)
             {

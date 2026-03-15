@@ -39,8 +39,8 @@
                 <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="80"/>
-                <DataGridTextColumn Header="Закупка" Binding="{Binding PurchasePrice, StringFormat={}{0:N0} ₽}" Width="100"/>
-                <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, StringFormat={}{0:N0} ₽}" Width="100"/>
+                <DataGridTextColumn Header="Закупка" Binding="{Binding PurchasePrice, StringFormat={}{0:N2} ₽}" Width="100"/>
+                <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, StringFormat={}{0:N2} ₽}" Width="100"/>
             </DataGrid.Columns>
         </DataGrid>
 

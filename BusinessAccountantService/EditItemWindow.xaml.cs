@@ -39,8 +39,8 @@ namespace BusinessAccountantService
             CurrentItem.Name = ItemNameBox.Text;
             CurrentItem.Category = CategoryBox.Text;
 
-            double.TryParse(PurchaseBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double p);
-            double.TryParse(RetailBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double r);
+            decimal.TryParse(PurchaseBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal p);
+            decimal.TryParse(RetailBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal r);
 
             CurrentItem.PurchasePrice = p;
             CurrentItem.RetailPrice = r;

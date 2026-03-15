@@ -57,15 +57,15 @@ namespace BusinessAccountantService
 
         private void UpdateTotals()
         {
-            double total = _orderItems.Sum(x => x.Total);
+            decimal total = _orderItems.Sum(x => x.Total);
 
             // Прибыль = (Цена работы) + (Маржа запчасти: Розница - Закупка)
-            double profit = _orderItems.Sum(x => x.ProductId.HasValue
+            decimal profit = _orderItems.Sum(x => x.ProductId.HasValue
                 ? (x.Price - x.PurchasePrice) * x.Quantity
                 : x.Total);
 
-            TotalCostText.Text = $"{total:N0} ₽";
-            ProfitText.Text = $"Чистая прибыль: {profit:N0} руб.";
+            TotalCostText.Text = $"{total:N2} ₽";
+            ProfitText.Text = $"Чистая прибыль: {profit:N2} руб.";
         }
 
         // Кнопка + ЗАПЧАСТЬ
