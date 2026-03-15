@@ -60,6 +60,10 @@ namespace BusinessAccountantService.Data
                 Category TEXT,      
                 DateOperation DATETIME 
             );
+            CREATE TABLE IF NOT EXISTS ServicePriceList (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ServiceName TEXT UNIQUE, -- Название услуги
+                DefaultPrice REAL   
 
 ";
                 command.ExecuteNonQuery();
