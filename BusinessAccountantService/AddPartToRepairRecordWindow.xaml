@@ -1,0 +1,41 @@
+﻿<Window x:Class="BusinessAccountantService.AddPartToRepairRecordWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BusinessAccountantService"
+        mc:Ignorable="d"
+        Title="Выбор запчасти" Height="300" Width="400" WindowStartupLocation="CenterOwner">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="ДОБАВИТЬ ЗАПЧАСТЬ СО СКЛАДА" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2980B9"/>
+
+            <Label Content="Поиск детали:"/>
+            <ComboBox x:Name="PartSearchBox" Height="30" IsEditable="True" 
+                      DisplayMemberPath="Name" IsTextSearchEnabled="False"
+                      KeyUp="PartSearchBox_KeyUp" SelectionChanged="PartSearchBox_SelectionChanged"/>
+
+            <Grid Margin="0,15,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Margin="0,0,10,0">
+                    <Label Content="В наличии:"/>
+                    <TextBlock x:Name="StockText" Text="0 шт." FontSize="16" FontWeight="Bold" Foreground="Gray"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <Label Content="Кол-во для заказа:"/>
+                    <TextBox x:Name="QtyBox" Text="1" Height="30" VerticalContentAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Добавить" Click="Add_Click" Width="120" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                <Button Content="Отмена" Click="Cancel_Click" Width="80" Height="35" Margin="10,0,0,0" Background="#BDC3C7" BorderThickness="0"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
