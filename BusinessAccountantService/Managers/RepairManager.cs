@@ -397,6 +397,42 @@ namespace BusinessAccountantService.Managers
             return stats;
         }
 
+        // Поиск по прайсу работ
+        public List<ServiceItem> GetServiceSuggestions(string query)
+        {
+            var list = new List<ServiceItem>();
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT ServiceName, DefaultPrice FROM ServicePriceList WHERE ServiceName LIKE $q LIMIT 10";
+                command.Parameters.AddWithValue("$q", "%" + query + "%");
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        list.Add(new ServiceItem { Name = reader.GetString(0), Price = reader.GetDouble(1) });
+                }
+            }
+            return list;
+        }
+
+        // Сохранение/Обновление цены в прайсе
+        public void UpdateServicePrice(string name, double price)
+        {
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                // INSERT OR REPLACE обновит цену, если работа с таким именем уже есть
+                command.CommandText = "INSERT OR REPLACE INTO ServicePriceList (ServiceName, DefaultPrice) VALUES ($name, $price)";
+                command.Parameters.AddWithValue("$name", name);
+                command.Parameters.AddWithValue("$price", price);
+                command.ExecuteNonQuery();
+            }
+        }
+
+
 
 
     }
