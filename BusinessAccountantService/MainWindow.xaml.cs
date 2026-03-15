@@ -31,6 +31,8 @@ namespace BusinessAccountantService
         public RepairManager _repairManager = new();
         public PdfExportManager _pdfmanager = new();
         public InventoryManager _inventoryManager = new();
+        public StatsManager _statsManager = new();
+        public ExpensesManager _expensesManager = new();
 
         public MainWindow()
         {

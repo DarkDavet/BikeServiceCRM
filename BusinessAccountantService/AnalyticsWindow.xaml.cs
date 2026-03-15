@@ -24,7 +24,8 @@ namespace BusinessAccountantService
     /// </summary>
     public partial class AnalyticsWindow : Window
     {
-        private RepairManager _repairManager => ((MainWindow)Application.Current.MainWindow)._repairManager;
+        private StatsManager _statsManager => ((MainWindow)Application.Current.MainWindow)._statsManager;
+        private ExpensesManager _expensesManager => ((MainWindow)Application.Current.MainWindow)._expensesManager;
         public enum ChartDataType { Revenue, Parts, Profit, Orders }
         private ChartDataType _currentChartMode = ChartDataType.Revenue;
 
@@ -39,7 +40,7 @@ namespace BusinessAccountantService
         }
         private void LoadData(DateTime date)
         {
-            var dailyData = _repairManager.GetDailyStats(date);
+            var dailyData = _statsManager.GetDailyStats(date);
 
             double totalRev = dailyData.Sum(x => x.dailyRev);
             double totalParts = dailyData.Sum(x => x.dailyParts);
@@ -110,7 +111,7 @@ namespace BusinessAccountantService
 
             // Обновляем надпись над графиком года
             YearLabel.Text = $"{year} ГОД";
-            var yearlyData = _repairManager.GetYearlyStats(year);
+            var yearlyData = _statsManager.GetYearlyStats(year);
 
             var series = new SeriesCollection();
             string[] monthNames = { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
@@ -160,7 +161,7 @@ namespace BusinessAccountantService
                 Separator = new LiveCharts.Wpf.Separator { Step = 1 }
             });
 
-            var yearlyExpenses = _repairManager.GetExpensesByYear(year);
+            var yearlyExpenses = _expensesManager.GetExpensesByYear(year);
             var pieSeries = new SeriesCollection();
 
             foreach (var stat in yearlyExpenses)
@@ -275,7 +276,7 @@ namespace BusinessAccountantService
             // 3. Обновляем цифры в карточках (зависит от того, месяц это или год)
             if (MainTabControl.SelectedIndex == 0) // Вкладка месяца
             {
-                var dailyData = _repairManager.GetDailyStats(date);
+                var dailyData = _statsManager.GetDailyStats(date);
                 UpdateCardTexts(
                     dailyData.Sum(x => x.dailyRev),
                     dailyData.Sum(x => x.dailyParts),
@@ -285,7 +286,7 @@ namespace BusinessAccountantService
             }
             else // Вкладка года
             {
-                var yearlyData = _repairManager.GetYearlyStats(date.Year);
+                var yearlyData = _statsManager.GetYearlyStats(date.Year);
                 UpdateCardTexts(
                     yearlyData.Sum(x => x.rev),
                     yearlyData.Sum(x => x.parts),
@@ -323,10 +324,10 @@ namespace BusinessAccountantService
         private void LoadExpensesStructure(DateTime date)
         {
             // 1. Для таблицы — берем историю (каждую запись отдельно)
-            ExpensesDetailGrid.ItemsSource = _repairManager.GetExpensesHistory(date);
+            ExpensesDetailGrid.ItemsSource = _expensesManager.GetExpensesHistory(date);
 
             // 2. Для круговой диаграммы — по-прежнему используем группировку по категориям
-            var categoryStats = _repairManager.GetExpensesByCategory(date);
+            var categoryStats = _expensesManager.GetExpensesByCategory(date);
             var pieSeries = new SeriesCollection();
             foreach (var stat in categoryStats)
             {
@@ -344,7 +345,7 @@ namespace BusinessAccountantService
         private void LoadYearlyExpensesPie(int year)
         {
             // Получаем сгруппированные данные по категориям за весь год
-            var yearlyExpenses = _repairManager.GetExpensesByYear(year);
+            var yearlyExpenses = _expensesManager.GetExpensesByYear(year);
 
             var pieSeries = new SeriesCollection();
 

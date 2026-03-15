@@ -23,8 +23,8 @@ namespace BusinessAccountantService
     public partial class EditRepairWindow : Window
     {
         private RepairRecord _currentRepair;
-        private readonly RepairManager _repairManager = new();
         private InventoryManager _inventoryManager => ((MainWindow)Application.Current.MainWindow)._inventoryManager;
+        private RepairManager _repairManager => ((MainWindow) Application.Current.MainWindow)._repairManager;
 
         private List<RepairItem> _sessionAddedParts = new(); 
         private List<RepairItem> _sessionRemovedParts = new();
@@ -44,7 +44,7 @@ namespace BusinessAccountantService
             StatusComboBox.Text = repair.Status;
 
             // Загружаем состав заказа из БД
-            var itemsFromDb = _repairManager.GetRepairItems(repair.Id);
+            var itemsFromDb = _inventoryManager.GetRepairItems(repair.Id);
             _orderItems = new ObservableCollection<RepairItem>(itemsFromDb);
 
             // Привязываем коллекцию к таблице
@@ -131,7 +131,7 @@ namespace BusinessAccountantService
                 _repairManager.UpdateRepair(_currentRepair);
 
                 // 2. Сохраняем состав заказа (удаляем старые строки и пишем новые)
-                _repairManager.SaveRepairItems(_currentRepair.Id, _orderItems);
+                _inventoryManager.SaveRepairItems(_currentRepair.Id, _orderItems);
 
                 _sessionAddedParts.Clear();
                 _sessionRemovedParts.Clear();
