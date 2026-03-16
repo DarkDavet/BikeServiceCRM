@@ -3,9 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BusinessAccountantService"
+        xmlns:local="clr-namespace:BusinessAccountantService.Managers"
         mc:Ignorable="d"
         Title="Редактирование заказа" Height="750" Width="600" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <local:StatusColorConverter x:Key="StatusColorConverter"/>
+    </Window.Resources>
 
     <Grid Background="#F5F6FA">
         <Grid.RowDefinitions>
@@ -30,15 +33,29 @@
                     <TextBlock x:Name="OrderDateText" Text="Заказ от ..." FontSize="11" Foreground="Gray"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1">
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <Label Content="Статус заказа:" FontSize="11" Foreground="Gray" Padding="0,0,0,2"/>
-                    <ComboBox x:Name="StatusComboBox" Height="30" VerticalContentAlignment="Center" FontWeight="SemiBold">
-                        <ComboBoxItem Content="Принят"/>
-                        <ComboBoxItem Content="В работе"/>
-                        <ComboBoxItem Content="Готов"/>
-                        <ComboBoxItem Content="Выдан"/>
-                    </ComboBox>
+
+                    <!-- Привязываемся к контенту выбранного элемента -->
+                    <Border x:Name="StatusBorder" 
+            Background="{Binding SelectedItem.Content, ElementName=StatusComboBox, Converter={StaticResource StatusColorConverter}}" 
+            CornerRadius="7" 
+            Padding="5">
+
+                        <ComboBox x:Name="StatusComboBox" 
+                  Height="26" 
+                  VerticalContentAlignment="Center" 
+                  FontWeight="SemiBold"
+                  Background="Transparent" 
+                  BorderThickness="0">
+                            <ComboBoxItem Content="Принят" IsSelected="True"/>
+                            <ComboBoxItem Content="В работе"/>
+                            <ComboBoxItem Content="Готов"/>
+                            <ComboBoxItem Content="Выдан"/>
+                        </ComboBox>
+                    </Border>
                 </StackPanel>
+
             </Grid>
         </Border>
 
