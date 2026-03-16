@@ -189,31 +189,6 @@ namespace BusinessAccountantService
             }
         }
 
-        private void ChangeStatus_Click(object sender, RoutedEventArgs e)
-        {
-            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
-            {
-                RepairsHistoryGrid.CommitEdit(DataGridEditingUnit.Row, true);
-                var menuItem = sender as MenuItem;
-                if (menuItem?.Tag == null) return;
-
-                string newStatus = menuItem.Tag.ToString();
-                _inventoryManager.UpdateRepairStatus(selectedRepair.Id, newStatus);
-                selectedRepair.Status = newStatus;
-
-                // Обновляем список, если мы в фильтрованном режиме (например "В работе")
-                if (_currentMode != ViewMode.All && ClientsGrid.SelectedItem is Client selectedClient)
-                {
-                    RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
-                }
-                else
-                {
-                    RepairsHistoryGrid.Items.Refresh();
-                }
-                UpdateStatusInfo();
-            }
-        }
-
         private void RepairsHistoryGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
@@ -225,10 +200,8 @@ namespace BusinessAccountantService
 
                 if (editWin.ShowDialog() == true)
                 {
-                    //if (editWin.IsDeleted)
-                      //  _repairManager.DeleteRepair(selectedRepair.Id);
-                   // else
-                        _repairManager.UpdateRepair(selectedRepair);
+                 
+                    _repairManager.UpdateRepair(selectedRepair);
 
                     if (ClientsGrid.SelectedItem is Client selectedClient)
                         RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
@@ -238,7 +211,6 @@ namespace BusinessAccountantService
             }
         }
 
-        // Вызывается при клике на клиента в таблице
         private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)
@@ -250,33 +222,5 @@ namespace BusinessAccountantService
                 RepairsHistoryGrid.ItemsSource = null;
             }
         }
-
-        private void RepairsHistoryGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            if (e.Column.Header.ToString() == "Статус" && e.EditAction == DataGridEditAction.Commit)
-            {
-                var repair = e.Row.Item as RepairRecord;
-                var cb = e.EditingElement as ComboBox;
-
-                if (repair != null && cb != null)
-                {
-                    string newStatus = cb.SelectedItem?.ToString() ?? cb.Text;
-
-                    if (!string.IsNullOrEmpty(newStatus))
-                    {
-                        repair.Status = newStatus;
-
-                        _repairManager.UpdateStatus(repair.Id, newStatus);
-
-                        if (newStatus == "Выдан")
-                        {
-                            MessageBox.Show("Статус обновлен на 'Выдан'.");
-                        }
-                        UpdateStatusInfo();
-                    }
-                }
-            }
-        }
-
     }
 }

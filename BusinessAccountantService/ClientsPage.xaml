@@ -32,7 +32,8 @@
       MouseDoubleClick="ClientsGrid_MouseDoubleClick"
       AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" 
       CanUserAddRows="False" CanUserDeleteRows="False"
-                      IsReadOnly="True">
+                      IsReadOnly="True"
+                      >
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
                     <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*"/>
@@ -47,75 +48,62 @@
             <GridSplitter Height="5" HorizontalAlignment="Stretch" Background="#DDDDDD" Margin="0,10"/>
 
             <TextBlock Text="История ремонтов выбранного клиента:" FontWeight="Bold" Margin="0,0,0,5"/>
-            <DataGrid x:Name="RepairsHistoryGrid" Height="180"
-      MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
-      CellEditEnding="RepairsHistoryGrid_CellEditEnding"
-      AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
-                      IsReadOnly="True">
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Статус: Принят" Click="ChangeStatus_Click" Tag="Принят"/>
-                        <MenuItem Header="Статус: В работе" Click="ChangeStatus_Click" Tag="В работе"/>
-                        <MenuItem Header="Статус: Готов" Click="ChangeStatus_Click" Tag="Готов"/>
-                        <Separator/>
-                        <MenuItem Header="Статус: Выдан" Click="ChangeStatus_Click" Tag="Выдан" Foreground="DarkGreen" FontWeight="Bold"/>
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="150"/>
-                    <DataGridTextColumn Header="Описание" Binding="{Binding ProblemDescription}" Width="*"/>
-                    <DataGridComboBoxColumn Header="Статус" Width="120"
-            SelectedItemBinding="{Binding Status, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid x:Name="RepairsHistoryGrid" 
+          Height="200"
+          MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
+          AutoGenerateColumns="False" 
+          CanUserAddRows="False" 
+          CanUserDeleteRows="False"
+          IsReadOnly="True"
+          SelectionMode="Single"
+          SelectionUnit="FullRow"
+          GridLinesVisibility="Horizontal"
+          HeadersVisibility="Column"
+          Background="White">
 
-                        <DataGridComboBoxColumn.CellStyle>
+                <!-- Контекстное меню и CellEditEnding полностью удалены -->
+
+                <DataGrid.Columns>
+                    <!-- Дата прихода -->
+                    <DataGridTextColumn Header="Дата" Binding="{Binding DateCreated, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
+
+                    <!-- Информация о технике -->
+                    <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="150"/>
+
+                    <!-- Краткое описание (займет всё свободное место) -->
+                    <DataGridTextColumn Header="Описание" Binding="{Binding ProblemDescription}" Width="*"/>
+
+                    <!-- Статус (теперь просто текст с цветовой индикацией ячейки) -->
+                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="120">
+                        <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                <!-- Убираем подсветку выделения, чтобы цвет статуса всегда был виден -->
                                 <Style.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
                                         <Setter Property="Foreground" Value="Black"/>
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
-                        </DataGridComboBoxColumn.CellStyle>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
 
-                        <DataGridComboBoxColumn.ElementStyle>
-                            <Style TargetType="ComboBox">
-                                <Setter Property="ItemsSource">
-                                    <Setter.Value>
-                                        <x:Array Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                                            <sys:String>Принят</sys:String>
-                                            <sys:String>В работе</sys:String>
-                                            <sys:String>Готов</sys:String>
-                                            <sys:String>Выдан</sys:String>
-                                        </x:Array>
-                                    </Setter.Value>
-                                </Setter>
-                                <!-- Делаем комбобокс прозрачным, чтобы видеть цвет ячейки под ним -->
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderThickness" Value="0"/>
+                    <!-- Оплата (с копейками BYN) -->
+                    <DataGridTextColumn Header="Итого" Binding="{Binding TotalCost, StringFormat={}{0:N2} р.}" Width="100">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                <Setter Property="Margin" Value="0,0,10,0"/>
                             </Style>
-                        </DataGridComboBoxColumn.ElementStyle>
-
-                        <DataGridComboBoxColumn.EditingElementStyle>
-                            <Style TargetType="ComboBox">
-                                <Setter Property="ItemsSource">
-                                    <Setter.Value>
-                                        <x:Array Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                                            <sys:String>Принят</sys:String>
-                                            <sys:String>В работе</sys:String>
-                                            <sys:String>Готов</sys:String>
-                                            <sys:String>Выдан</sys:String>
-                                        </x:Array>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </DataGridComboBoxColumn.EditingElementStyle>
-                    </DataGridComboBoxColumn>
-                    <DataGridTextColumn Header="Оплата" Binding="{Binding TotalCost}" Width="80"/>
-                    <DataGridTextColumn Header="Дата" Binding="{Binding DateFormatted}" Width="110"/>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
+
         </StackPanel>
 
         <!-- 3: КНОПКИ (Универсальные) -->
