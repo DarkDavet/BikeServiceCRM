@@ -10,9 +10,10 @@
             <ComboBox x:Name="CategoryBox" IsEditable="True" Margin="0,0,0,10" 
                       SelectionChanged="CategoryBox_SelectionChanged">
                 <ComboBoxItem Content="Запчасти"/>
-                <ComboBoxItem Content="Расходники"/>
-                <ComboBoxItem Content="Велосипеды"/>
-                <ComboBoxItem Content="Аксессуары"/>
+                <ComboBoxItem Content="Инструменты"/>
+                <ComboBoxItem Content="Химия/Средства"/>
+                <ComboBoxItem Content="Инвентарь"/>
+                <ComboBoxItem Content="Другое"/>
             </ComboBox>
 
             <Label Content="Наименование товара:"/>

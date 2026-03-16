@@ -51,7 +51,7 @@ namespace BusinessAccountantService.Data
                 Quantity INTEGER DEFAULT 0,
                 PurchasePrice REAL DEFAULT 0,
                 RetailPrice REAL DEFAULT 0,
-                Category TEXT -- Запчасти, Велосипеды, Аксессуары
+                Category TEXT -- Запчасти, Инструменты, Химия/Средства, Инвентарь, Другое
             );
             CREATE TABLE IF NOT EXISTS Expenses (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
