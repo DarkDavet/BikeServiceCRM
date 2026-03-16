@@ -34,7 +34,6 @@ namespace BusinessAccountantService
         {
             var items = _inventoryManager.GetAllItems();
             InventoryGrid.ItemsSource = items;
-            // Обновляем текст статуса (он теперь внутри Page)
             StatusInfoText.Text = $"Товаров в базе: {items.Count}";
         }
 

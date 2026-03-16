@@ -3,11 +3,13 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:BusinessAccountantService"
+      xmlns:local="clr-namespace:BusinessAccountantService.Managers"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="InventoryPage">
-
+    <Page.Resources>
+        <local:PriceToDashConverter x:Key="PriceToDashConverter"/>
+    </Page.Resources>
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,8 +36,8 @@
                 <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="80"/>
-                <DataGridTextColumn Header="Закупка" Binding="{Binding PurchasePrice, StringFormat={}{0:N2} ₽}" Width="100"/>
-                <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, StringFormat={}{0:N2} ₽}" Width="100"/>
+                <DataGridTextColumn Header="Закупка" Binding="{Binding PurchasePrice, Converter={StaticResource PriceToDashConverter}}" Width="100"/>
+                <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, Converter={StaticResource PriceToDashConverter}}" Width="100"/>
             </DataGrid.Columns>
         </DataGrid>
 
