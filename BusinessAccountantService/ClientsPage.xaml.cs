@@ -120,10 +120,12 @@ namespace BusinessAccountantService
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
                 ClientsGrid.SelectedItem is Client selectedClient)
             {
-                _repairManager.UpdateStatus(selectedRepair.Id, "Принят");
-                selectedRepair.Status = "Принят";
                 _pdfManager.ExportEntryAct(selectedClient, selectedRepair);
                 RepairsHistoryGrid.Items.Refresh();
+            }
+            else
+            {
+                MessageBox.Show("Выберите клиента и заказ для печати акта приемки!");
             }
         }
 
@@ -132,16 +134,20 @@ namespace BusinessAccountantService
             if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
                 ClientsGrid.SelectedItem is Client selectedClient)
             {
-                _repairManager.UpdateStatus(selectedRepair.Id, "Выдан");
-                selectedRepair.Status = "Выдан";
+                if (selectedRepair.Status != "Выдан" && selectedRepair.Status != "Готов")
+                {
+                    MessageBox.Show("Сначала завершите ремонт и выдайте заказ через окно редактирования (двойной клик), чтобы зафиксировать запчасти и итоговую сумму!",
+                                    "Печать невозможна", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
 
                 _pdfManager.ExportFinalAct(selectedClient, selectedRepair);
-
-                RepairsHistoryGrid.Items.Refresh();
             }
             else
             {
-                MessageBox.Show("Выберите и клиента, и заказ!");
+                MessageBox.Show("Выберите клиента и заказ!");
             }
         }
 

@@ -23,8 +23,10 @@ namespace BusinessAccountantService
     public partial class EditRepairWindow : Window
     {
         private RepairRecord _currentRepair;
-        private InventoryManager _inventoryManager => ((MainWindow)Application.Current.MainWindow)._inventoryManager;
-        private RepairManager _repairManager => ((MainWindow) Application.Current.MainWindow)._repairManager;
+
+        private InventoryManager _inventoryManager = new();
+        private RepairManager _repairManager = new();
+        private ClientManager _clientManager = new();
 
         private List<RepairItem> _sessionAddedParts = new(); 
         private List<RepairItem> _sessionRemovedParts = new();
@@ -38,22 +40,37 @@ namespace BusinessAccountantService
             _currentRepair = repair;
             this.Closing += EditRepairWindow_Closing;
 
-            // Заполняем поля данными из заказа
+            // 1. Сначала ставим номер и дату (они работают)
+            OrderIdText.Text = repair.Id.ToString("D4");
             OrderDateText.Text = $"Заказ от {repair.DateCreated:dd.MM.yyyy}";
+
+            // 2. ЗАГРУЗКА КЛИЕНТА (С проверкой!)
+            var client = _clientManager.GetClientById(repair.ClientId);
+            if (client != null)
+            {
+                ClientNameText.Text = $"Клиент: {client.Name}";
+            }
+            else
+            {
+                // Если увидите это в окне — значит в repair.ClientId пришел 0 или не тот ID
+                ClientNameText.Text = $"Клиент не найден (ID: {repair.ClientId})";
+            }
+
+            // 3. Остальные поля
             BikeInfoBox.Text = repair.BikeInfo;
             ProblemBox.Text = repair.ProblemDescription;
+
+            // ВАЖНО: Установка текста в ComboBox
             StatusComboBox.Text = repair.Status;
 
-            // Загружаем состав заказа из БД
+            // 4. Загрузка таблицы
             var itemsFromDb = _inventoryManager.GetRepairItems(repair.Id);
             _orderItems = new ObservableCollection<RepairItem>(itemsFromDb);
-
-            // Привязываем коллекцию к таблице
             OrderItemsGrid.ItemsSource = _orderItems;
 
-            // Подписываемся на изменения в таблице для автопересчета итогов
             _orderItems.CollectionChanged += (s, e) => UpdateTotals();
             UpdateTotals();
+
             if (repair.Status == "Выдан")
             {
                 LockWindowForEditing();

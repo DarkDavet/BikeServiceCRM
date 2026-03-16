@@ -19,7 +19,7 @@ namespace BusinessAccountantService.Managers
                 connection.Open();
                 var command = connection.CreateCommand();
 
-                string sql = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, PartsCost, TotalCost, Status, DateCreated " +
+                string sql = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, PartsCost, TotalCost, Status, DateCreated, ClientId " +
                              "FROM Repairs WHERE ClientId = $id";
 
                 if (mode == ViewMode.Active) sql += " AND Status != 'Выдан'";
@@ -41,7 +41,8 @@ namespace BusinessAccountantService.Managers
                             PartsCost = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4),
                             TotalCost = reader.GetDecimal(5),
                             Status = reader.IsDBNull(6) ? "Принят" : reader.GetString(6),
-                            DateCreated = reader.IsDBNull(7) ? DateTime.Now : reader.GetDateTime(7)
+                            DateCreated = reader.IsDBNull(7) ? DateTime.Now : reader.GetDateTime(7),
+                            ClientId = reader.GetInt32(8)
                         });
                     }
                 }

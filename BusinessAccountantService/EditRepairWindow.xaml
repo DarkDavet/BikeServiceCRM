@@ -21,6 +21,8 @@
         </Grid.RowDefinitions>
 
         <!-- 0: ШАПКА -->
+        <!-- 0: ШАПКА -->
+        <!-- 0: ШАПКА -->
         <Border Grid.Row="0" Background="White" Padding="20,15" BorderBrush="#DCDDE1" BorderThickness="0,0,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -29,26 +31,32 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="РЕДАКТИРОВАНИЕ ЗАКАЗА" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+                    <!-- НОМЕР ЗАКАЗА И ЗАГОЛОВОК -->
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="ЗАКАЗ №" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+                        <TextBlock x:Name="OrderIdText" Text="000" FontSize="18" FontWeight="Bold" Foreground="#2980B9" Margin="5,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- ИМЯ КЛИЕНТА -->
+                    <TextBlock x:Name="ClientNameText" Text="Загрузка клиента..." FontSize="13" FontWeight="SemiBold" Foreground="#34495E" Margin="0,2,0,2"/>
+
+                    <!-- ДАТА -->
                     <TextBlock x:Name="OrderDateText" Text="Заказ от ..." FontSize="11" Foreground="Gray"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <Label Content="Статус заказа:" FontSize="11" Foreground="Gray" Padding="0,0,0,2"/>
-
-                    <!-- Привязываемся к контенту выбранного элемента -->
                     <Border x:Name="StatusBorder" 
-            Background="{Binding SelectedItem.Content, ElementName=StatusComboBox, Converter={StaticResource StatusColorConverter}}" 
-            CornerRadius="7" 
-            Padding="5">
-
+                    Background="{Binding SelectedItem.Content, ElementName=StatusComboBox, Converter={StaticResource StatusColorConverter}}" 
+                    CornerRadius="7" 
+                    Padding="5">
                         <ComboBox x:Name="StatusComboBox" 
-                  Height="26" 
-                  VerticalContentAlignment="Center" 
-                  FontWeight="SemiBold"
-                  Background="Transparent" 
-                  BorderThickness="0">
-                            <ComboBoxItem Content="Принят" IsSelected="True"/>
+                          Height="26" 
+                          VerticalContentAlignment="Center" 
+                          FontWeight="SemiBold"
+                          Background="Transparent" 
+                          BorderThickness="0">
+                            <ComboBoxItem Content="Принят"/>
                             <ComboBoxItem Content="В работе"/>
                             <ComboBoxItem Content="Готов"/>
                             <Separator/>
@@ -56,9 +64,10 @@
                         </ComboBox>
                     </Border>
                 </StackPanel>
-
             </Grid>
         </Border>
+
+
 
         <!-- 1: КОНТЕНТ -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
