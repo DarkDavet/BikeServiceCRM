@@ -28,13 +28,10 @@ namespace BusinessAccountantService
         private ViewMode _currentMode;
         private ICollectionView _clientsView;
 
-        // Быстрый доступ к менеджерам из MainWindow
-        private ClientManager _clientManager => ((MainWindow)Application.Current.MainWindow)._clientManager;
-        private RepairManager _repairManager => ((MainWindow)Application.Current.MainWindow)._repairManager;
-        private PdfExportManager _pdfManager => ((MainWindow)Application.Current.MainWindow)._pdfmanager;
-        private InventoryManager _inventoryManager => ((MainWindow)Application.Current.MainWindow)._inventoryManager;
+        private ClientManager _clientManager = new();
+        private RepairManager _repairManager = new();
+        private PdfExportManager _pdfManager = new();
 
-        // Конструктор теперь принимает режим отображения
         public ClientsPage(ViewMode mode)
         {
             InitializeComponent();
@@ -86,7 +83,6 @@ namespace BusinessAccountantService
             {
                 if (MessageBox.Show("Удалить этот заказ?", "Удаление", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    // Используем менеджер вместо прямого SQL кода здесь (лучше вынести в RepairManager)
                     _repairManager.DeleteRepair(selectedRepair.Id);
 
                     if (ClientsGrid.SelectedItem is Client c)
@@ -155,11 +151,9 @@ namespace BusinessAccountantService
         {
             if (_clientsView == null) return;
 
-            // Логика подсчета (как у вас была)
             int visibleClientsCount = 0;
             foreach (var item in _clientsView) visibleClientsCount++;
 
-            // Обновляем UI элементы страницы
             if (_currentMode == ViewMode.Archive)
                 StatusInfoText.Foreground = Brushes.RoyalBlue;
             else if (_currentMode == ViewMode.Active)
@@ -182,7 +176,7 @@ namespace BusinessAccountantService
                     if (editWin.IsDeleted)
                     {
                         _clientManager.DeleteClient(selectedClient);
-                        LoadClients(); // Перезагружаем список
+                        LoadClients();
                         RepairsHistoryGrid.ItemsSource = null;
                     }
                     else

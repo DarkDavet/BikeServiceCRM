@@ -22,8 +22,7 @@ namespace BusinessAccountantService
     /// </summary>
     public partial class InventoryPage : Page
     {
-        // Быстрый доступ к менеджеру из MainWindow
-        private InventoryManager _inventoryManager => ((MainWindow)Application.Current.MainWindow)._inventoryManager;
+        private readonly InventoryManager _inventoryManager = new();
 
         public InventoryPage()
         {

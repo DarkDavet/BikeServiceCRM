@@ -13,16 +13,10 @@
     <Grid Background="#F5F6FA">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Шапка -->
             <RowDefinition Height="*"/>
-            <!-- Контент -->
             <RowDefinition Height="Auto"/>
-            <!-- Итоги -->
         </Grid.RowDefinitions>
 
-        <!-- 0: ШАПКА -->
-        <!-- 0: ШАПКА -->
-        <!-- 0: ШАПКА -->
         <Border Grid.Row="0" Background="White" Padding="20,15" BorderBrush="#DCDDE1" BorderThickness="0,0,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -31,16 +25,13 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel VerticalAlignment="Center">
-                    <!-- НОМЕР ЗАКАЗА И ЗАГОЛОВОК -->
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="ЗАКАЗ №" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
                         <TextBlock x:Name="OrderIdText" Text="000" FontSize="18" FontWeight="Bold" Foreground="#2980B9" Margin="5,0,0,0"/>
                     </StackPanel>
 
-                    <!-- ИМЯ КЛИЕНТА -->
                     <TextBlock x:Name="ClientNameText" Text="Загрузка клиента..." FontSize="13" FontWeight="SemiBold" Foreground="#34495E" Margin="0,2,0,2"/>
 
-                    <!-- ДАТА -->
                     <TextBlock x:Name="OrderDateText" Text="Заказ от ..." FontSize="11" Foreground="Gray"/>
                 </StackPanel>
 
@@ -67,9 +58,6 @@
             </Grid>
         </Border>
 
-
-
-        <!-- 1: КОНТЕНТ -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="20">
                 <Label Content="Информация о велосипеде:" FontWeight="SemiBold"/>
@@ -109,7 +97,6 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- 2: НИЖНЯЯ ПАНЕЛЬ -->
         <Border Grid.Row="2" Background="White" Padding="20,15" BorderBrush="#DCDDE1" BorderThickness="0,1,0,0">
             <Grid>
                 <Grid.RowDefinitions>
