@@ -162,7 +162,6 @@ namespace BusinessAccountantService
             StatusInfoText.Text = $"Отображено клиентов: {visibleClientsCount}";
         }
 
-        // Измените вызов окна: Owner теперь MainWindow
         private void ClientsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ClientsGrid.SelectedItem is Client selectedClient)

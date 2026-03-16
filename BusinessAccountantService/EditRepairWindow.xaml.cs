@@ -36,6 +36,7 @@ namespace BusinessAccountantService
         {
             InitializeComponent();
             _currentRepair = repair;
+            this.Closing += EditRepairWindow_Closing;
 
             // Заполняем поля данными из заказа
             OrderDateText.Text = $"Заказ от {repair.DateCreated:dd.MM.yyyy}";
@@ -157,26 +158,29 @@ namespace BusinessAccountantService
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            RollbackChanges();
             this.DialogResult = false;
         }
 
-        // Вызываем это и при закрытии окна через X (событие Closing)
+        private void EditRepairWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.DialogResult != true)
+            {
+                RollbackChanges();
+            }
+        }
+
         private void RollbackChanges()
         {
-            // 1. Возвращаем на склад то, что добавили в этом сеансе
             foreach (var item in _sessionAddedParts)
             {
                 _inventoryManager.IncreaseQuantity(item.ProductId.Value, item.Quantity);
             }
 
-            // 2. Снова списываем то, что пытались удалить
             foreach (var item in _sessionRemovedParts)
             {
                 _inventoryManager.DecreaseQuantity(item.ProductId.Value, item.Quantity);
             }
 
-            // Очищаем списки, чтобы не сработало дважды
             _sessionAddedParts.Clear();
             _sessionRemovedParts.Clear();
         }
