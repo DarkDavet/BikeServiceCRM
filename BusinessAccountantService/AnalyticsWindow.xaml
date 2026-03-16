@@ -10,14 +10,10 @@
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- 0: Шапка -->
             <RowDefinition Height="Auto"/>
-            <!-- 1: Карточки -->
             <RowDefinition Height="*"/>
-            <!-- 2: Вкладки -->
         </Grid.RowDefinitions>
 
-        <!-- Строка 0: ШАПКА -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5,0,0,15">
             <TextBlock Text="АНАЛИТИКА СЕРВИСА" FontSize="22" FontWeight="Bold" Foreground="#2C3E50" VerticalAlignment="Center"/>
             <DatePicker x:Name="MonthPicker" Margin="25,0,0,0" Width="180" Height="30" 

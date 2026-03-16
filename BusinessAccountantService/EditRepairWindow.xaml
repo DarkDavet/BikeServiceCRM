@@ -55,7 +55,8 @@
                     <StackPanel Margin="5">
                         <DataGrid x:Name="OrderItemsGrid" Height="250" AutoGenerateColumns="False" 
                                   CanUserAddRows="False" SelectionMode="Single" Background="White"
-                                  BorderThickness="0" GridLinesVisibility="Horizontal" RowHeight="35">
+                                  BorderThickness="0" GridLinesVisibility="Horizontal" RowHeight="35"
+                                  IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="Тип" Binding="{Binding TypeDisplay}" Width="80" IsReadOnly="True"/>

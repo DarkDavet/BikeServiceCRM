@@ -13,16 +13,11 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- 0: Поиск и заголовок -->
             <RowDefinition Height="*"/>
-            <!-- 1: Основная таблица (Клиенты или Склад) -->
             <RowDefinition Height="Auto"/>
-            <!-- 2: Разделитель и История (только для режима Клиентов) -->
             <RowDefinition Height="Auto"/>
-            <!-- 3: Кнопки действий -->
         </Grid.RowDefinitions>
 
-        <!-- 0: ШАПКА -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
             <TextBlock x:Name="MainTitleText" Text="Список клиентов" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
 
@@ -32,13 +27,12 @@
             <TextBlock x:Name="StatusInfoText" Text="Клиентов: 0 | Заказов: 0" Foreground="#27AE60" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
         </StackPanel>
 
-        <!-- 1: ЦЕНТРАЛЬНЫЙ БЛОК (Таблицы) -->
         <Grid Grid.Row="1">
-            <!-- Таблица КЛИЕНТОВ -->
             <DataGrid x:Name="ClientsGrid" Visibility="Visible" 
       MouseDoubleClick="ClientsGrid_MouseDoubleClick"
       AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" 
-      CanUserAddRows="False" CanUserDeleteRows="False">
+      CanUserAddRows="False" CanUserDeleteRows="False"
+                      IsReadOnly="True">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
                     <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*"/>
@@ -56,7 +50,8 @@
             <DataGrid x:Name="RepairsHistoryGrid" Height="180"
       MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
       CellEditEnding="RepairsHistoryGrid_CellEditEnding"
-      AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
+      AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                      IsReadOnly="True">
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Статус: Принят" Click="ChangeStatus_Click" Tag="Принят"/>

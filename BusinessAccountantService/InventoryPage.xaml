@@ -9,17 +9,12 @@
       Title="InventoryPage">
 
     <Grid Margin="20">
-        <!-- Добавил Margin, чтобы таблица не липла к краям -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- 0: Поиск -->
             <RowDefinition Height="*"/>
-            <!-- 1: Таблица склада -->
             <RowDefinition Height="Auto"/>
-            <!-- 2: Кнопки -->
         </Grid.RowDefinitions>
 
-        <!-- 0: ШАПКА -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
             <TextBlock Text="Склад запчастей" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
 
@@ -31,10 +26,10 @@
                        FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
         </StackPanel>
 
-        <!-- 1: ТАБЛИЦА СКЛАДА -->
         <DataGrid Grid.Row="1" x:Name="InventoryGrid"
                   MouseDoubleClick="InventoryGrid_MouseDoubleClick"
-                  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
+                  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>
                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*"/>
