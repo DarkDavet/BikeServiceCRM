@@ -56,7 +56,6 @@ namespace BusinessAccountantService
 
         private void AddRepair_Click(object sender, RoutedEventArgs e)
         {
-            // Логика склада отсюда УДАЛЕНА, она теперь в InventoryPage
             if (ClientsGrid.SelectedItem is Client selectedClient)
             {
                 AddRepairWindow repairWin = new AddRepairWindow(selectedClient.Id)
@@ -149,18 +148,32 @@ namespace BusinessAccountantService
 
         private void UpdateStatusInfo()
         {
-            if (_clientsView == null) return;
+            int clientCount = ClientsGrid.Items.Count;
 
-            int visibleClientsCount = 0;
-            foreach (var item in _clientsView) visibleClientsCount++;
+            int activeOrders = _repairManager.GetActiveRepairsCount();
+            int totalOrders = _repairManager.GetAllRepairsCount();
+            int archivedOrders = totalOrders - activeOrders;
 
-            if (_currentMode == ViewMode.Archive)
+            if (_currentMode == ViewMode.Active)
+            {
+                StatusInfoText.Text = $"Активных клиентов: {clientCount} | Заказов в работе: {activeOrders}";
+                StatusInfoText.Foreground = Brushes.SeaGreen; 
+                MainTitleText.Text = "В РАБОТЕ";
+            }
+            else if (_currentMode == ViewMode.Archive)
+            {
+                StatusInfoText.Text = $"Спящих клиентов: {clientCount} | Выполненных заказов: {archivedOrders}";
                 StatusInfoText.Foreground = Brushes.RoyalBlue;
-            else if (_currentMode == ViewMode.Active)
-                StatusInfoText.Foreground = Brushes.SeaGreen;
-
-            StatusInfoText.Text = $"Отображено клиентов: {visibleClientsCount}";
+                MainTitleText.Text = "АРХИВ";
+            }
+            else 
+            {
+                StatusInfoText.Text = $"Всего клиентов: {clientCount} | Всего заказов: {totalOrders}";
+                StatusInfoText.Foreground = Brushes.DimGray;
+                MainTitleText.Text = "ВСЯ БАЗА";
+            }
         }
+
 
         private void ClientsGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {

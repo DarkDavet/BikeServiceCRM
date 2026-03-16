@@ -10,99 +10,80 @@
     <Page.Resources>
         <local:StatusColorConverter x:Key="StatusColorConverter"/>
     </Page.Resources>
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-            <TextBlock x:Name="MainTitleText" Text="Список клиентов" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="MainTitleText" Text="БАЗА КЛИЕНТОВ" FontSize="22" FontWeight="Black" Foreground="#2C3E50" VerticalAlignment="Center"/>
+                <TextBlock x:Name="StatusInfoText" Text="" FontSize="14" VerticalAlignment="Bottom" Margin="15,0,0,3" FontWeight="Medium"/>
+            </StackPanel>
 
-            <Label Content="Поиск:" Margin="30,0,5,0" VerticalAlignment="Center" Foreground="Gray"/>
-            <TextBox x:Name="SearchBox" Width="250" Height="28" VerticalContentAlignment="Center" TextChanged="SearchBox_TextChanged" />
-
-            <TextBlock x:Name="StatusInfoText" Text="Клиентов: 0 | Заказов: 0" Foreground="#27AE60" FontWeight="Bold" VerticalAlignment="Center" Margin="20,0,0,0"/>
-        </StackPanel>
-
-        <Grid Grid.Row="1">
-            <DataGrid x:Name="ClientsGrid" Visibility="Visible" 
-      MouseDoubleClick="ClientsGrid_MouseDoubleClick"
-      AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" 
-      CanUserAddRows="False" CanUserDeleteRows="False"
-                      IsReadOnly="True"
-                      >
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40"/>
-                    <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
-                    <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="*"/>
-                </DataGrid.Columns>
-            </DataGrid>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Label Content="Поиск:" VerticalAlignment="Center" Foreground="Gray"/>
+                <TextBox x:Name="SearchBox" Width="250" Height="28" VerticalContentAlignment="Center" TextChanged="SearchBox_TextChanged" Margin="10,0,0,0"/>
+            </StackPanel>
         </Grid>
 
-        <StackPanel x:Name="RepairsPanel" Grid.Row="2" Visibility="Visible">
-            <GridSplitter Height="5" HorizontalAlignment="Stretch" Background="#DDDDDD" Margin="0,10"/>
+        <DataGrid Grid.Row="2" x:Name="ClientsGrid" MouseDoubleClick="ClientsGrid_MouseDoubleClick"
+              AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" 
+              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+              GridLinesVisibility="Horizontal" RowHeight="32">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
 
-            <TextBlock Text="История ремонтов выбранного клиента:" FontWeight="Bold" Margin="0,0,0,5"/>
-            <DataGrid x:Name="RepairsHistoryGrid" 
-          Height="200"
-          MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
-          AutoGenerateColumns="False" 
-          CanUserAddRows="False" 
-          CanUserDeleteRows="False"
-          IsReadOnly="True"
-          SelectionMode="Single"
-          SelectionUnit="FullRow"
-          GridLinesVisibility="Horizontal"
-          HeadersVisibility="Column"
-          Background="White">
-
+        <StackPanel Grid.Row="3" Margin="0,15,0,0">
+            <TextBlock Text="ИСТОРИЯ РЕМОНТОВ ВЫБРАННОГО КЛИЕНТА" FontSize="11" FontWeight="Bold" Foreground="#7F8C8D" Margin="0,0,0,5"/>
+            <DataGrid x:Name="RepairsHistoryGrid" Height="180" MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
+                  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow"
+                  GridLinesVisibility="Horizontal" HeadersVisibility="Column" Background="White">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Дата" Binding="{Binding DateCreated, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
-                    <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="150"/>
+                    <DataGridTextColumn Header="Дата" Binding="{Binding DateCreated, StringFormat={}{0:dd.MM.yyyy}}" Width="90"/>
+                    <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="140"/>
                     <DataGridTextColumn Header="Описание" Binding="{Binding ProblemDescription}" Width="*"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="120">
+                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="110">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">
                                 <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
-                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                <Setter Property="TextBlock.TextAlignment" Value="Center"/>
                                 <Style.Triggers>
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter Property="Foreground" Value="Black"/>
-                                        <Setter Property="BorderBrush" Value="Transparent"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-
-                    <DataGridTextColumn Header="Итого" Binding="{Binding TotalCost, StringFormat={}{0:N2} р.}" Width="100">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="HorizontalAlignment" Value="Right"/>
-                                <Setter Property="Margin" Value="0,0,10,0"/>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Итого" Binding="{Binding TotalCost, StringFormat={}{0:N2} р.}" Width="90"/>
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>
 
-        <Grid Grid.Row="3" Margin="0,15,0,0">
+        <Grid Grid.Row="4" Margin="0,15,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button x:Name="BtnAddPrimary" Content="Добавить клиента" Click="AddClient_Click" Width="130" Height="30" Margin="0,0,10,0"/>
-                <Button x:Name="BtnAddSecondary" Content="Новый заказ" Click="AddRepair_Click" Width="130" Height="30"/>
+                <Button x:Name="BtnAddPrimary" Content="+ КЛИЕНТ" Click="AddClient_Click" Width="130" Height="35" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="10,0,0,0"/>
+                <Button x:Name="BtnAddSecondary" Content="+ ЗАКАЗ" Click="AddRepair_Click" Width="130" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="10,0,0,0"/>
             </StackPanel>
-
-            <StackPanel x:Name="PdfButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Акт приемки (PDF)" Click="EntryAct_Click" Width="140" Height="30" Margin="0,0,10,0" Background="#27AE60" Foreground="White" BorderThickness="0"/>
-                <Button Content="Акт выдачи (PDF)" Click="FinalAct_Click" Width="140" Height="30" Background="#27AE60" Foreground="White" BorderThickness="0"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="АКТ ПРИЕМКИ" Click="EntryAct_Click" Width="130" Height="35" Background="#34495E" Foreground="White" Margin="0,0,10,0" BorderThickness="0"/>
+                <Button Content="ФИНАЛЬНЫЙ АКТ" Click="FinalAct_Click" Width="130" Height="35" Background="#34495E" Foreground="White" BorderThickness="0"/>
             </StackPanel>
         </Grid>
     </Grid>
+
 </Page>
