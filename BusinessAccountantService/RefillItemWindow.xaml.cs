@@ -2,6 +2,7 @@
 using BusinessAccountantService.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,63 +29,49 @@ namespace BusinessAccountantService
         {
             InitializeComponent();
             _currentItem = item;
-
             ItemTitleText.Text = $"ПОПОЛНЕНИЕ: {item.Name.ToUpper()}";
 
-            NewPurchasePriceBox.Text = item.PurchasePrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+            // Показываем опцию опта, если это запчасти
+            if (item.Category != null && item.Category.Trim().Equals("Запчасти", StringComparison.OrdinalIgnoreCase))
+            {
+                BulkModeCheck.Visibility = Visibility.Visible;
+            }
+
+            NewPurchasePriceBox.Text = item.PurchasePrice.ToString("F2");
         }
 
         private void SaveRefill_Click(object sender, RoutedEventArgs e)
         {
-            // 1. Валидация количества
-            if (!int.TryParse(RefillQtyBox.Text, out int qty) || qty <= 0)
+            int.TryParse(RefillQuantityBox.Text, out int qty);
+            decimal finalUnitPrice = 0;
+            decimal totalSpent = 0;
+
+            if (BulkModeCheck.IsChecked == true)
             {
-                MessageBox.Show("Введите корректное количество (целое число > 0)");
-                return;
+                decimal.TryParse(BulkTotalBox.Text.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out totalSpent);
+                if (qty > 0) finalUnitPrice = totalSpent / qty;
+            }
+            else
+            {
+                decimal.TryParse(NewPurchasePriceBox.Text.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out finalUnitPrice);
+                totalSpent = finalUnitPrice * qty;
             }
 
-            // 2. Валидация цены закупки (универсальный парсинг)
-            if (!decimal.TryParse(NewPurchasePriceBox.Text.Replace(",", "."),
-                System.Globalization.NumberStyles.Any,
-                System.Globalization.CultureInfo.InvariantCulture, out decimal price))
+            if (qty <= 0 || finalUnitPrice <= 0)
             {
-                MessageBox.Show("Введите корректную цену закупки");
+                MessageBox.Show("Введите корректные данные!");
                 return;
             }
 
             try
             {
-                // 3. Обновляем остатки в базе
-                _inventoryManager.RefillItem(_currentItem.Id, qty, price);
-
-                // 4. ФИКСИРУЕМ РЕАЛЬНЫЙ РАСХОД ДЕНЕГ
-                decimal totalSpent = price * qty;
-
-                // Берем категорию прямо из карточки товара (Инструмент, Запчасти и т.д.)
-                string itemCategory = string.IsNullOrWhiteSpace(_currentItem.Category)
-                                      ? "Запчасти"
-                                      : _currentItem.Category;
-
-                _inventoryManager.AddExpense(
-                    $"Пополнение: {_currentItem.Name} (x{qty})",
-                    totalSpent,
-                    itemCategory // <-- Теперь диаграмма в аналитике разложит это по нужным кускам
-                );
+                // Обновляем склад и фиксируем расход (все в decimal)
+                _inventoryManager.RefillItem(_currentItem.Id, qty, finalUnitPrice);
+                _inventoryManager.AddExpense($"Пополнение: {_currentItem.Name} (x{qty})", totalSpent, _currentItem.Category);
 
                 this.DialogResult = true;
             }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при сохранении: {ex.Message}");
-            }
-        }
-
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            RefillQtyBox.Focus();
-            RefillQtyBox.SelectAll(); // Выделяем текст "1", чтобы его можно было сразу заменить
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
