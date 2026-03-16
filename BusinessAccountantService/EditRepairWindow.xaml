@@ -51,7 +51,8 @@
                             <ComboBoxItem Content="Принят" IsSelected="True"/>
                             <ComboBoxItem Content="В работе"/>
                             <ComboBoxItem Content="Готов"/>
-                            <ComboBoxItem Content="Выдан"/>
+                            <Separator/>
+                            <ComboBoxItem Content="Выдан" Foreground="DarkGreen" FontWeight="Bold"/>
                         </ComboBox>
                     </Border>
                 </StackPanel>
@@ -80,7 +81,7 @@
                                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="60"/>
                                 <DataGridTextColumn Header="Цена" Binding="{Binding Price, StringFormat={}{0:N0}}" Width="90"/>
                                 <DataGridTextColumn Header="Итого" Binding="{Binding Total, StringFormat={}{0:N0} ₽}" Width="90" IsReadOnly="True" FontWeight="Bold"/>
-                                <DataGridTemplateColumn Width="40">
+                                <DataGridTemplateColumn x:Name="DeleteColumn" Width="40">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Button Content="✕" Click="RemoveItem_Click" Background="Transparent" BorderThickness="0" Foreground="#E74C3C" FontSize="14"/>
@@ -91,8 +92,8 @@
                         </DataGrid>
 
                         <UniformGrid Columns="2" Margin="0,10,0,0">
-                            <Button Content="+ ЗАПЧАСТЬ" Click="OpenPartSearch_Click" Height="40" Background="#2980B9" Foreground="White" FontWeight="Bold" Margin="0,0,5,0"/>
-                            <Button Content="+ РАБОТА" Click="OpenServiceSearch_Click" Height="40" Background="#27AE60" Foreground="White" FontWeight="Bold" Margin="5,0,0,0"/>
+                            <Button x:Name="BtnOpenPartSearch" Content="+ ЗАПЧАСТЬ" Click="OpenPartSearch_Click" Height="40" Background="#2980B9" Foreground="White" FontWeight="Bold" Margin="0,0,5,0"/>
+                            <Button x:Name="BtnOpenServiceSearch" Content="+ РАБОТА" Click="OpenServiceSearch_Click" Height="40" Background="#27AE60" Foreground="White" FontWeight="Bold" Margin="5,0,0,0"/>
                         </UniformGrid>
                     </StackPanel>
                 </GroupBox>
@@ -120,9 +121,9 @@
                 </Grid>
 
                 <Grid Grid.Row="1">
-                    <Button Content="Удалить заказ" Width="130" Height="35" HorizontalAlignment="Left" Click="Delete_Click" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
+                    <Button x:Name="BtnDelete" Content="Удалить заказ" Width="130" Height="35" HorizontalAlignment="Left" Click="Delete_Click" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Сохранить" Width="120" Height="35" Click="Save_Click" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+                        <Button x:Name="BtnSave" Content="Сохранить" Width="120" Height="35" Click="Save_Click" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
                         <Button Content="Отмена" Width="100" Height="35" Margin="10,0,0,0" Click="Cancel_Click" Background="#BDC3C7" BorderThickness="0"/>
                     </StackPanel>
                 </Grid>

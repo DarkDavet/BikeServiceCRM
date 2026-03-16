@@ -54,6 +54,10 @@ namespace BusinessAccountantService
             // Подписываемся на изменения в таблице для автопересчета итогов
             _orderItems.CollectionChanged += (s, e) => UpdateTotals();
             UpdateTotals();
+            if (repair.Status == "Выдан")
+            {
+                LockWindowForEditing();
+            }
         }
 
         private void UpdateTotals()
@@ -120,6 +124,17 @@ namespace BusinessAccountantService
         {
             OrderItemsGrid.CommitEdit(DataGridEditingUnit.Row, true);
 
+            string selectedStatus = StatusComboBox.Text;
+
+            if (selectedStatus == "Выдан" && _currentRepair.Status != "Выдан")
+            {
+                var result = MessageBox.Show(
+                    "Установка статуса 'Выдан' заблокирует редактирование заказа навсегда. Вы уверены?",
+                    "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.No) return; 
+            }
+
             _currentRepair.BikeInfo = BikeInfoBox.Text;
             _currentRepair.ProblemDescription = ProblemBox.Text;
             _currentRepair.Status = StatusComboBox.Text;
@@ -136,6 +151,11 @@ namespace BusinessAccountantService
 
                 _sessionAddedParts.Clear();
                 _sessionRemovedParts.Clear();
+
+                if(_currentRepair.Status == "Выдан")
+                {
+                    LockWindowForEditing();
+                }
 
                 this.DialogResult = true;
             }
@@ -185,6 +205,24 @@ namespace BusinessAccountantService
             _sessionRemovedParts.Clear();
         }
 
+        private void LockWindowForEditing()
+        {
+            BikeInfoBox.IsReadOnly = true;
+            ProblemBox.IsReadOnly = true;
+
+            OrderItemsGrid.IsReadOnly = true;
+            BtnOpenPartSearch.IsEnabled = false;
+            BtnOpenServiceSearch.IsEnabled = false;
+
+            if (DeleteColumn != null) DeleteColumn.Visibility = Visibility.Collapsed;
+
+            StatusComboBox.IsEnabled = false;
+
+            BtnSave.Visibility = Visibility.Collapsed;
+            BtnDelete.Visibility = Visibility.Collapsed;
+
+            this.Title = $"ПРОСМОТР ЗАКАЗА №{_currentRepair.Id} (ВЫДАН)";
+        }
 
     }
 }
