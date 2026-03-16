@@ -30,8 +30,31 @@ namespace BusinessAccountantService
 
             ItemNameBox.Text = item.Name;
             CategoryBox.Text = item.Category;
-            PurchaseBox.Text = item.PurchasePrice.ToString();
             RetailBox.Text = item.RetailPrice.ToString();
+
+            UpdateVisibility(item.Category);
+        }
+
+        private void UpdateVisibility(string category)
+        {
+            if (RetailPriceBlock == null) return;
+
+            if (!string.IsNullOrEmpty(category) && category.Trim().Equals("Запчасти", StringComparison.OrdinalIgnoreCase))
+            {
+                RetailPriceBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                RetailPriceBlock.Visibility = Visibility.Collapsed;
+                RetailBox.Text = "0";
+            }
+        }
+
+        private void CategoryBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            string cat = (CategoryBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? CategoryBox.Text;
+            UpdateVisibility(cat);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -39,10 +62,8 @@ namespace BusinessAccountantService
             CurrentItem.Name = ItemNameBox.Text;
             CurrentItem.Category = CategoryBox.Text;
 
-            decimal.TryParse(PurchaseBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal p);
             decimal.TryParse(RetailBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal r);
 
-            CurrentItem.PurchasePrice = p;
             CurrentItem.RetailPrice = r;
 
             DialogResult = true;

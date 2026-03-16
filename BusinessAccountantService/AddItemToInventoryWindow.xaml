@@ -66,7 +66,7 @@
                         </StackPanel>
 
                         <!-- ПОЛЕ РОЗНИЦЫ -->
-                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                        <StackPanel x:Name="RetailPriceBlock" Grid.Column="1" Margin="5,0,0,0">
                             <Label Content="Цена розница:" Foreground="#27AE60" FontWeight="Bold"/>
                             <TextBox x:Name="RetailPriceBox" Text="0" Height="28" VerticalContentAlignment="Center"/>
                         </StackPanel>

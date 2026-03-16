@@ -6,40 +6,47 @@
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
         Title="EditItemWindow" Height="450" Width="400">
-    <Grid>
-        <StackPanel Margin="20">
-            <TextBlock Text="РЕДАКТИРОВАНИЕ ЗАПЧАСТИ" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2C3E50"/>
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="РЕДАКТИРОВАНИЕ ПОЗИЦИИ" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2C3E50"/>
 
             <Label Content="Наименование:"/>
             <TextBox x:Name="ItemNameBox" Margin="0,0,0,10" Height="28" VerticalContentAlignment="Center"/>
 
             <Label Content="Категория:"/>
-            <ComboBox x:Name="CategoryBox" IsEditable="True" Margin="0,0,0,10">
+            <ComboBox x:Name="CategoryBox" SelectionChanged="CategoryBox_SelectionChanged" IsEditable="True" Margin="0,0,0,10">
                 <ComboBoxItem Content="Запчасти"/>
                 <ComboBoxItem Content="Расходники"/>
                 <ComboBoxItem Content="Аксессуары"/>
+                <ComboBoxItem Content="Инструмент"/>
             </ComboBox>
 
+            <!-- БЛОК ЦЕН -->
             <Grid Margin="0,10,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+
+                <!-- ЗАКУПКА (Скрыта по вашему желанию для всех) -->
+                <StackPanel x:Name="PurchasePriceBlock" Grid.Column="0" Margin="0,0,5,0" Visibility="Collapsed">
                     <Label Content="Цена закупки:" Foreground="#C0392B"/>
-                    <TextBox x:Name="PurchaseBox" Height="28"/>
+                    <TextBox x:Name="PurchaseBox" Height="28" IsReadOnly="True" Background="#F5F6FA"/>
                 </StackPanel>
-                <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                    <Label Content="Цена розница:" Foreground="#27AE60"/>
-                    <TextBox x:Name="RetailBox" Height="28"/>
+
+                <!-- РОЗНИЦА (Скрывается программно для не-запчастей) -->
+                <StackPanel x:Name="RetailPriceBlock" Visibility="Collapsed" Grid.Column="1" Margin="5,0,0,0">
+                    <Label Content="Цена розница:" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                    <TextBox x:Name="RetailBox" Height="28" VerticalContentAlignment="Center"/>
                 </StackPanel>
             </Grid>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Удалить товар" Click="Delete_Click" Width="110" Margin="0,0,40,0" Background="#C0392B" Foreground="White"/>
-                <Button Content="Сохранить" Click="Save_Click" Width="100" Background="#27AE60" Foreground="White"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button Content="Удалить товар" Click="Delete_Click" Width="110" Margin="0,0,40,0" Background="#C0392B" Foreground="White" BorderThickness="0"/>
+                <Button Content="Сохранить" Click="Save_Click" Width="100" Background="#27AE60" Foreground="White" BorderThickness="0"/>
                 <Button Content="Отмена" Click="Cancel_Click" Width="80" Margin="10,0,0,0"/>
             </StackPanel>
         </StackPanel>
     </Grid>
+
 </Window>

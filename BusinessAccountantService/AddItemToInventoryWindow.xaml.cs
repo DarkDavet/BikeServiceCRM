@@ -35,12 +35,17 @@ namespace BusinessAccountantService
 
             string cat = (CategoryBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? "";
 
-            // Показываем чекбокс только для запчастей
-            BulkModeCheck.Visibility = cat == "Запчасти" ? Visibility.Visible : Visibility.Collapsed;
-
-            // Если категория сменилась на другую — выключаем оптовый режим
-            if (cat != "Запчасти")
+            if (cat.Trim().Equals("Запчасти", StringComparison.OrdinalIgnoreCase))
             {
+                RetailPriceBlock.Visibility = Visibility.Visible;
+                BulkModeCheck.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                RetailPriceBlock.Visibility = Visibility.Collapsed;
+                RetailPriceBox.Text = "0"; 
+
+                BulkModeCheck.Visibility = Visibility.Collapsed;
                 BulkModeCheck.IsChecked = false;
             }
         }
