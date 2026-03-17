@@ -6,6 +6,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:BusinessAccountantService.Managers" 
         Title="ВелоСервис CRM" Height="700" Width="1100" 
+        Icon="/bl_icon.ico"
         WindowStartupLocation="CenterScreen" Background="#F5F5F5">
     <Window.Resources>
         <local:StatusColorConverter x:Key="StatusColorConverter"/>
