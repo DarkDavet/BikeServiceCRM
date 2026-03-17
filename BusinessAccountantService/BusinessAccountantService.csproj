@@ -10,11 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="BikeLab_logo _1.png" />
     <None Remove="bl_icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="bl_icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="bl_icon.ico" />
+    <Resource Include="BikeLab_logo _1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="bl_icon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

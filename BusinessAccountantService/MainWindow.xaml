@@ -5,41 +5,114 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:BusinessAccountantService.Managers" 
-        Title="ВелоСервис CRM" Height="700" Width="1100" 
-        Icon="/bl_icon.ico"
-        WindowStartupLocation="CenterScreen" Background="#F5F5F5">
+        Icon="bl_icon.ico" 
+        Title="BikeLab CRM" Height="750" Width="1200" 
+        WindowStartupLocation="CenterScreen" Background="#F5F6FA">
+
     <Window.Resources>
         <local:StatusColorConverter x:Key="StatusColorConverter"/>
+
+        <!-- Общий стиль для кнопок меню -->
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#DCDDE1"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Margin" Value="10,2"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="20,0,0,0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <!-- 1. Когда навели мышкой -->
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#27AE60"/>
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                    <!-- ТЕМНЫЙ ТЕКСТ -->
+                </Trigger>
+
+                <!-- 2. КОГДА КНОПКА ВЫБРАНА (Проверка цвета из C#) -->
+                <Trigger Property="Background" Value="{x:Static Brushes.LightGreen}">
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                    <!-- ТЕМНЫЙ ТЕКСТ -->
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
-        <!-- Разметка: колонка для меню (200px) и колонка для контента -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Боковая панель меню -->
-        <StackPanel Grid.Column="0" Background="#2C3E50">
-            <TextBlock Text="BIKE SERVICE" Foreground="White" FontSize="20" 
-               FontWeight="Bold" Margin="20" HorizontalAlignment="Center"/>
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <Grid Grid.Column="0" Background="#2C3E50">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Логотип -->
+                <RowDefinition Height="*"/>
+                <!-- Меню -->
+                <RowDefinition Height="Auto"/>
+                <!-- Склад и Аналитика -->
+            </Grid.RowDefinitions>
 
-            <Button Name="BtnAllClients" Content="Все" Height="40" Margin="10,5" Background="#34495E" Foreground="White" BorderThickness="0" Click="ShowAllClients_Click"/>
-            <Button Name="BtnActiveOrders" Content="В работе" Height="40" Margin="10,5" Background="#34495E" Foreground="White" BorderThickness="0" Click="ShowActiveOrders_Click"/>
-            <Button Name="BtnArchive" Content="В архиве" Height="40" Margin="10,5" Background="#34495E" Foreground="White" BorderThickness="0" Click="ShowArchive_Click"/>
+            <!-- 1. БЛОК ЛОГОТИПА -->
+            <StackPanel Grid.Row="0" Margin="0,30,0,30">
+                <!-- Сюда подставится твой BikeLab_logo.png -->
+                <Image Source="/BikeLab_logo _1.png" Height="80" Stretch="Uniform" Margin="10"/>
+                <TextBlock Text="SERVICE CRM" Foreground="#7F8C8D" FontSize="14" 
+                           HorizontalAlignment="Center" Margin="0,-5,0,0"/>
+            </StackPanel>
 
-            <Separator Margin="10" Background="#7F8C8D"/>
+            <!-- 2. ОСНОВНОЕ МЕНЮ -->
+            <StackPanel Grid.Row="1">
 
-            <Button Content="Итоги месяца" Click="ShowMonthlyStats_Click" 
-            Background="#8E44AD" Foreground="White" Height="40" Margin="10,0,10,5" BorderThickness="0"/>
+                <Button Name="BtnAllClients" Content="👥 Все клиенты" Style="{StaticResource MenuButtonStyle}" Click="ShowAllClients_Click"/>
+                <Button Name="BtnActiveOrders" Content="🔧 Заказы в работе" Style="{StaticResource MenuButtonStyle}" Click="ShowActiveOrders_Click"/>
+                <Button Name="BtnArchive" Content="📁 Архив выдачи" Style="{StaticResource MenuButtonStyle}" Click="ShowArchive_Click"/>
+            </StackPanel>
 
-            <!-- Кнопка сброса в самый низ через большой отступ или просто в конце -->
-            <Separator Margin="10" Background="#7F8C8D"/>
-            <Button Content="СБРОС БАЗЫ (TEST)" Click="ResetDb_Click" 
-            Background="#C0392B" Foreground="White" Height ="30" Margin="10,5"/>
-            <Button Name="BtnInventory" Content="СКЛАД" Click="ShowInventory_Click" 
-Background="#FF2BA5C0" Foreground="White" Height ="50" Margin="10,5"/>
-        </StackPanel>
-        <Frame x:Name="MainFrame" Grid.Column="1" NavigationUIVisibility="Hidden" />
+            <!-- 3. НИЖНИЙ БЛОК (СКЛАД И АНАЛИТИКА) -->
+            <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                <Separator Margin="20,10" Background="#34495E"/>
+
+                <Button Content="📊 Финансовая аналитика" Click="ShowMonthlyStats_Click" 
+                        Height="45" Margin="15,5" Background="#8E44AD" Foreground="White" 
+                        FontWeight="Bold" BorderThickness="0">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+
+                <Button Name="BtnInventory" Content="📦 СКЛАД" Click="ShowInventory_Click" 
+                        Height="50" Margin="15,5" Background="#2BA5C0" Foreground="White" 
+                        FontWeight="Black" BorderThickness="0">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="8"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- КОНТЕНТ (ПРАВАЯ ЧАСТЬ) -->
+        <Border Grid.Column="1" Background="White" CornerRadius="15,0,0,15">
+            <Grid>
+                <!-- Тень удалена для исключения ошибки, добавлена тонкая рамка слева -->
+                <Border BorderBrush="#DCDDE1" BorderThickness="1,0,0,0" CornerRadius="15,0,0,15">
+                    <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Margin="5"/>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

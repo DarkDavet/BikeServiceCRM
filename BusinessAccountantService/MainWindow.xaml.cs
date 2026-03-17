@@ -70,17 +70,36 @@ namespace BusinessAccountantService
             HighlightButton(BtnInventory);
         }
 
-        // Подсветка кнопок меню
         private void HighlightButton(Button activeBtn)
         {
-            BtnAllClients.Background = _defaultButtonBrush;
-            BtnActiveOrders.Background = _defaultButtonBrush;
-            BtnArchive.Background = _defaultButtonBrush;
-            BtnInventory.Background = (Brush)new BrushConverter().ConvertFrom("#FF2BA5C0"); // Цвет склада
+            // 1. Сбрасываем кнопки навигации в дефолт (прозрачные)
+            BtnAllClients.ClearValue(Button.BackgroundProperty);
+            BtnActiveOrders.ClearValue(Button.BackgroundProperty);
+            BtnArchive.ClearValue(Button.BackgroundProperty);
 
+            // Сбрасываем текст (ClearValue заставит кнопку взять цвет из стиля)
+            BtnAllClients.ClearValue(Button.ForegroundProperty);
+            BtnActiveOrders.ClearValue(Button.ForegroundProperty);
+            BtnArchive.ClearValue(Button.ForegroundProperty);
+
+            // 2. Активируем выбранную кнопку
             if (activeBtn != null)
-                activeBtn.Background = Brushes.LightGreen; // Или ваш цвет активной кнопки
+            {
+                if (activeBtn == BtnInventory)
+                {
+                    activeBtn.Background = (Brush)new BrushConverter().ConvertFrom("#FF2BA5C0");
+                    activeBtn.Foreground = Brushes.White;
+                }
+                else
+                {
+                    // Красим в LightGreen — XAML увидит этот цвет и сам сделает текст ТЕМНЫМ
+                    activeBtn.Background = Brushes.LightGreen;
+                }
+            }
         }
+
+
+
 
         private void ShowMonthlyStats_Click(object sender, RoutedEventArgs e)
         {
