@@ -171,7 +171,7 @@ namespace BusinessAccountantService
             {
                 StatusInfoText.Text = $"Всего клиентов: {clientCount} | Всего заказов: {totalOrders}";
                 StatusInfoText.Foreground = Brushes.DimGray;
-                MainTitleText.Text = "ВСЯ БАЗА";
+                MainTitleText.Text = "БАЗА КЛИЕНТОВ И ЗАКАЗОВ";
             }
         }
 
