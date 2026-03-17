@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Оформление заказа — BIKE LAB" Height="550" Width="480" 
+        Title="Оформление заказа на ремонт — BikeLab" Height="550" Width="480" 
         WindowStartupLocation="CenterOwner" Background="#F5F6FA"
         ResizeMode="NoResize">
 
@@ -86,7 +86,7 @@
                 <DropShadowEffect BlurRadius="15" ShadowDepth="1" Opacity="0.05"/>
             </Border.Effect>
             <StackPanel>
-                <TextBlock Text="НОВЫЙ ЗАКАЗ ДЛЯ:" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="0,0,0,5"/>
+                <TextBlock Text="НОВЫЙ ЗАКАЗ НА РЕМОНТ ДЛЯ:" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="0,0,0,5"/>
                 <TextBlock x:Name="ClientNameText" Text="Иванов Иван Иванович" FontSize="18" FontWeight="Black" Foreground="#2C3E50" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>

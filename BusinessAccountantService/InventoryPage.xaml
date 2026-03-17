@@ -51,7 +51,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="СКЛАД И ИНВЕНТАРЬ" FontSize="24" FontWeight="Black" Foreground="#2C3E50"/>
+                <TextBlock Text="СКЛАД" FontSize="24" FontWeight="Black" Foreground="#2C3E50"/>
                 <CheckBox x:Name="OnlyPartsCheck" Content="Только запчасти" 
                           Margin="20,0,0,0" VerticalAlignment="Center" Foreground="#7F8C8D"
                           Checked="FilterChanged" Unchecked="FilterChanged"/>
@@ -149,7 +149,8 @@
                     <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>
                     <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*" FontWeight="SemiBold"/>
                     <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="100"/>
-                    <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, Converter={StaticResource PriceToDashConverter}}" Width="120"/>
+                    <DataGridTextColumn Header="Закупка (за 1 ед.)" Binding="{Binding PurchasePrice, Converter={StaticResource PriceToDashConverter}}" Width="120"/>
+                    <DataGridTextColumn Header="Розница (за 1 ед.)" Binding="{Binding RetailPrice, Converter={StaticResource PriceToDashConverter}}" Width="120"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

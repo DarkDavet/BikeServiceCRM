@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Прочий расход — BIKE LAB" Height="420" Width="380" 
+        Title="Прочий расход — BikeLab" Height="420" Width="380" 
         WindowStartupLocation="CenterOwner" Background="#F5F6FA"
         ResizeMode="NoResize">
 
@@ -101,13 +101,13 @@
             <TextBlock Text="СУММА (BYN)" FontSize="9" FontWeight="Bold" Foreground="#E74C3C" Margin="2,0,0,0"/>
             <TextBox x:Name="AmountBox" FontWeight="Black" Foreground="#E74C3C" />
 
-            <TextBlock Text="КАТЕГОРИЯ ТРАТ" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <TextBlock Text="КАТЕГОРИЯ РАСХОДОВ" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
             <ComboBox x:Name="CategoryBox" IsEditable="True">
                 <ComboBoxItem Content="Аренда"/>
                 <ComboBoxItem Content="Налоги"/>
                 <ComboBoxItem Content="Коммуналка"/>
                 <ComboBoxItem Content="Реклама"/>
-                <ComboBoxItem Content="Инструмент"/>
+                <ComboBoxItem Content="Рeмонт"/>
                 <ComboBoxItem Content="Прочее"/>
             </ComboBox>
         </StackPanel>
@@ -119,7 +119,7 @@
                     Click="Cancel_Click" 
                     Width="100" Margin="0,0,10,0"/>
 
-            <Button Content="ЗАПИСАТЬ" 
+            <Button Content="ПОДТВЕРДИТЬ" 
                     Style="{StaticResource PrimaryButtonStyle}" 
                     Background="#E67E22" 
                     Click="Save_Click" 

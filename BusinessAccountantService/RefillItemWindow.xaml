@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Пополнение склада — BIKE LAB" Height="420" Width="400" 
+        Title="Пополнение склада — BikeLab" Height="420" Width="400" 
         WindowStartupLocation="CenterOwner" Background="#F5F6FA"
         ResizeMode="NoResize">
 
@@ -81,7 +81,7 @@
 
         <!-- ШАПКА -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock x:Name="ItemTitleText" Text="ПОПОЛНЕНИЕ СКЛАДА" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+            <TextBlock x:Name="ItemTitleText" Text="ПОПОЛНЕНИЕ ПОЗИЦИИ" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
             <Separator Height="2" Background="#27AE60" Width="40" HorizontalAlignment="Left" Margin="2,5,0,0"/>
         </StackPanel>
 
@@ -126,7 +126,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <TextBlock Text="СУММА ЗА ВСЮ ПАРТИЮ" FontSize="9" FontWeight="Bold" Foreground="#2980B9"/>
+                            <TextBlock Text="НОВАЯ ЦЕНА ЗАКУПКИ (ЗА ВСЮ ПАРТИЮ)" FontSize="9" FontWeight="Bold" Foreground="#2980B9"/>
                             <TextBox x:Name="BulkTotalBox" Text="0" Background="#F1F9FF" Margin="0,5,0,0" Foreground="#2980B9" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Grid>

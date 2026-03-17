@@ -216,7 +216,7 @@
                 <Grid Margin="0,0,0,25">
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock x:Name="ProfitText" Text="Чистая прибыль: 0 BYN" FontSize="14" FontWeight="Bold" Foreground="#3498DB"/>
-                        <TextBlock Text="Налоги и сборы учтены" FontSize="10" Foreground="#BDC3C7"/>
+                        <TextBlock Text="только с учётом расходов на запчасти" FontSize="10" Foreground="#BDC3C7"/>
                     </StackPanel>
 
                     <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">

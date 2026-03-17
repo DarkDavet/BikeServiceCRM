@@ -43,7 +43,7 @@
                     <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
                 </Border.Effect>
                 <StackPanel IsHitTestVisible="False">
-                    <TextBlock Text="ЗАПЧАСТИ" Foreground="Gray" FontSize="11"/>
+                    <TextBlock Text="РАСХОДЫ" Foreground="Gray" FontSize="11"/>
                     <TextBlock x:Name="PartsText" Text="0 ₽" FontSize="18" FontWeight="Bold" Foreground="#C0392B"/>
                 </StackPanel>
             </Border>
@@ -65,7 +65,7 @@
                     <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1" Color="Black"/>
                 </Border.Effect>
                 <StackPanel IsHitTestVisible="False">
-                    <TextBlock Text="ЗАКАЗОВ" Foreground="Gray" FontSize="11"/>
+                    <TextBlock Text="ЗАКАЗЫ" Foreground="Gray" FontSize="11"/>
                     <TextBlock x:Name="CountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#8E44AD"/>
                 </StackPanel>
             </Border>
@@ -111,7 +111,7 @@
                                     <!-- Список -->
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Text="СТРУКТУРА ТРАТ" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="РАСХОДЫ ЗА МЕСЯЦ" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
                                 <lvc:PieChart Grid.Row="1" x:Name="ExpensesPieChart" Height="180" LegendLocation="Bottom"  Hoverable="True"/>
 

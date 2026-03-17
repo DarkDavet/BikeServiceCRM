@@ -74,8 +74,8 @@
             <!-- 2. ОСНОВНОЕ МЕНЮ -->
             <StackPanel Grid.Row="1">
 
-                <Button Name="BtnAllClients" Content="👥 Все клиенты" Style="{StaticResource MenuButtonStyle}" Click="ShowAllClients_Click"/>
-                <Button Name="BtnActiveOrders" Content="🔧 Заказы в работе" Style="{StaticResource MenuButtonStyle}" Click="ShowActiveOrders_Click"/>
+                <Button Name="BtnAllClients" Content="👥 Все клиенты и заказы" Style="{StaticResource MenuButtonStyle}" Click="ShowAllClients_Click"/>
+                <Button Name="BtnActiveOrders" Content="🔧 В работе" Style="{StaticResource MenuButtonStyle}" Click="ShowActiveOrders_Click"/>
                 <Button Name="BtnArchive" Content="📁 Архив выдачи" Style="{StaticResource MenuButtonStyle}" Click="ShowArchive_Click"/>
             </StackPanel>
 

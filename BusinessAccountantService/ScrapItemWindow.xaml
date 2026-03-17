@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Списание остатков — BIKE LAB" Height="320" Width="380" 
+        Title="Списание остатков — BikeLab" Height="320" Width="380" 
         WindowStartupLocation="CenterOwner" Background="#F5F6FA"
         ResizeMode="NoResize">
 

@@ -163,7 +163,7 @@ namespace BusinessAccountantService
             }
             else if (_currentMode == ViewMode.Archive)
             {
-                StatusInfoText.Text = $"Спящих клиентов: {clientCount} | Выполненных заказов: {archivedOrders}";
+                StatusInfoText.Text = $"Обслуженных клиентов: {clientCount} | Выполненных заказов: {archivedOrders}";
                 StatusInfoText.Foreground = Brushes.RoyalBlue;
                 MainTitleText.Text = "АРХИВ";
             }

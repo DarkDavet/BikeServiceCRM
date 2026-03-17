@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-            Title="Редактирование — BIKE LAB" Height="450" Width="450" 
+            Title="Данные клиента — BikeLab" Height="450" Width="450" 
         WindowStartupLocation="CenterOwner" Background="#F5F6FA"
         ResizeMode="NoResize">
 
@@ -104,7 +104,7 @@
 
         <!-- ШАПКА -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="РЕДАКТИРОВАНИЕ КЛИЕНТА" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+            <TextBlock Text="ИНФОРМАЦИЯ О КЛИЕНТЕ" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
             <Separator Height="2" Background="#3498DB" Width="40" HorizontalAlignment="Left" Margin="2,5,0,0"/>
         </StackPanel>
 
