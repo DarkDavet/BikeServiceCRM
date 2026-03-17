@@ -335,7 +335,7 @@ namespace BusinessAccountantService
                 {
                     Title = stat.Category,
                     Values = new ChartValues<decimal> { stat.Amount },
-                    DataLabels = true,
+                    DataLabels = false,
                     LabelPoint = point => $"{point.SeriesView.Title}: {point.Y:N2} ₽"
                 });
             }
@@ -355,7 +355,7 @@ namespace BusinessAccountantService
                 {
                     Title = stat.Category,
                     Values = new ChartValues<decimal> { stat.Amount },
-                    DataLabels = true,
+                    DataLabels = false,
                     LabelPoint = p => $"{p.SeriesView.Title}: {p.Y:N2} ₽"
                 });
             }
