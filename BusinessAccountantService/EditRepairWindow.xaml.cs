@@ -231,7 +231,7 @@ namespace BusinessAccountantService
             BtnOpenPartSearch.IsEnabled = false;
             BtnOpenServiceSearch.IsEnabled = false;
 
-            if (DeleteColumn != null) DeleteColumn.Visibility = Visibility.Collapsed;
+           if (DeleteColumn != null) DeleteColumn.Visibility = Visibility.Collapsed;
 
             StatusComboBox.IsEnabled = false;
 

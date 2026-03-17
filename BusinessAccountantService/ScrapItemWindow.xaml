@@ -5,21 +5,109 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Списание остатков" Height="250" Width="350" WindowStartupLocation="CenterOwner">
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock Text="СПИСАНИЕ СО СКЛАДА" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#E67E22"/>
+        Title="Списание остатков — BIKE LAB" Height="320" Width="380" 
+        WindowStartupLocation="CenterOwner" Background="#F5F6FA"
+        ResizeMode="NoResize">
 
-            <TextBlock x:Name="ItemNameText" Text="Товар: ..." FontWeight="SemiBold" Margin="0,0,0,5"/>
-            <TextBlock x:Name="CurrentQtyText" Text="В наличии: 0 шт." Foreground="Gray" Margin="0,0,0,15"/>
+    <Window.Resources>
+        <!-- СТИЛЬ ОСНОВНОЙ КНОПКИ (Подтвердить) -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <Label Content="Сколько штук списать?"/>
-            <TextBox x:Name="ScrapQtyBox" Height="30" VerticalContentAlignment="Center" FontSize="16" FontWeight="Bold"/>
+        <!-- СТИЛЬ ВТОРОСТЕПЕННОЙ КНОПКИ (Отмена) -->
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="Background" Value="#E0E2E6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D1D4D9"/>
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <UniformGrid Columns="2" Margin="0,20,0,0">
-                <Button Content="ПОДТВЕРДИТЬ" Click="ConfirmScrap_Click" Height="35" Background="#E67E22" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
-                <Button Content="Отмена" Click="Cancel_Click" Height="35" Margin="10,0,0,0"/>
-            </UniformGrid>
+        <!-- СТИЛЬ ПОЛЕЙ ВВОДА -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#DCDDE1"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Margin" Value="0,5,0,0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="10"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#E67E22"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Контент -->
+            <RowDefinition Height="Auto"/>
+            <!-- Кнопки -->
+        </Grid.RowDefinitions>
+
+        <!-- ШАПКА -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="СПИСАНИЕ СО СКЛАДА" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+            <Separator Height="2" Background="#E67E22" Width="40" HorizontalAlignment="Left" Margin="2,5,0,0"/>
         </StackPanel>
+
+        <!-- КОНТЕНТ -->
+        <StackPanel Grid.Row="1">
+            <Border Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="15">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" ShadowDepth="1" Opacity="0.05"/>
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock x:Name="ItemNameText" Text="Товар: ..." FontSize="13" FontWeight="Bold" Foreground="#2C3E50" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="CurrentQtyText" Text="В наличии: 0 шт." FontSize="11" Foreground="#95A5A6" Margin="0,2,0,15"/>
+
+                    <TextBlock Text="СКОЛЬКО ШТУК СПИСАТЬ?" FontSize="9" FontWeight="Bold" Foreground="#E67E22" Margin="2,0,0,0"/>
+                    <TextBox x:Name="ScrapQtyBox" Text="1" FontSize="20" FontWeight="Black" Foreground="#E67E22"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- КНОПКИ -->
+        <UniformGrid Grid.Row="2" Columns="2" Margin="0,20,0,0">
+            <Button Content="ПОДТВЕРДИТЬ" Style="{StaticResource PrimaryButtonStyle}" 
+                    Background="#E67E22" Click="ConfirmScrap_Click" Margin="0,0,5,0"/>
+
+            <Button Content="ОТМЕНА" Style="{StaticResource SecondaryButtonStyle}" 
+                    Click="Cancel_Click" Margin="5,0,0,0"/>
+        </UniformGrid>
     </Grid>
 </Window>

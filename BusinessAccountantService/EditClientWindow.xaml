@@ -5,24 +5,147 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-            Title="Окно редактировния" Height="350" Width="400" WindowStartupLocation="CenterOwner">
-    <StackPanel Margin="20">
-        <TextBlock Text="Редактирование данных клиента" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+            Title="Редактирование — BIKE LAB" Height="450" Width="450" 
+        WindowStartupLocation="CenterOwner" Background="#F5F6FA"
+        ResizeMode="NoResize">
 
-        <TextBlock Text="ФИО:"/>
-        <TextBox x:Name="FullNameBox" Margin="0,5,0,15" Height="25"/>
+    <Window.Resources>
+        <!-- 1. ГЛАВНАЯ КНОПКА (Сохранить) -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-        <TextBlock Text="Телефон:"/>
-        <TextBox x:Name="PhoneBox" Margin="0,5,0,15" Height="25"/>
+        <!-- 2. ВТОРОСТЕПЕННАЯ КНОПКА (Отмена) -->
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="Background" Value="#E0E2E6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D1D4D9"/>
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-        <TextBlock Text="Адрес:"/>
-        <TextBox x:Name="AddressBox" Margin="0,5,0,15" Height="25"/>
+        <!-- 3. ОПАСНАЯ КНОПКА (Удалить) -->
+        <Style x:Key="DangerButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#E74C3C"/>
+            <Setter Property="Background" Value="#FDECEA"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E74C3C"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
-            <Button Content="Удалить клиента" Width="130" Height="30" Margin="0,0,30,0" 
-                    Click="Delete_Click" Background="#C0392B" Foreground="White"/>
-            <Button Content="Сохранить" Width="100" Height="30" Background="#27AE60" Foreground="White" Click="Save_Click"/>
-            <Button Content="Отмена" Width="80" Height="30" Margin="10,0,0,0" Click="Cancel_Click"/>
+        <!-- 4. СТИЛЬ ПОЛЕЙ ВВОДА -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#DCDDE1"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#3498DB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Поля -->
+            <RowDefinition Height="Auto"/>
+            <!-- Кнопки -->
+        </Grid.RowDefinitions>
+
+        <!-- ШАПКА -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="РЕДАКТИРОВАНИЕ КЛИЕНТА" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+            <Separator Height="2" Background="#3498DB" Width="40" HorizontalAlignment="Left" Margin="2,5,0,0"/>
         </StackPanel>
-    </StackPanel>
+
+        <!-- ПОЛЯ ВВОДА -->
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="ФИО КЛИЕНТА" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <TextBox x:Name="FullNameBox" />
+
+            <TextBlock Text="НОМЕР ТЕЛЕФОНА" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <TextBox x:Name="PhoneBox" />
+
+            <TextBlock Text="АДРЕС ПРОЖИВАНИЯ" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <TextBox x:Name="AddressBox" />
+        </StackPanel>
+
+        <!-- КНОПКИ -->
+        <Grid Grid.Row="2" Margin="0,15,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <!-- Удалить -->
+                <ColumnDefinition Width="*"/>
+                <!-- Spacer -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Группа кнопок -->
+            </Grid.ColumnDefinitions>
+
+            <Button Content="УДАЛИТЬ" 
+                    Style="{StaticResource DangerButtonStyle}" 
+                    Click="Delete_Click" Width="100"/>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Content="ОТМЕНА" 
+                        Style="{StaticResource SecondaryButtonStyle}" 
+                        Click="Cancel_Click" 
+                        Width="100" Margin="0,0,10,0"/>
+
+                <Button Content="СОХРАНИТЬ" 
+                        Style="{StaticResource PrimaryButtonStyle}" 
+                        Background="#27AE60" 
+                        Click="Save_Click" Width="130"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>

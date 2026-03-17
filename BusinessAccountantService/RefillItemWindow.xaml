@@ -5,23 +5,101 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="Пополнение склада" Height="350" Width="400" WindowStartupLocation="CenterOwner">
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock x:Name="ItemTitleText" Text="ПОПОЛНЕНИЕ" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2C3E50"/>
+        Title="Пополнение склада — BIKE LAB" Height="420" Width="400" 
+        WindowStartupLocation="CenterOwner" Background="#F5F6FA"
+        ResizeMode="NoResize">
 
-            <Label Content="Количество (добавить к остатку):"/>
-            <TextBox x:Name="RefillQuantityBox" Text="1" Height="30" VerticalContentAlignment="Center" Margin="0,0,0,15"/>
+    <Window.Resources>
+        <!-- СТИЛЬ ОСНОВНОЙ КНОПКИ -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <Border Background="#F9F9F9" CornerRadius="5" Padding="10" Margin="0,0,0,20" BorderBrush="#DCDDE1" BorderThickness="1">
+        <!-- СТИЛЬ ВТОРОСТЕПЕННОЙ КНОПКИ -->
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="Background" Value="#E0E2E6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D1D4D9"/>
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- СТИЛЬ ПОЛЕЙ ВВОДА -->
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#DCDDE1"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#3498DB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Шапка -->
+            <RowDefinition Height="*"/>
+            <!-- Поля -->
+            <RowDefinition Height="Auto"/>
+            <!-- Кнопки -->
+        </Grid.RowDefinitions>
+
+        <!-- ШАПКА -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock x:Name="ItemTitleText" Text="ПОПОЛНЕНИЕ СКЛАДА" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+            <Separator Height="2" Background="#27AE60" Width="40" HorizontalAlignment="Left" Margin="2,5,0,0"/>
+        </StackPanel>
+
+        <!-- ОСНОВНОЙ БЛОК -->
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="КОЛИЧЕСТВО (ДОБАВИТЬ К ОСТАТКУ)" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <TextBox x:Name="RefillQuantityBox" Text="1" FontWeight="Bold" FontSize="14"/>
+
+            <Border Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="15" Margin="0,5,0,0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15" ShadowDepth="1" Opacity="0.05"/>
+                </Border.Effect>
                 <StackPanel>
-                    <!-- Видимость управляется из C# в зависимости от категории -->
                     <CheckBox x:Name="BulkModeCheck" Content="Закупка оптом (за всю партию)" 
-                              Margin="0,0,0,10" Foreground="#2980B9" FontWeight="SemiBold"
-                              Visibility="Collapsed"/>
+                              Margin="0,0,0,12" Foreground="#2980B9" FontWeight="SemiBold" Visibility="Collapsed"/>
 
                     <Grid>
-                        <!-- ПОЛЕ 1: Цена за 1 шт (скрывается при опте) -->
+                        <!-- ПОЛЕ 1: Цена за 1 шт -->
                         <StackPanel>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -32,11 +110,11 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <Label Content="Новая цена закупки (за 1 шт):" Foreground="#C0392B"/>
-                            <TextBox x:Name="NewPurchasePriceBox" Height="30" VerticalContentAlignment="Center"/>
+                            <TextBlock Text="НОВАЯ ЦЕНА ЗАКУПКИ (1 ШТ)" FontSize="9" FontWeight="Bold" Foreground="#E74C3C"/>
+                            <TextBox x:Name="NewPurchasePriceBox" Margin="0,5,0,0" Foreground="#E74C3C" FontWeight="SemiBold"/>
                         </StackPanel>
 
-                        <!-- ПОЛЕ 2: Сумма за партию (появляется при опте) -->
+                        <!-- ПОЛЕ 2: Сумма за партию -->
                         <StackPanel>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -48,17 +126,21 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <Label Content="Сумма за всю партию (BYN):" Foreground="#2980B9" FontWeight="Bold"/>
-                            <TextBox x:Name="BulkTotalBox" Text="0" Height="30" VerticalContentAlignment="Center" Background="#EBF5FB"/>
+                            <TextBlock Text="СУММА ЗА ВСЮ ПАРТИЮ" FontSize="9" FontWeight="Bold" Foreground="#2980B9"/>
+                            <TextBox x:Name="BulkTotalBox" Text="0" Background="#F1F9FF" Margin="0,5,0,0" Foreground="#2980B9" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Grid>
                 </StackPanel>
             </Border>
-
-            <UniformGrid Columns="2">
-                <Button Content="ПРИНЯТЬ" Click="SaveRefill_Click" Height="35" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
-                <Button Content="Отмена" Click="Cancel_Click" Height="35" Margin="10,0,0,0"/>
-            </UniformGrid>
         </StackPanel>
+
+        <!-- КНОПКИ -->
+        <UniformGrid Grid.Row="2" Columns="2" Margin="0,15,0,0">
+            <Button Content="ПРИНЯТЬ" Style="{StaticResource PrimaryButtonStyle}" 
+                    Background="#27AE60" Click="SaveRefill_Click" Margin="0,0,5,0"/>
+
+            <Button Content="ОТМЕНА" Style="{StaticResource SecondaryButtonStyle}" 
+                    Click="Cancel_Click" Margin="5,0,0,0"/>
+        </UniformGrid>
     </Grid>
 </Window>

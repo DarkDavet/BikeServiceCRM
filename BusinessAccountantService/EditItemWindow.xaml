@@ -5,48 +5,152 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
-        Title="EditItemWindow" Height="450" Width="400">
-    <Grid Margin="20">
-        <StackPanel>
-            <TextBlock Text="РЕДАКТИРОВАНИЕ ПОЗИЦИИ" FontSize="18" FontWeight="Bold" Margin="0,0,0,15" Foreground="#2C3E50"/>
+        Title="Редактирование товара — BIKE LAB" Height="480" Width="420" 
+        WindowStartupLocation="CenterOwner" Background="#F5F6FA"
+        ResizeMode="NoResize">
 
-            <Label Content="Наименование:"/>
-            <TextBox x:Name="ItemNameBox" Margin="0,0,0,10" Height="28" VerticalContentAlignment="Center"/>
+    <Window.Resources>
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <Label Content="Категория:"/>
-            <ComboBox x:Name="CategoryBox" SelectionChanged="CategoryBox_SelectionChanged" IsEditable="True" Margin="0,0,0,10">
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="Background" Value="#E0E2E6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D1D4D9"/>
+                    <Setter Property="Foreground" Value="#2C3E50"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DangerButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#E74C3C"/>
+            <Setter Property="Background" Value="#FDECEA"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E74C3C"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#DCDDE1"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="8"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#3498DB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="РЕДАКТИРОВАНИЕ ТОВАРА" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+            <Separator Height="2" Background="#3498DB" Width="40" HorizontalAlignment="Left" Margin="2,5,0,0"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="НАИМЕНОВАНИЕ" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <TextBox x:Name="ItemNameBox" />
+
+            <TextBlock Text="КАТЕГОРИЯ" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
+            <ComboBox x:Name="CategoryBox" SelectionChanged="CategoryBox_SelectionChanged" IsEditable="True">
                 <ComboBoxItem Content="Запчасти"/>
                 <ComboBoxItem Content="Расходники"/>
                 <ComboBoxItem Content="Аксессуары"/>
                 <ComboBoxItem Content="Инструмент"/>
             </ComboBox>
 
-            <!-- БЛОК ЦЕН -->
-            <Grid Margin="0,10,0,20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <Border Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="15" Margin="0,5,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- ЗАКУПКА (Скрыта по вашему желанию для всех) -->
-                <StackPanel x:Name="PurchasePriceBlock" Grid.Column="0" Margin="0,0,5,0" Visibility="Collapsed">
-                    <Label Content="Цена закупки:" Foreground="#C0392B"/>
-                    <TextBox x:Name="PurchaseBox" Height="28" IsReadOnly="True" Background="#F5F6FA"/>
-                </StackPanel>
+                    <StackPanel x:Name="PurchasePriceBlock" Grid.Column="0" Margin="0,0,8,0" Visibility="Collapsed">
+                        <TextBlock Text="ЗАКУПКА" FontSize="9" FontWeight="Bold" Foreground="#E74C3C"/>
+                        <TextBox x:Name="PurchaseBox" IsReadOnly="True" Background="#F9F9F9" Margin="0,5,0,0"/>
+                    </StackPanel>
 
-                <!-- РОЗНИЦА (Скрывается программно для не-запчастей) -->
-                <StackPanel x:Name="RetailPriceBlock" Visibility="Collapsed" Grid.Column="1" Margin="5,0,0,0">
-                    <Label Content="Цена розница:" Foreground="#27AE60" HorizontalAlignment="Center"/>
-                    <TextBox x:Name="RetailBox" Height="28" VerticalContentAlignment="Center"/>
-                </StackPanel>
-            </Grid>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-                <Button Content="Удалить товар" Click="Delete_Click" Width="110" Margin="0,0,40,0" Background="#C0392B" Foreground="White" BorderThickness="0"/>
-                <Button Content="Сохранить" Click="Save_Click" Width="100" Background="#27AE60" Foreground="White" BorderThickness="0"/>
-                <Button Content="Отмена" Click="Cancel_Click" Width="80" Margin="10,0,0,0"/>
-            </StackPanel>
+                    <StackPanel x:Name="RetailPriceBlock" Grid.Column="1" Margin="8,0,0,0" Visibility="Collapsed">
+                        <TextBlock Text="РОЗНИЦА" FontSize="9" FontWeight="Bold" Foreground="#27AE60"/>
+                        <TextBox x:Name="RetailBox" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </StackPanel>
-    </Grid>
 
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="УДАЛИТЬ" Style="{StaticResource DangerButtonStyle}" Click="Delete_Click" Width="100"/>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Content="ОТМЕНА" Style="{StaticResource SecondaryButtonStyle}" Click="Cancel_Click" Width="100" Margin="0,0,10,0"/>
+                <Button Content="СОХРАНИТЬ" Style="{StaticResource PrimaryButtonStyle}" Background="#27AE60" Click="Save_Click" Width="130"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>
