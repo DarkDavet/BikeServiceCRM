@@ -57,23 +57,88 @@
                 <TextBlock x:Name="StatusInfoText" Text="" FontSize="14" VerticalAlignment="Bottom" Margin="15,0,0,4" Foreground="#7F8C8D"/>
             </StackPanel>
 
-            <Border Grid.Column="1" Background="White" CornerRadius="8" HorizontalAlignment="Right" Padding="10,2" BorderBrush="#DCDDE1" BorderThickness="1">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="🔍" VerticalAlignment="Center" Margin="5,0" Foreground="#BDC3C7"/>
-                    <TextBox x:Name="SearchBox" Width="220" BorderThickness="0" Background="Transparent" 
-                             VerticalContentAlignment="Center" TextChanged="SearchBox_TextChanged" 
-                             Tag="Поиск по фамилии или телефону..."/>
-                </StackPanel>
+            <Border Grid.Column="1" x:Name="SearchBorder" 
+        Background="White" CornerRadius="10" 
+        HorizontalAlignment="Right" Padding="8,2" 
+        BorderBrush="#DCDDE1" BorderThickness="1.5"
+        Width="280">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <!-- Подсветка при наведении или фокусе внутри -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="#3498DB"/>
+                            </Trigger>
+                            <EventTrigger RoutedEvent="FocusManager.GotFocus">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                            To="#3498DB" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Иконка лупы -->
+                    <TextBlock Text="🔍" Grid.Column="0" VerticalAlignment="Center" 
+                   Margin="5,0" Foreground="#BDC3C7" FontSize="14"/>
+
+                    <!-- Текст-подсказка (исчезает при вводе) -->
+                    <TextBlock Text="Поиск по клиентам..." Grid.Column="1" 
+                   VerticalAlignment="Center" Margin="5,0" Foreground="#BDC3C7" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Само поле ввода -->
+                    <TextBox x:Name="SearchBox" Grid.Column="1" 
+                 BorderThickness="0" Background="Transparent" 
+                 VerticalContentAlignment="Center" FontSize="13"
+                 TextChanged="SearchBox_TextChanged" Padding="5,0"/>
+                </Grid>
             </Border>
+
         </Grid>
 
         <!-- РЯД 2: ТАБЛИЦА КЛИЕНТОВ (В КАРТОЧКЕ) -->
         <Border Grid.Row="2" Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="5">
+            
             <DataGrid x:Name="ClientsGrid" MouseDoubleClick="ClientsGrid_MouseDoubleClick"
                       AutoGenerateColumns="False" SelectionChanged="ClientsGrid_SelectionChanged" HeadersVisibility="Column"
                       CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                       GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#F1F2F6" 
-                      RowHeight="20" BorderThickness="0" Background="Transparent">
+                      RowHeight="30" BorderThickness="0" Background="Transparent">
+                <DataGrid.Resources>
+                    <!-- Стиль, который центрирует текст во всех колонках по вертикали -->
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                                        <ContentPresenter VerticalAlignment="Center" Margin="5,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="40"/>
                     <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding Name}" Width="*" FontWeight="SemiBold"/>
@@ -90,7 +155,22 @@
                 <DataGrid x:Name="RepairsHistoryGrid" Height="300" MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
                           AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
                           IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow"
-                          GridLinesVisibility="Horizontal" RowHeight="20" HorizontalGridLinesBrush="#F1F2F6" HeadersVisibility="Column" Background="Transparent" BorderThickness="0">
+                          GridLinesVisibility="Horizontal" RowHeight="30" HorizontalGridLinesBrush="#F1F2F6" HeadersVisibility="Column" Background="Transparent" BorderThickness="0">
+                    <DataGrid.Resources>
+                        <!-- Стиль, который центрирует текст во всех колонках по вертикали -->
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                                            <ContentPresenter VerticalAlignment="Center" Margin="5,0"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Принят" Binding="{Binding DateCreated, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
                         <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="180"/>
@@ -98,10 +178,10 @@
                         <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="120">
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="DataGridCell">
+                                    <!-- Закрашиваем фон всей ячейки -->
                                     <Setter Property="Background" Value="{Binding Status, Converter={StaticResource StatusColorConverter}}"/>
-                                    <Setter Property="FontWeight" Value="SemiBold"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter Property="Foreground" Value="Black"/>
@@ -109,8 +189,25 @@
                                     </Style.Triggers>
                                 </Style>
                             </DataGridTextColumn.CellStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Итого" Binding="{Binding TotalCost, StringFormat={}{0:N2} р.}" Width="110" FontWeight="Bold"/>
+
+                        <DataGridTextColumn Header="Итого" Binding="{Binding TotalCost, StringFormat={}{0:N2} р.}" Width="100">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="Margin" Value="0,0,10,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>
