@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
         Title="Пополнение склада — BikeLab" Height="420" Width="400" 
-        WindowStartupLocation="CenterOwner" Background="#F5F6FA"
+        WindowStartupLocation="CenterScreen" Background="#F5F6FA"
         ResizeMode="NoResize">
 
     <Window.Resources>

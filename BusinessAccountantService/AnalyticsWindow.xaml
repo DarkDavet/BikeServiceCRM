@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BusinessAccountantService"
         mc:Ignorable="d"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
-        Title="Аналитика сервиса" Height="700" Width="1000" Background="#F5F6FA"
+        Title="Аналитика сервиса" Height="750" Width="1200" Background="#F5F6FA"
         WindowStartupLocation="CenterScreen">
     
     <Grid Margin="15">
