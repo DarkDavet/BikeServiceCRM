@@ -5,98 +5,164 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:BusinessAccountantService.Managers"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="700" d:DesignWidth="900"
       Title="InventoryPage">
+
     <Page.Resources>
         <local:PriceToDashConverter x:Key="PriceToDashConverter"/>
+
+        <!-- Твой фирменный стиль кнопок -->
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="15,0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="6"/>
+                </Style>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Page.Resources>
-    <Grid Margin="20">
+
+    <Grid Margin="25">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- 0: Заголовок и поиск -->
+            <!-- 0: Шапка -->
             <RowDefinition Height="Auto"/>
-            <!-- 1: Карточки статистики -->
+            <!-- 1: Статистика -->
             <RowDefinition Height="*"/>
             <!-- 2: Таблица -->
             <RowDefinition Height="Auto"/>
             <!-- 3: Кнопки -->
         </Grid.RowDefinitions>
 
-        <!-- РЯД 0: ЗАГОЛОВОК И ПОИСК -->
+        <!-- РЯД 0: ШАПКА И ПОИСК (В стиле ClientsPage) -->
         <Grid Grid.Row="0" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="СКЛАД" FontSize="24" FontWeight="Black" Foreground="#2C3E50" VerticalAlignment="Center"/>
-
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Label Content="Поиск по складу:" VerticalAlignment="Center" Foreground="Gray"/>
-                <TextBox x:Name="SearchBox" Width="300" Height="30" VerticalContentAlignment="Center" 
-                     Margin="10,0" TextChanged="SearchBox_TextChanged" Padding="5,0"/>
-                <CheckBox x:Name="OnlyPartsCheck" Content="Показать только запчасти" 
-                      VerticalAlignment="Center" FontWeight="SemiBold"
-                      Checked="FilterChanged" Unchecked="FilterChanged"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="СКЛАД И ИНВЕНТАРЬ" FontSize="24" FontWeight="Black" Foreground="#2C3E50"/>
+                <CheckBox x:Name="OnlyPartsCheck" Content="Только запчасти" 
+                          Margin="20,0,0,0" VerticalAlignment="Center" Foreground="#7F8C8D"
+                          Checked="FilterChanged" Unchecked="FilterChanged"/>
             </StackPanel>
+
+            <Border Grid.Column="1" x:Name="SearchBorder" 
+                    Background="White" CornerRadius="10" 
+                    HorizontalAlignment="Right" Padding="8,2" 
+                    BorderBrush="#DCDDE1" BorderThickness="1.5" Width="280">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="🔍" VerticalAlignment="Center" Margin="5,0" Foreground="#BDC3C7"/>
+                    <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" 
+                             VerticalContentAlignment="Center" FontSize="13" TextChanged="SearchBox_TextChanged" Padding="5,0"/>
+                    <TextBlock Text="Поиск по складу..." Grid.Column="1" VerticalAlignment="Center" Margin="10,0" 
+                               Foreground="#BDC3C7" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Border>
         </Grid>
 
-        <!-- РЯД 1: КАРТОЧКИ СТАТИСТИКИ -->
-        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,20">
-            <!-- Запчасти -->
-            <Border Background="#E3F2FD" BorderBrush="#2196F3" BorderThickness="0,0,0,4" Margin="0,0,10,0" Padding="15,10" CornerRadius="4">
+        <!-- РЯД 1: КАРТОЧКИ СТАТИСТИКИ (Улучшенный дизайн) -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,25">
+            <!-- Каждая карточка теперь с CornerRadius 10 и полоской слева -->
+            <Border Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="4,1,1,1" Margin="0,0,10,0" Padding="15,12">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush" Value="#3498DB"/>
+                    </Style>
+                </Border.Style>
                 <StackPanel>
-                    <TextBlock Text="ЗАПЧАСТИ" FontSize="10" FontWeight="Bold" Foreground="#1976D2"/>
-                    <TextBlock x:Name="PartsCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#1565C0"/>
+                    <TextBlock Text="ЗАПЧАСТИ" FontSize="10" FontWeight="Bold" Foreground="#7F8C8D"/>
+                    <TextBlock x:Name="PartsCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
                 </StackPanel>
             </Border>
-            <!-- Инструмент -->
-            <Border Background="#F5F5F5" BorderBrush="#616161" BorderThickness="0,0,0,4" Margin="5,0,5,0" Padding="15,10" CornerRadius="4">
+
+            <Border Background="White" CornerRadius="10" BorderBrush="#95A5A6" BorderThickness="4,1,1,1" Margin="5,0,5,0" Padding="15,12">
                 <StackPanel>
-                    <TextBlock Text="ИНСТРУМЕНТ" FontSize="10" FontWeight="Bold" Foreground="#424242"/>
-                    <TextBlock x:Name="ToolsCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#212121"/>
+                    <TextBlock Text="ИНСТРУМЕНТ" FontSize="10" FontWeight="Bold" Foreground="#7F8C8D"/>
+                    <TextBlock x:Name="ToolsCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
                 </StackPanel>
             </Border>
-            <!-- Химия -->
-            <Border Background="#FFF3E0" BorderBrush="#FF9800" BorderThickness="0,0,0,4" Margin="5,0,5,0" Padding="15,10" CornerRadius="4">
+
+            <Border Background="White" CornerRadius="10" BorderBrush="#F39C12" BorderThickness="4,1,1,1" Margin="5,0,5,0" Padding="15,12">
                 <StackPanel>
-                    <TextBlock Text="ХИМИЯ / СРЕДСТВА" FontSize="10" FontWeight="Bold" Foreground="#E65100"/>
-                    <TextBlock x:Name="ChemicalsCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#EF6C00"/>
+                    <TextBlock Text="СРЕДСТВА/ХИМИЯ" FontSize="10" FontWeight="Bold" Foreground="#7F8C8D"/>
+                    <TextBlock x:Name="ChemicalsCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
                 </StackPanel>
             </Border>
-            <!-- Инвентарь -->
-            <Border Background="#F3E5F5" BorderBrush="#9C27B0" BorderThickness="0,0,0,4" Margin="10,0,0,0" Padding="15,10" CornerRadius="4">
+
+            <Border Background="White" CornerRadius="10" BorderBrush="#9B59B6" BorderThickness="4,1,1,1" Margin="10,0,0,0" Padding="15,12">
                 <StackPanel>
-                    <TextBlock Text="ИНВЕНТАРЬ" FontSize="10" FontWeight="Bold" Foreground="#7B1FA2"/>
-                    <TextBlock x:Name="InventoryCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#6A1B9A"/>
+                    <TextBlock Text="ИНВЕНТАРЬ" FontSize="10" FontWeight="Bold" Foreground="#7F8C8D"/>
+                    <TextBlock x:Name="InventoryCountText" Text="0 шт." FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
                 </StackPanel>
             </Border>
         </UniformGrid>
 
-        <!-- РЯД 2: ТАБЛИЦА -->
-        <DataGrid Grid.Row="2" x:Name="InventoryGrid"
-              MouseDoubleClick="InventoryGrid_MouseDoubleClick"
-              AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
-              IsReadOnly="True" GridLinesVisibility="Horizontal" RowHeight="35">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="120"/>
-                <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*"/>
-                <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="80"/>
-                <DataGridTextColumn Header="Закупка" Binding="{Binding PurchasePrice, Converter={StaticResource PriceToDashConverter}}" Width="100"/>
-                <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, Converter={StaticResource PriceToDashConverter}}" Width="100"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <!-- РЯД 2: ТАБЛИЦА (В белой карточке) -->
+        <Border Grid.Row="2" Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="5">
+            <DataGrid x:Name="InventoryGrid" AutoGenerateColumns="False" CanUserAddRows="False" 
+                      IsReadOnly="True" GridLinesVisibility="Horizontal" RowHeight="35" HeadersVisibility="Column"
+                      BorderThickness="0" Background="Transparent" HorizontalGridLinesBrush="#F1F2F6"
+                      MouseDoubleClick="InventoryGrid_MouseDoubleClick">
+                <DataGrid.Resources>
+                    <!-- Стиль, который центрирует текст во всех колонках по вертикали -->
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Background="{TemplateBinding Background}" BorderThickness="0">
+                                        <ContentPresenter VerticalAlignment="Center" Margin="5,0"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </DataGrid.Resources>
 
-        <!-- РЯД 3: КНОПКИ -->
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>
+                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="100"/>
+                    <DataGridTextColumn Header="Розница" Binding="{Binding RetailPrice, Converter={StaticResource PriceToDashConverter}}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- РЯД 3: КНОПКИ (Стиль ActionButtonStyle) -->
         <Grid Grid.Row="3" Margin="0,20,0,0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Content="+ НОВАЯ ПОЗИЦИЯ" Click="AddItem_Click" Width="150" Height="35" Background="#27AE60" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,10,0"/>
-                <Button Content="ПОПОЛНИТЬ" Click="RefillItem_Click" Width="110" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,10,0"/>
-                <Button Content="СПИСАТЬ" Click="ScrapItem_Click" Width="110" Height="35" Background="#E67E22" Foreground="White" FontWeight="Bold" BorderThickness="0" Margin="0,0,10,0"/>
-                <Button Content="УДАЛИТЬ" Click="DeleteItem_Click" Width="110" Height="35" Background="#C0392B" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="+ НОВАЯ ПОЗИЦИЯ" Style="{StaticResource ActionButtonStyle}" Background="#27AE60" Click="AddItem_Click" Margin="0,0,10,0"/>
+                <Button Content="ПОПОЛНИТЬ" Style="{StaticResource ActionButtonStyle}" Background="#3498DB" Click="RefillItem_Click" Margin="0,0,10,0"/>
+                <Button Content="СПИСАТЬ" Style="{StaticResource ActionButtonStyle}" Background="#E67E22" Click="ScrapItem_Click" Margin="0,0,10,0"/>
+                <Button Content="УДАЛИТЬ" Style="{StaticResource ActionButtonStyle}" Background="#E74C3C" Click="DeleteItem_Click"/>
             </StackPanel>
-            <Button Grid.Column="1" Content="ПРОЧИЙ РАСХОД" Click="AddManualExpense_Click" HorizontalAlignment="Right" Width="150" Height="35" Background="#34495E" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
+            <Button Content="ПРОЧИЙ РАСХОД" Style="{StaticResource ActionButtonStyle}" Background="#34495E" Click="AddManualExpense_Click" HorizontalAlignment="Right"/>
         </Grid>
     </Grid>
 </Page>
