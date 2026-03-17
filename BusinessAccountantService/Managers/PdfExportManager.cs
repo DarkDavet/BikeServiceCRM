@@ -4,6 +4,7 @@ using QuestPDF.Fluent;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,94 +16,115 @@ namespace BusinessAccountantService.Managers
     {
         public void ExportEntryAct(Client client, RepairRecord repair)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "PDF files (*.pdf)|*.pdf",
-                FileName = $"Priemka_{client.Name}_{DateTime.Now:ddMMyy}.pdf"
-            };
+            // --- ДАННЫЕ МАСТЕРСКОЙ И МАСТЕРА ---
+            string masterName = "Колос Глеб Юрьевич"; // Впишите ФИО мастера
+            string masterPhone = "+375 (29) 277-72-16"; // Впишите телефон мастера
+            string shopAddress = "г. Минск, ул. Бурдейного, 22";
 
-            if (saveFileDialog.ShowDialog() == true)
+            string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BikeLab_logo.png");
+            var mainColor = "#2C3E50";
+            var accentColor = "#E67E22";
+
+            Document.Create(container =>
             {
-                Document.Create(container =>
+                container.Page(page =>
                 {
-                    container.Page(page =>
+                    page.Margin(40);
+                    page.DefaultTextStyle(x => x.FontSize(10).FontColor(mainColor).FontFamily("Arial"));
+
+                    // --- ХЕДЕР ---
+                    page.Header().Row(row =>
                     {
-                        page.Margin(50);
-
-                        page.Header().Row(row => {
-                            row.RelativeItem().Column(col => {
-                                col.Item().Text("ВЕЛО-МАСТЕРСКАЯ \"ДВА КОЛЕСА\"").FontSize(22).ExtraBold().FontColor(QuestPDF.Helpers.Colors.Blue.Medium);
-                                col.Item().Text("Ремонт любой сложности • Запчасти • Тюнинг").FontSize(9).Italic().FontColor(QuestPDF.Helpers.Colors.Grey.Medium);
-                                col.Item().PaddingTop(5).Text(x => {
-                                    x.Span("Тел: ").Bold();
-                                    x.Span("+7 (999) 000-00-00");
-                                });
-                            });
-
-                            // ПРАВАЯ СТОРОНА: Номер и статус
-                            row.RelativeItem().AlignRight().Column(c => {
-                                c.Item().Text("АКТ ПРИЁМКИ").FontSize(14).SemiBold();
-                                c.Item().Text($"Заказ №: #00{repair.Id}").FontSize(12).Bold();
-                                c.Item().PaddingTop(5).Text(DateTime.Now.ToString("dd.MM.yyyy HH:mm")).FontSize(10);
-                            });
-                        });
-
-                        page.Content().PaddingVertical(20).Column(col =>
+                        row.RelativeItem().Column(col =>
                         {
-                            // Данные клиента
-                            col.Item().PaddingBottom(5).Text("ДАННЫЕ КЛИЕНТА").Bold().FontSize(12);
-                            col.Item().Text($"ФИО: {client.Name}");
-                            col.Item().Text($"Телефон: {client.Phone}");
+                            // ЛОГОТИП
+                            if (File.Exists(logoPath))
+                                col.Item().Height(60).Image(logoPath);
+                            else
+                                col.Item().Text("BIKE LAB").FontSize(24).ExtraBold().FontColor(accentColor);
 
-                            col.Item().PaddingVertical(10).LineHorizontal(0.5f).LineColor(QuestPDF.Helpers.Colors.Grey.Lighten2);
-
-                            // Велосипед
-                            col.Item().PaddingBottom(5).Text("ОБЪЕКТ ПРИЕМКИ").Bold().FontSize(12);
-                            col.Item().Text($"Модель: {repair.BikeInfo}");
-
-                            // Проблема
-                            col.Item().PaddingTop(10).Text("ОПИСАНИЕ НЕИСПРАВНОСТИ:").Bold();
-                            col.Item().Background(QuestPDF.Helpers.Colors.Grey.Lighten4).Padding(10).Text(repair.ProblemDescription).Italic();
-
-                            // ПРЕДВАРИТЕЛЬНЫЙ СПИСОК РАБОТ (Новое!)
-                            if (!string.IsNullOrWhiteSpace(repair.WorksPerformed))
-                            {
-                                col.Item().PaddingTop(15).Text("ПРЕДВАРИТЕЛЬНЫЙ ПЛАН РАБОТ:").Bold();
-                                col.Item().Text(repair.WorksPerformed);
-                            }
-
-                            // ФИНАНСЫ (Новое!)
-                            col.Item().PaddingTop(15).AlignRight().Column(c =>
-                            {
-                                c.Item().Text($"Ориентировочная стоимость: {repair.TotalCost} руб.").FontSize(14).SemiBold();
-                                c.Item().Text("Цена может измениться после дефектовки").FontSize(9).Italic();
-                            });
-
-                            // Подписи
-                            col.Item().PaddingTop(40).Row(row => {
-                                row.RelativeItem().Column(c => {
-                                    c.Item().Text("Принял (Мастер):");
-                                    c.Item().PaddingTop(10).Text("____________________");
-                                });
-                                row.RelativeItem().AlignRight().Column(c => {
-                                    c.Item().Text("Сдал (Клиент):");
-                                    c.Item().PaddingTop(10).Text("____________________");
-                                });
-                            });
+                            // АДРЕС ПОД ЛОГОТИПОМ
+                            col.Item().PaddingTop(2).Text(shopAddress).FontSize(9).SemiBold();
+                            col.Item().Text("Профессиональный велосервис").FontSize(8).Italic().FontColor("#7F8C8D");
                         });
 
-
-                        page.Footer().AlignCenter().Text(x => {
-                            x.Span("Стр. ");
-                            x.CurrentPageNumber();
+                        row.RelativeItem().AlignRight().Column(col =>
+                        {
+                            col.Item().Text("АКТ ПРИЁМКИ ТС").FontSize(18).ExtraBold().FontColor(mainColor);
+                            col.Item().Text($"ЗАКАЗ №{repair.Id:D4}").FontSize(14).Bold().FontColor(accentColor);
+                            col.Item().Text($"Дата: {DateTime.Now:dd.MM.yyyy}").FontSize(10);
                         });
                     });
-                })
-                .GeneratePdf(saveFileDialog.FileName);
 
-                Process.Start(new ProcessStartInfo(saveFileDialog.FileName) { UseShellExecute = true });
-            }
+                    page.Content().PaddingVertical(15).Column(col =>
+                    {
+                        // --- БЛОК 1: КЛИЕНТ И ВЕЛОСИПЕД ---
+                        col.Item().Row(row =>
+                        {
+                            row.RelativeItem().Border(0.5f).BorderColor("#DCDDE1").Padding(10).Column(c => {
+                                c.Item().Text("ВЛАДЕЛЕЦ").FontSize(8).Bold().FontColor("#7F8C8D");
+                                c.Item().PaddingTop(2).Text(client.Name).FontSize(11).Bold();
+                                c.Item().Text(client.Phone).FontSize(10);
+                            });
+
+                            row.ConstantItem(10);
+
+                            row.RelativeItem().Border(0.5f).BorderColor("#DCDDE1").Padding(10).Column(c => {
+                                c.Item().Text("ОБЪЕКТ ПРИЕМКИ").FontSize(8).Bold().FontColor("#7F8C8D");
+                                c.Item().PaddingTop(2).Text(repair.BikeInfo).FontSize(11).Bold();;
+                            });
+                        });
+
+                        // --- БЛОК 2: ОПИСАНИЕ (БЕЗ ТАБЛИЦЫ) ---
+                        col.Item().PaddingTop(25).Text("ОПИСАНИЕ НЕИСПРАВНОСТЕЙ:").FontSize(11).Bold();
+
+                        col.Item().PaddingTop(8).Background("#F9F9F9").Padding(15).Column(c => {
+                            c.Item().Text(repair.ProblemDescription).LineHeight(1.5f);
+
+                            // Пустые линии для ручных заметок, если описание короткое
+                            c.Item().PaddingTop(10).Text("____________________________________________________________________________________");
+                            c.Item().PaddingTop(10).Text("____________________________________________________________________________________");
+                        });
+
+                        // --- БЛОК 4: ДАННЫЕ МАСТЕРА ---
+                        col.Item().PaddingTop(20).BorderTop(0.5f).BorderColor("#DCDDE1").PaddingTop(10).Row(r => {
+                            r.RelativeItem().Text(t => {
+                                t.Span("Ваш мастер: ").Bold();
+                                t.Span(masterName);
+                            });
+                            r.RelativeItem().AlignRight().Text(t => {
+                                t.Span("Связь с мастером: ").Bold();
+                                t.Span(masterPhone);
+                            });
+                        });
+
+                        col.Item().PaddingTop(60).Row(row => {
+                            // Мастер
+                            row.RelativeItem().Column(c => {
+                                c.Item().Text("Принял (Мастер):").FontSize(9);
+                                c.Item().PaddingTop(15).Text("____________________").FontSize(10);
+                                c.Item().Text("(подпись)").FontSize(7).FontColor("#7F8C8D");
+                            });
+
+                            // Клиент
+                            row.RelativeItem().AlignRight().Column(c => {
+                                c.Item().Text("Сдал (Клиент):").FontSize(9);
+                                c.Item().PaddingTop(15).Text("____________________").FontSize(10);
+                                c.Item().Text("(подпись)").FontSize(7).FontColor("#7F8C8D");
+                            });
+                        });
+                    });
+
+                    // Футер без номера страницы
+                    page.Footer().PaddingTop(30).AlignCenter().Text("BIKE LAB — Качественный сервис для вашего велосипеда").FontSize(8).FontColor("#BDC3C7");
+                });
+            }).GeneratePdf("EntryAct.pdf");
+
+            Process.Start(new ProcessStartInfo("EntryAct.pdf") { UseShellExecute = true });
         }
+
+
+
         public void ExportFinalAct(Client client, RepairRecord repair)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog
