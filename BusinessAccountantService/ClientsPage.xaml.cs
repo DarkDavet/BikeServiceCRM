@@ -31,6 +31,7 @@ namespace BusinessAccountantService
         private ClientManager _clientManager = new();
         private RepairManager _repairManager = new();
         private PdfExportManager _pdfManager = new();
+        private InventoryManager _inventoryManager = new();
 
         public ClientsPage(ViewMode mode)
         {
@@ -136,9 +137,9 @@ namespace BusinessAccountantService
                     return;
                 }
 
-                // var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
+                var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
 
-                _pdfManager.ExportFinalAct(selectedClient, selectedRepair);
+                _pdfManager.ExportFinalAct(selectedClient, selectedRepair, items);
             }
             else
             {
