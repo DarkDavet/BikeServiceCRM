@@ -185,7 +185,7 @@
                                 <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*" FontWeight="SemiBold"/>
                                 <DataGridTextColumn Header="Тип" Binding="{Binding TypeDisplay}" Width="80"/>
                                 <DataGridTextColumn Header="Кол-во" Binding="{Binding Quantity}" Width="60"/>
-                                <DataGridTextColumn Header="Итого" Binding="{Binding Total, StringFormat={}{0:N0} ₽}" Width="100" FontWeight="Black"/>
+                                <DataGridTextColumn Header="Итого" Binding="{Binding Total, StringFormat={}{0:N2} ₽}" Width="100" FontWeight="Black"/>
                                 <DataGridTemplateColumn x:Name="DeleteColumn" Width="45">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>

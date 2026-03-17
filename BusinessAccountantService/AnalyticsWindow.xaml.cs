@@ -170,8 +170,8 @@ namespace BusinessAccountantService
                 {
                     Title = stat.Category,
                     Values = new ChartValues<decimal> { stat.Amount },
-                    DataLabels = true,
-                    LabelPoint = p => $"{p.Y:N2} ₽"
+                    DataLabels = false,
+                    LabelPoint = p => $""
                 });
             }
             YearlyExpensesPieChart.Series = pieSeries;
@@ -336,7 +336,7 @@ namespace BusinessAccountantService
                     Title = stat.Category,
                     Values = new ChartValues<decimal> { stat.Amount },
                     DataLabels = false,
-                    LabelPoint = point => $"{point.SeriesView.Title}: {point.Y:N2} ₽"
+                    LabelPoint = point => $""
                 });
             }
             ExpensesPieChart.Series = pieSeries;
@@ -356,7 +356,7 @@ namespace BusinessAccountantService
                     Title = stat.Category,
                     Values = new ChartValues<decimal> { stat.Amount },
                     DataLabels = false,
-                    LabelPoint = p => $"{p.SeriesView.Title}: {p.Y:N2} ₽"
+                    LabelPoint = p => $""
                 });
             }
 
