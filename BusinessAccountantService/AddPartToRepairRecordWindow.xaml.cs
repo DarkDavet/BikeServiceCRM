@@ -75,6 +75,9 @@ namespace BusinessAccountantService
             {
                 _foundItem = item;
                 StockText.Text = $"{item.Quantity} шт.";
+
+                PartSearchBox.Text = item.Name;
+
                 QtyBox.Focus();
                 QtyBox.SelectAll();
             }

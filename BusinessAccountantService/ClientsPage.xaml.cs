@@ -92,6 +92,29 @@ namespace BusinessAccountantService
             }
         }
 
+        private void ShowAllOrdersToggle_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshRepairsList();
+        }
+
+        // 2. Универсальный метод обновления таблицы заказов
+        private void RefreshRepairsList()
+        {
+            // Если тогл ВКЛЮЧЕН — берем ВСЕ заказы текущего режима
+            if (ShowAllOrdersToggle.IsChecked == true)
+            {
+                RepairsHistoryGrid.ItemsSource = _repairManager.GetAllRepairsByMode(_currentMode);
+            }
+            // Если тогл ВЫКЛЮЧЕН — берем только заказы выбранного клиента
+            else if (ClientsGrid.SelectedItem is Client selectedClient)
+            {
+                RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
+            }
+            else
+            {
+                RepairsHistoryGrid.ItemsSource = null;
+            }
+        }
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             _clientsView?.Refresh();
@@ -108,43 +131,7 @@ namespace BusinessAccountantService
             return (client.Name?.ToLower().Contains(query) ?? false) ||
                    (client.Phone?.Contains(query) ?? false);
         }
-
-        // PDF акты
-        private void EntryAct_Click(object sender, RoutedEventArgs e)
-        {
-            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
-                ClientsGrid.SelectedItem is Client selectedClient)
-            {
-                _pdfManager.ExportEntryAct(selectedClient, selectedRepair);
-                RepairsHistoryGrid.Items.Refresh();
-            }
-            else
-            {
-                MessageBox.Show("Выберите клиента и заказ для печати акта приемки!");
-            }
-        }
-
-        private void FinalAct_Click(object sender, RoutedEventArgs e)
-        {
-            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
-                ClientsGrid.SelectedItem is Client selectedClient)
-            {
-                if (selectedRepair.Status != "Выдан" && selectedRepair.Status != "Готов")
-                {
-                    MessageBox.Show("Сначала завершите ремонт и выдайте заказ через окно редактирования (двойной клик), чтобы зафиксировать запчасти и итоговую сумму!",
-                                    "Печать невозможна", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
-
-                _pdfManager.ExportFinalAct(selectedClient, selectedRepair, items);
-            }
-            else
-            {
-                MessageBox.Show("Выберите клиента и заказ!");
-            }
-        }
+      
 
         private void UpdateStatusInfo()
         {
@@ -226,13 +213,44 @@ namespace BusinessAccountantService
 
         private void ClientsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ClientsGrid.SelectedItem is Client selectedClient)
+            if (ShowAllOrdersToggle.IsChecked == true) return;
+
+            RefreshRepairsList();
+        }
+
+        private void EntryAct_Click(object sender, RoutedEventArgs e)
+        {
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
+                ClientsGrid.SelectedItem is Client selectedClient)
             {
-                RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
+                _pdfManager.ExportEntryAct(selectedClient, selectedRepair);
+                RepairsHistoryGrid.Items.Refresh();
             }
             else
             {
-                RepairsHistoryGrid.ItemsSource = null;
+                MessageBox.Show("Выберите клиента и заказ для печати акта приемки!");
+            }
+        }
+
+        private void FinalAct_Click(object sender, RoutedEventArgs e)
+        {
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
+                ClientsGrid.SelectedItem is Client selectedClient)
+            {
+                if (selectedRepair.Status != "Выдан" && selectedRepair.Status != "Готов")
+                {
+                    MessageBox.Show("Сначала завершите ремонт и выдайте заказ через окно редактирования (двойной клик), чтобы зафиксировать запчасти и итоговую сумму!",
+                                    "Печать невозможна", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
+
+                _pdfManager.ExportFinalAct(selectedClient, selectedRepair, items);
+            }
+            else
+            {
+                MessageBox.Show("Выберите клиента и заказ!");
             }
         }
     }

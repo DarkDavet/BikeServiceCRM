@@ -32,38 +32,38 @@ namespace BusinessAccountantService
         {
             InitializeComponent();
 
-            // Загружаем полный список ОДИН РАЗ при открытии
+            // Загружаем список один раз
             var allServices = _repairManager.GetServiceSuggestions("");
             _serviceView = CollectionViewSource.GetDefaultView(allServices);
-            ServiceSearchBox.ItemsSource = _serviceView;
 
+            // Привязываем источник один раз!
+            ServiceSearchBox.ItemsSource = _serviceView;
             ServiceSearchBox.Focus();
         }
 
         // Поиск в прайс-листе по мере ввода текста
         private void ServiceSearchBox_KeyUp(object sender, KeyEventArgs e)
         {
-            // Игнорируем навигационные клавиши
             if (e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.Enter || e.Key == Key.Escape) return;
 
-            string query = ServiceSearchBox.Text.ToLower();
+            // Берем текст прямо из TextBox внутри ComboBox, чтобы избежать лагов
+            var textBox = (TextBox)ServiceSearchBox.Template.FindName("PART_EditableTextBox", ServiceSearchBox);
+            string query = textBox?.Text.ToLower() ?? ServiceSearchBox.Text.ToLower();
 
-            // Фильтруем коллекцию вместо перезаписи ItemsSource
             _serviceView.Filter = item =>
             {
                 if (string.IsNullOrEmpty(query)) return true;
-                var service = item as ServiceItem;
-                return service.Name.ToLower().Contains(query);
+                return (item as ServiceItem).Name.ToLower().Contains(query);
             };
 
-            var textBox = (TextBox)ServiceSearchBox.Template.FindName("SERVICE_EditableTextBox", ServiceSearchBox);
+            ServiceSearchBox.IsDropDownOpen = true;
+
+            // Возвращаем курсор в конец, чтобы текст не затирался при автодополнении
             if (textBox != null)
             {
                 textBox.SelectionStart = textBox.Text.Length;
                 textBox.SelectionLength = 0;
             }
-
-            ServiceSearchBox.IsDropDownOpen = true;
         }
 
         // Если выбрали готовую услугу — подставляем её цену
@@ -74,16 +74,6 @@ namespace BusinessAccountantService
                 PriceBox.Text = selected.Price.ToString();
                 PriceBox.Focus();
                 PriceBox.SelectAll();
-            }
-        }
-
-        private void ServiceSearchBox_DropDownOpened(object sender, EventArgs e)
-        {
-            // Если поле пустое, загружаем весь список услуг
-            if (string.IsNullOrWhiteSpace(ServiceSearchBox.Text))
-            {
-                var allServices = _repairManager.GetServiceSuggestions(""); // Передаем пустую строку для получения всех
-                ServiceSearchBox.ItemsSource = allServices;
             }
         }
 

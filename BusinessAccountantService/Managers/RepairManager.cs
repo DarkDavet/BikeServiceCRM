@@ -11,6 +11,47 @@ namespace BusinessAccountantService.Managers
 {
     public class RepairManager
     {
+
+        public List<RepairRecord> GetAllRepairsByMode(ViewMode mode)
+        {
+            var list = new List<RepairRecord>();
+            using (var connection = new SqliteConnection(DatabaseService.ConnectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+
+                // Тот же запрос, но без WHERE ClientId
+                string sql = "SELECT Id, BikeInfo, ProblemDescription, WorksPerformed, PartsCost, TotalCost, Status, DateCreated, ClientId " +
+                             "FROM Repairs WHERE 1=1";
+
+                if (mode == ViewMode.Active) sql += " AND Status != 'Выдан'";
+                else if (mode == ViewMode.Archive) sql += " AND Status = 'Выдан'";
+
+                sql += " ORDER BY DateCreated DESC";
+                command.CommandText = sql;
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add(new RepairRecord
+                        {
+                            Id = reader.GetInt32(0),
+                            BikeInfo = reader.GetString(1),
+                            ProblemDescription = reader.GetString(2),
+                            WorksPerformed = reader.IsDBNull(3) ? "" : reader.GetString(3),
+                            PartsCost = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4),
+                            TotalCost = reader.GetDecimal(5),
+                            Status = reader.IsDBNull(6) ? "Принят" : reader.GetString(6),
+                            DateCreated = reader.IsDBNull(7) ? DateTime.Now : reader.GetDateTime(7),
+                            ClientId = reader.GetInt32(8)
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
         public List<RepairRecord> GetRepairsByClient(int clientId, ViewMode mode)
         {
             var list = new List<RepairRecord>();

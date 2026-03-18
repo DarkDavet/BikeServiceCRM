@@ -96,6 +96,7 @@
         <StackPanel Grid.Row="1">
             <TextBlock Text="ПОИСК ДЕТАЛИ НА СКЛАДЕ" FontSize="9" FontWeight="Bold" Foreground="#95A5A6" Margin="2,0,0,0"/>
             <ComboBox x:Name="PartSearchBox" IsEditable="True" 
+                      TextSearch.TextPath="Name"
                       DisplayMemberPath="Name" IsTextSearchEnabled="False"
                       KeyUp="PartSearchBox_KeyUp" 
                       SelectionChanged="PartSearchBox_SelectionChanged" />

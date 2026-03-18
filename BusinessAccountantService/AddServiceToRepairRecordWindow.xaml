@@ -94,7 +94,6 @@
                       DisplayMemberPath="Name" IsTextSearchEnabled="False"
                       KeyUp="ServiceSearchBox_KeyUp" 
                       SelectionChanged="ServiceSearchBox_SelectionChanged"
-                      DropDownOpened="ServiceSearchBox_DropDownOpened" 
                       VerticalContentAlignment="Center" Margin="0,0,0,20"/>
 
             <!-- КАРТОЧКА СТОИМОСТИ -->

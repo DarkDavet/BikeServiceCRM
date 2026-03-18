@@ -151,9 +151,13 @@
         <!-- РЯД 3: ИСТОРИЯ РЕМОНТОВ -->
         <StackPanel Grid.Row="3" Margin="0,25,0,0">
             <TextBlock Text="ПОСЛЕДНИЕ ЗАКАЗЫ КЛИЕНТА" FontSize="12" FontWeight="Bold" Foreground="#95A5A6" Margin="5,0,0,10"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Все заказы (общий список)" FontSize="11" Foreground="#95A5A6" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <CheckBox x:Name="ShowAllOrdersToggle" Click="ShowAllOrdersToggle_Click" Style="{StaticResource {x:Type CheckBox}}"/>
+            </StackPanel>
             <Border Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="5">
                 <DataGrid x:Name="RepairsHistoryGrid" Height="300" MouseDoubleClick="RepairsHistoryGrid_MouseDoubleClick"
-                          AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                          VirtualizingStackPanel.IsVirtualizing="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
                           IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow"
                           GridLinesVisibility="Horizontal" RowHeight="30" HorizontalGridLinesBrush="#F1F2F6" HeadersVisibility="Column" Background="Transparent" BorderThickness="0">
                     <DataGrid.Resources>
