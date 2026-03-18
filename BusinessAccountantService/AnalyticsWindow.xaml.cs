@@ -47,9 +47,9 @@ namespace BusinessAccountantService
             decimal totalProfit = totalRev - totalParts;
             int totalCount = dailyData.Sum(x => x.dailyCount);
 
-            RevText.Text = $"{totalRev:N0} ₽";
-            PartsText.Text = $"{totalParts:N0} ₽";
-            ProfitText.Text = $"{totalProfit:N0} ₽";
+            RevText.Text = $"{totalRev:N2} ₽";
+            PartsText.Text = $"{totalParts:N2} ₽";
+            ProfitText.Text = $"{totalProfit:N2} ₽";
             CountText.Text = totalCount.ToString();
 
             MonthLabel.Text = date.ToString("MMMM yyyy", new CultureInfo("ru-RU")).ToUpper();
@@ -266,15 +266,12 @@ namespace BusinessAccountantService
             if (MainTabControl == null || MonthPicker?.SelectedDate == null) return;
             DateTime date = MonthPicker.SelectedDate.Value;
 
-            // 1. Обновляем всё легкое (рамки карточек и линейные графики)
             RefreshGraphs();
 
-            // 2. Обновляем тяжелые диаграммы (сработают только при смене даты/таба)
             LoadExpensesStructure(date);
             LoadYearlyExpensesPie(date.Year);
 
-            // 3. Обновляем цифры в карточках (зависит от того, месяц это или год)
-            if (MainTabControl.SelectedIndex == 0) // Вкладка месяца
+            if (MainTabControl.SelectedIndex == 0) 
             {
                 var dailyData = _statsManager.GetDailyStats(date);
                 UpdateCardTexts(
@@ -284,7 +281,7 @@ namespace BusinessAccountantService
                     dailyData.Sum(x => x.dailyCount)
                 );
             }
-            else // Вкладка года
+            else 
             {
                 var yearlyData = _statsManager.GetYearlyStats(date.Year);
                 UpdateCardTexts(

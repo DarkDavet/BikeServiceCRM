@@ -163,10 +163,7 @@ namespace BusinessAccountantService
 
             expenseWin.Owner = Window.GetWindow(this);
 
-            if (expenseWin.ShowDialog() == true)
-            {
-                MessageBox.Show("Расход успешно зафиксирован!");
-            }
+            expenseWin.ShowDialog();
         }
 
     }

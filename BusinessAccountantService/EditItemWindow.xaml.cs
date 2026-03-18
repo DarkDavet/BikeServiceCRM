@@ -37,15 +37,15 @@ namespace BusinessAccountantService
 
         private void UpdateVisibility(string category)
         {
-            if (RetailPriceBlock == null) return;
+            if (PriceInfoBorder == null) return;
 
             if (!string.IsNullOrEmpty(category) && category.Trim().Equals("Запчасти", StringComparison.OrdinalIgnoreCase))
             {
-                RetailPriceBlock.Visibility = Visibility.Visible;
+                PriceInfoBorder.Visibility = Visibility.Visible;
             }
             else
             {
-                RetailPriceBlock.Visibility = Visibility.Collapsed;
+                PriceInfoBorder.Visibility = Visibility.Collapsed;
                 RetailBox.Text = "0";
             }
         }

@@ -118,7 +118,7 @@
          BorderThickness="1" 
          Padding="5"/>
 
-            <Border Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="15" Margin="0,5,0,0">
+            <Border x:Name="PriceInfoBorder" Visibility="Collapsed" Background="White" CornerRadius="10" BorderBrush="#DCDDE1" BorderThickness="1" Padding="15" Margin="0,5,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -130,7 +130,7 @@
                         <TextBox x:Name="PurchaseBox" IsReadOnly="True" Background="#F9F9F9" Margin="0,5,0,0"/>
                     </StackPanel>
 
-                    <StackPanel x:Name="RetailPriceBlock" Grid.Column="1" Margin="8,0,0,0" Visibility="Collapsed">
+                    <StackPanel x:Name="RetailPriceBlock" Grid.Column="1" Margin="8,0,0,0" Visibility="Visible">
                         <TextBlock Text="РОЗНИЦА" FontSize="9" FontWeight="Bold" Foreground="#27AE60"/>
                         <TextBox x:Name="RetailBox" Margin="0,5,0,0"/>
                     </StackPanel>
