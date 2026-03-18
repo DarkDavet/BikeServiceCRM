@@ -68,7 +68,6 @@ namespace BusinessAccountantService
                 {
                     RepairsHistoryGrid.ItemsSource = _repairManager.GetRepairsByClient(selectedClient.Id, _currentMode);
                     UpdateStatusInfo();
-                    MessageBox.Show("Заказ добавлен!");
                 }
             }
             else

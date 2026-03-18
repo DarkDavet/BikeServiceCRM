@@ -50,17 +50,9 @@ namespace BusinessAccountantService
             }
         }
 
-        private void CategoryBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-            string cat = (CategoryBox.SelectedItem as ComboBoxItem)?.Content.ToString() ?? CategoryBox.Text;
-            UpdateVisibility(cat);
-        }
-
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             CurrentItem.Name = ItemNameBox.Text;
-            CurrentItem.Category = CategoryBox.Text;
 
             decimal.TryParse(RetailBox.Text.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal r);
 

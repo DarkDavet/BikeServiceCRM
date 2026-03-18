@@ -16,7 +16,7 @@ namespace BusinessAccountantService.Managers
             string status = value?.ToString();
             return status switch
             {
-                "Принят" => Brushes.LightGray,
+                "Принят" => Brushes.Gold,
                 "В работе" => Brushes.LightSkyBlue,
                 "Готов" => Brushes.LightGreen,
                 "Выдан" => Brushes.Gray,
