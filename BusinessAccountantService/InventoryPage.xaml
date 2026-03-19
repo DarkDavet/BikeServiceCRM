@@ -144,7 +144,16 @@
                         </Setter>
                     </Style>
                 </DataGrid.Resources>
-
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Quantity}" Value="0">
+                                <Setter Property="Background" Value="#FFEBEE"/>
+                                <Setter Property="Foreground" Value="#C62828"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="150"/>
                     <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="*" FontWeight="SemiBold"/>
