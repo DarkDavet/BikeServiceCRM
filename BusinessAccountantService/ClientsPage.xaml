@@ -150,7 +150,7 @@
 
         <!-- РЯД 3: ИСТОРИЯ РЕМОНТОВ -->
         <StackPanel Grid.Row="3" Margin="0,25,0,0">
-            <TextBlock Text="ПОСЛЕДНИЕ ЗАКАЗЫ КЛИЕНТА" FontSize="12" FontWeight="Bold" Foreground="#95A5A6" Margin="5,0,0,10"/>
+            <TextBlock Text="ЗАКАЗЫ КЛИЕНТА" FontSize="12" FontWeight="Bold" Foreground="#95A5A6" Margin="5,0,0,10"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock Text="Все заказы (общий список)" FontSize="11" Foreground="#95A5A6" Margin="0,0,10,0" VerticalAlignment="Center"/>
                 <CheckBox x:Name="ShowAllOrdersToggle" Click="ShowAllOrdersToggle_Click" Style="{StaticResource {x:Type CheckBox}}"/>
@@ -176,6 +176,7 @@
                         </Style>
                     </DataGrid.Resources>
                     <DataGrid.Columns>
+                        <DataGridTextColumn Header="№" Binding="{Binding Id}" Width="50"/>
                         <DataGridTextColumn Header="Принят" Binding="{Binding DateCreated, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
                         <DataGridTextColumn Header="Велосипед" Binding="{Binding BikeInfo}" Width="180"/>
                         <DataGridTextColumn Header="Описание" Binding="{Binding ProblemDescription}" Width="*"/>

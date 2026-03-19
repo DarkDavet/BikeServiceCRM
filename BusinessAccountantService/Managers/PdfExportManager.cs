@@ -145,9 +145,9 @@ namespace BusinessAccountantService.Managers
                         });
                     });
                 });
-            }).GeneratePdf("EntryAct.pdf");
+            }).GeneratePdf($"{client.Name}_заказ_{repair.Id}_акт_приёмки.pdf");
 
-            Process.Start(new ProcessStartInfo("EntryAct.pdf") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo($"{client.Name}_заказ_{repair.Id}_акт_приёмки.pdf") { UseShellExecute = true });
         }
 
 
@@ -300,9 +300,9 @@ namespace BusinessAccountantService.Managers
                         });
                     });
                 });
-            }).GeneratePdf("FinalAct.pdf");
+            }).GeneratePdf($"{client.Name}_заказ_{repair.Id}_акт_выдачм.pdf");
 
-            Process.Start(new ProcessStartInfo("FinalAct.pdf") { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo($"{client.Name}_заказ_{repair.Id}_акт_выдачм.pdf") { UseShellExecute = true });
         }
 
 

@@ -220,38 +220,57 @@ namespace BusinessAccountantService
 
         private void EntryAct_Click(object sender, RoutedEventArgs e)
         {
-            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
-                ClientsGrid.SelectedItem is Client selectedClient)
+            // Берем только выделенный заказ
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
             {
-                _pdfManager.ExportEntryAct(selectedClient, selectedRepair);
-                RepairsHistoryGrid.Items.Refresh();
+                // Находим клиента по ClientId из заказа
+                var client = _clientManager.GetClientById(selectedRepair.ClientId);
+
+                if (client != null)
+                {
+                    _pdfManager.ExportEntryAct(client, selectedRepair);
+                }
+                else
+                {
+                    MessageBox.Show("Клиент для этого заказа не найден в базе!");
+                }
             }
             else
             {
-                MessageBox.Show("Выберите клиента и заказ для печати акта приемки!");
+                MessageBox.Show("Выберите заказ в таблице для печати акта приемки!");
             }
         }
 
         private void FinalAct_Click(object sender, RoutedEventArgs e)
         {
-            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair &&
-                ClientsGrid.SelectedItem is Client selectedClient)
+            if (RepairsHistoryGrid.SelectedItem is RepairRecord selectedRepair)
             {
+                // Проверка статуса остается
                 if (selectedRepair.Status != "Выдан" && selectedRepair.Status != "Готов")
                 {
-                    MessageBox.Show("Сначала завершите ремонт и выдайте заказ через окно редактирования (двойной клик), чтобы зафиксировать запчасти и итоговую сумму!",
+                    MessageBox.Show("Сначала завершите ремонт и выдайте заказ!",
                                     "Печать невозможна", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
+                // Находим клиента по ClientId из заказа
+                var client = _clientManager.GetClientById(selectedRepair.ClientId);
 
-                _pdfManager.ExportFinalAct(selectedClient, selectedRepair, items);
+                if (client != null)
+                {
+                    var items = _inventoryManager.GetRepairItems(selectedRepair.Id);
+                    _pdfManager.ExportFinalAct(client, selectedRepair, items);
+                }
+                else
+                {
+                    MessageBox.Show("Клиент для этого заказа не найден!");
+                }
             }
             else
             {
-                MessageBox.Show("Выберите клиента и заказ!");
+                MessageBox.Show("Выберите заказ для печати акта выдачи!");
             }
         }
+
     }
 }
