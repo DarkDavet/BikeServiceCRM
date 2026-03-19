@@ -57,17 +57,25 @@ namespace BusinessAccountantService
                 totalSpent = finalUnitPrice * qty;
             }
 
-            if (qty <= 0 || finalUnitPrice <= 0)
+            if (qty <= 0 || finalUnitPrice < 0)
             {
-                MessageBox.Show("Введите корректные данные!");
+                MessageBox.Show("Введите корректные данные (количество должно быть больше нуля)!");
                 return;
             }
 
             try
             {
-                // Обновляем склад и фиксируем расход (все в decimal)
                 _inventoryManager.RefillItem(_currentItem.Id, qty, finalUnitPrice);
-                _inventoryManager.AddExpense($"Пополнение: {_currentItem.Name} (x{qty})", totalSpent, _currentItem.Category);
+
+                // 2. В расходы записываем только если потратили больше 0
+                if (totalSpent > 0)
+                {
+                    _inventoryManager.AddExpense(
+                        $"Пополнение: {_currentItem.Name} (x{qty})",
+                        totalSpent,
+                        _currentItem.Category
+                    );
+                }
 
                 this.DialogResult = true;
             }
